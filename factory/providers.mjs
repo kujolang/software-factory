@@ -1,3 +1,4 @@
+import {requireCredentialSafeInput} from './secret-egress.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -103,6 +104,7 @@ export async function executeProposal(options = {}) {
     if(provider==='ollama'&&Buffer.byteLength(prompt)+Buffer.byteLength(JSON.stringify(schema))>Math.min(48000,65536-(maxOutputTokens||8192)-8192))throw failure('context_byte_budget');
     if(model!==undefined&&(typeof model!=='string'||!model.trim()||model.length>200||/[\r\n\0]/.test(model)))throw failure('invalid_model');
     if(signal?.aborted)throw failure('cancelled');
+    if(provider!=='mock')receipt.secretScan=requireCredentialSafeInput(prompt,schema);
     const validate=new Ajv2020({strict:false,allErrors:false}).compile(schema);
     let output;
     if(provider==='mock') {
@@ -169,6 +171,8 @@ export async function executeProposal(options = {}) {
     receipt.finishedAt=new Date().toISOString();receipt.durationMs=Date.now()-start;
     return {output,receipt};
   } catch (error) {
+    if(error.secretScan)receipt.secretScan=error.secretScan;
+    if(error.receipt?.secretScan)receipt.secretScan=error.receipt.secretScan;
     receipt.reason=error.code?.startsWith?.('E')?'provider_io_failure':error.code||'invalid_provider_contract';
     receipt.finishedAt=new Date().toISOString();receipt.durationMs=Date.now()-start;
     const safe=failure(receipt.reason);safe.receipt=receipt;throw safe;
