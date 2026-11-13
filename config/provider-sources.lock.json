@@ -1,0 +1,119 @@
+{
+  "schema": "kujo.factory.provider-sources/v1",
+  "repository": "https://github.com/kujolang/ollama.git",
+  "commit": "5821d7baee785ac8c10cf07dae8f29dc43b846ab",
+  "files": {
+    ".gitignore": {
+      "sha256": "05e7dcba6d1c38ca418845a310a06c3a445f1af6146491268fd04bef67627a17",
+      "size": 58
+    },
+    "AGENTS.md": {
+      "sha256": "041d73af865ba95551c4f25c76f13f8f33f6bd9e2e28175d68a0a7cfe91107b5",
+      "size": 688
+    },
+    "CHANGELOG.md": {
+      "sha256": "3a881d45c48d7916b0555ae914a627ae2e5f27bdb4663883b8a19988e4609aaa",
+      "size": 1241
+    },
+    "LICENSE": {
+      "sha256": "8ee6bb7efe66214ac88396c545448eeaed8e83bed89565a551ca77b6de34abb7",
+      "size": 1065
+    },
+    "README.md": {
+      "sha256": "2fbed7d58276b913145acef75c13aa6826bca52ff843d55f8e5d8d90e7b1d988",
+      "size": 3299
+    },
+    "docs/OLLAMA_IMPLEMENTATION_REPORT.md": {
+      "sha256": "3677622044e2ec5381c2cc25961eebb06436c77cd146bd3fdbb4eee709fc84be",
+      "size": 3933
+    },
+    "docs/OLLAMA_REFERENCE_PACKAGE_PHASE2_REPORT.md": {
+      "sha256": "d393119575dbf4bb83f034df5c967c5c3e4409448cc06d81ef0ab62a3c74c6e4",
+      "size": 5315
+    },
+    "docs/PROVIDER_PACKAGE_PATTERN_DRAFT.md": {
+      "sha256": "deae76ca58e23217f944e27962615ce9ffdc24b51ff95922fd250d001a3ef688",
+      "size": 2461
+    },
+    "examples/ai_sdk.kujo": {
+      "sha256": "229fa7373ffa1929103380f0d4ee3363e4ec1496ca801d9bf4bd09061bf9f90a",
+      "size": 342
+    },
+    "examples/cloud.kujo": {
+      "sha256": "c43df98c811d4ed6ee19b80a3d82a6b3e9ecdb0a9a9de61a1e594cc6554aceb8",
+      "size": 282
+    },
+    "examples/embeddings.kujo": {
+      "sha256": "3fff8e81c520fc26e9da4678a9b3ce623816ac370f7d3b3c2e6137c6318edb84",
+      "size": 164
+    },
+    "examples/models.kujo": {
+      "sha256": "eb882b07883da05ea5fc55c3b9016e774b780ec0c8b398777962e064b4e16a98",
+      "size": 150
+    },
+    "examples/native_chat.kujo": {
+      "sha256": "95f8538b7b57b6df580b5f55e9b3ffa0a093bb2cf70cb9347a282002966ad729",
+      "size": 341
+    },
+    "examples/quickstart.kujo": {
+      "sha256": "71e08f88ab594fc9c39cb6bc71ea1c6b4ae61f4eced9031cc635a2e6209b6a79",
+      "size": 179
+    },
+    "examples/streaming.kujo": {
+      "sha256": "44b0fa0726b51e1af7a8beef28ff7967f286a7c5bfe92883476169fbba2bf6f9",
+      "size": 262
+    },
+    "examples/structured_output.kujo": {
+      "sha256": "ab5c5b448f5bb0c98910c37045227ae77302648aeeda67d8ac50b0d900d706a6",
+      "size": 293
+    },
+    "examples/tools.kujo": {
+      "sha256": "ec444aef613bab056c76eed4f2aa87bb756add08eed348ee3f86eafb252a3505",
+      "size": 402
+    },
+    "kennel.toml": {
+      "sha256": "409b3fb935ebc76554d738a38e10282cadd05ffda456273ea04f8a6c86fac748",
+      "size": 1279
+    },
+    "kujo.toml": {
+      "sha256": "ba5fc13c4647061e084abf4801b4787917859293b79e2a9ea8f82ac7da8d8ff7",
+      "size": 61
+    },
+    "ollama.kujo": {
+      "sha256": "4488496e95d193589c53cbda40a2f6e9c3cd8baaa2ce93bff703df077ef887c2",
+      "size": 1496
+    },
+    "provider.kujo": {
+      "sha256": "573952b3ab54226d264d68eca1dcf6faf2b31b713bbd5a8be39bfb14607150a3",
+      "size": 249
+    },
+    "scripts/release_quality_gate.sh": {
+      "sha256": "ebed05f8e11d48863b442082ed3953794ced7e993e560d7d8e3499c500aa5713",
+      "size": 300
+    },
+    "scripts/verify_installed_package.sh": {
+      "sha256": "98b34879ed3cb0b8acc51168286b182fc80384d79f59ee739106b217c7563ad7",
+      "size": 1036
+    },
+    "src/ollama.kujo": {
+      "sha256": "9d59de8ac292a82162f400f73d7cf9c319c00dc3ae65d0f19b9950e65de535a6",
+      "size": 9494
+    },
+    "src/provider.kujo": {
+      "sha256": "2d70a267ac86a3ad7ac905fab50f89f0c27e15888246cee80e7ac2c16ce94c8c",
+      "size": 6068
+    },
+    "tests/driver_tests.kujo": {
+      "sha256": "f10104e2f4b46840b685608db443c25e60220b202d5efbbfc71b3c001bb92f19",
+      "size": 2141
+    },
+    "tests/installed_consumer_smoke.kujo": {
+      "sha256": "5a47aaf45de4d66cbcef518c913dd4dfe38a19691c5b165179d37aba5f9d6ea8",
+      "size": 649
+    },
+    "tests/native_client_tests.kujo": {
+      "sha256": "f2436fa07e3ec13ad493e5f63cf664f2eb69e7277ca6b137c940ee4bd4a178b7",
+      "size": 3539
+    }
+  }
+}

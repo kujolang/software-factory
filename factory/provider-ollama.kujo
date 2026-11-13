@@ -1,0 +1,32 @@
+# Trusted controller bridge. Request text is JSON data, never Kujo source.
+# Import is pinned by the host through KUJO_MODULE_PATH and source verification.
+from src.ollama import create_client, client_chat, client_list_models
+request := parse_json(read_file("request.json"))
+transport := func(url, options) {
+    if url != request["host"] + "/api/chat" && url != request["host"] + "/api/tags" { return Err("Unexpected provider endpoint") }
+    options["redirects"] := "none"
+    options["max_response_bytes"] := request["maxBytes"]
+    return http_request(url, options)
+}
+client := create_client({"host": request["host"], "api_key": "", "timeout": request["timeout"], "allow_insecure_localhost": true, "transport": transport})
+inventory := client_list_models(client)
+mut local_model := false
+if inventory["ok"] && has_key(inventory["data"], "models") {
+    for item in inventory["data"]["models"] {
+        if has_key(item, "name") && item["name"] == request["model"] && has_key(item, "remote_host") == 0 && has_key(item, "remote_model") == 0 {
+            local_model := true
+        }
+    }
+}
+if !local_model {
+    print(to_json({"ok":false,"status_code":0,"message":"Installed local model required"}))
+} else {
+    result := client_chat(client, {
+        "model": request["model"],
+        "messages": [{"role": "user", "content": request["prompt"]}],
+        "format": request["schema"],
+        "stream": false,
+        "options": {"num_predict": request["maxOutputTokens"]}
+    })
+    print(to_json(result))
+}

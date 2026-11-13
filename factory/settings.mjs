@@ -33,3 +33,7 @@ export const model = process.env.FACTORY_MODEL || settings.model;
 export const runsRoot = path.resolve(root,process.env.FACTORY_RUNS || settings.runsDirectory || '.runtime/runs');
 
 export const providerHome = path.join(root,'.runtime/provider');
+
+export const provider = process.env.FACTORY_PROVIDER || 'codex';
+if(!['codex','ollama'].includes(provider))throw Error('FACTORY_PROVIDER must be codex or ollama; fixtures cannot run production missions');
+export const ollamaHost = process.env.FACTORY_OLLAMA_HOST || 'http://127.0.0.1:11434';
