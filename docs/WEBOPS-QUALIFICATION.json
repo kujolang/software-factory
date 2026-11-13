@@ -69,5 +69,47 @@
     "Prior verified local Lens sample only; no new browser execution or current production observation",
     "No SiteProbe crawl; text-only models receive findings and screenshot hashes, not pixels",
     "Model advisory review is not deterministic QA or authentication of original evidence"
-  ]
+  ],
+  "offline": {
+    "verifierCommit": "8971808",
+    "focusedEvidenceTests": 32,
+    "reports": [
+      {
+        "path": ".runtime/ledger-completion/webops-live-export.json",
+        "sha256": "bea76dce7337fe2faff30c2754c1854677f74f7097f6f718225746bb2664e751"
+      },
+      {
+        "path": ".runtime/ledger-completion/webops-live-offline-verify.json",
+        "sha256": "e40b1b9193f8abed6d1dace38009f88cbd25a4e9dfbe0dee0a440788d808c3ec"
+      }
+    ],
+    "result": {
+      "schema": "kujo.factory.evidence-verification/v1",
+      "ok": true,
+      "runId": "webops-dTHTEJ",
+      "bundleId": "sha256:a2c5e9e546a4b617b49e55b8db65ab80113c90ab8f76fc8a25fb31da098105bb",
+      "manifestSha256": "ba39360c8128890df641a75d2354c007779f3042d70dfd45ac0d3bbbc0d04dac",
+      "files": 56,
+      "integrity": "verified",
+      "authentication": {
+        "status": "unsigned",
+        "trustedKeyFingerprint": null
+      },
+      "claims": {
+        "checks": [
+          "run identity",
+          "WebOps advisory mission footprint",
+          "WebOps retained Lens/Workcell source, canonical advisory roles and terminal ledger agree"
+        ],
+        "recordedStatus": "completed",
+        "missionFamily": "webops",
+        "missionEvidence": "Historical sampled Lens evidence reviewed as advisory text; no current website, screenshot model inspection, software approval or action authorization",
+        "softwareReleaseApproval": false
+      },
+      "executionProof": "not-established-by-this-verifier",
+      "humanApproval": "not-established-by-this-verifier",
+      "deploymentAuthorized": false,
+      "note": "Hashes establish byte identity. A signature authenticates a manifest attestation with the supplied trust key; neither proves tests ran or grants authority."
+    }
+  }
 }
