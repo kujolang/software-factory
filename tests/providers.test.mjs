@@ -21,7 +21,7 @@ test('offline mock validates actual output and labels fixture evidence',async()=
   assert.equal(providerCatalog.find(p=>p.id==='ollama').tools,false);
 });
 test('invalid options and unenforceable ceilings fail before dispatch',async()=>{
-  for(const options of [{provider:'unknown'},{provider:'codex',maxCostUsd:0},{provider:'codex',maxOutputTokens:1},{provider:'mock',timeoutMs:0},{provider:'mock',maxBytes:Infinity}]){
+  for(const options of [{provider:'unknown'},{provider:'codex',maxCostUsd:0},{provider:'codex',maxOutputTokens:1},{provider:'ollama',prompt:'x'.repeat(48001)},{provider:'mock',timeoutMs:0},{provider:'mock',maxBytes:Infinity}]){
     await assert.rejects(executeProposal({...base,...options}),e=>e.receipt.status==='failed'&&e.receipt.cost===null);
   }
 });
@@ -93,7 +93,7 @@ test('pinned Kujo Ollama native adapter passes deterministic HTTP conformance (n
   try{
     const r=await executeProposal(options);
     assert.equal(r.output.answer,'native fixture');assert.equal(r.receipt.usage.input_tokens,7);assert.equal(r.receipt.cost,null);
-    assert.equal(observed.url,'/api/chat');assert.equal(observed.headers.authorization,undefined);assert.equal(observed.body.stream,false);assert.equal(observed.body.tools,undefined);assert.equal(observed.body.options.num_predict,128);assert.deepEqual(observed.body.format,schema);
+    assert.equal(observed.url,'/api/chat');assert.equal(observed.headers.authorization,undefined);assert.equal(observed.body.stream,false);assert.equal(observed.body.tools,undefined);assert.equal(observed.body.options.num_predict,128);assert.equal(observed.body.options.num_ctx,65536);assert.equal(r.receipt.context.inputByteLimit,48000);assert.deepEqual(observed.body.format,schema);
     mode='remote';await assert.rejects(executeProposal(options),{code:'provider_request_failed'});
     mode='redirect';await assert.rejects(executeProposal(options),{code:'provider_request_failed'});assert.equal(redirectHits,0);
     mode='tool';await assert.rejects(executeProposal(options),{code:'prohibited_tool_call'});

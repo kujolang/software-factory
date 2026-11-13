@@ -98,6 +98,7 @@ export async function executeProposal(options = {}) {
     if(maxCostUsd!==null)throw failure('cost_ceiling_unenforceable');
     if(maxOutputTokens!==null && !integer(maxOutputTokens,1,32768))throw failure('invalid_token_limit');
     if(provider==='codex'&&maxOutputTokens!==null)throw failure('token_ceiling_unenforceable');
+    if(provider==='ollama'&&Buffer.byteLength(prompt)+Buffer.byteLength(JSON.stringify(schema))>Math.min(48000,65536-(maxOutputTokens||8192)-8192))throw failure('context_byte_budget');
     if(model!==undefined&&(typeof model!=='string'||!model.trim()||model.length>200||/[\r\n\0]/.test(model)))throw failure('invalid_model');
     if(signal?.aborted)throw failure('cancelled');
     const validate=new Ajv2020({strict:false,allErrors:false}).compile(schema);
@@ -133,12 +134,13 @@ export async function executeProposal(options = {}) {
       } else {
         if(!model)throw failure('model_required');
         const host=validateOllamaHost(options.ollamaHost||'http://127.0.0.1:11434');
+        receipt.context={requestedTokens:65536,inputByteLimit:Math.min(48000,65536-(maxOutputTokens||8192)-8192),inputBytes:Buffer.byteLength(prompt)+Buffer.byteLength(JSON.stringify(schema)),note:'Requested server context, not proof of model context support or complete source attention'};
         const source=options.ollamaRoot||dependency('ollama');
         receipt.sourceCommit=verifySource(source);
         env.KUJO_MODULE_PATH=source;
         env.KUJO_ALLOW_PRIVATE_NETWORK_DESTINATIONS='1'; // Fixed loopback URL and redirect denial enforced by bridge.
         fs.copyFileSync(path.join(root,'factory/provider-ollama.kujo'),path.join(temp,'bridge.kujo'));
-        fs.writeFileSync(path.join(temp,'request.json'),JSON.stringify({host,model,prompt,schema,timeout:Math.max(0.001,timeoutMs/1000),maxOutputTokens:maxOutputTokens||8192,maxBytes}),{mode:0o600});
+        fs.writeFileSync(path.join(temp,'request.json'),JSON.stringify({host,model,prompt,schema,timeout:Math.max(0.001,timeoutMs/1000),maxOutputTokens:maxOutputTokens||8192,contextTokens:65536,maxBytes}),{mode:0o600});
         const wire=await run(options.kujoBinary||kujoBinary(),['run','--isolated-imports','--untrusted','--allow-fs-read','--allow-net-client',path.join(temp,'bridge.kujo')]);
         let result;try{result=JSON.parse(wire);}catch{throw failure('malformed_provider_response');}
         if(!result?.ok) {receipt.retryable=[429,500,502,503,504].includes(result?.status_code);throw failure('provider_request_failed');}

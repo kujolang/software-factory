@@ -26,7 +26,7 @@ if !local_model {
         "messages": [{"role": "user", "content": request["prompt"]}],
         "format": request["schema"],
         "stream": false,
-        "options": {"num_predict": request["maxOutputTokens"]}
+        "options": {"num_predict": request["maxOutputTokens"], "num_ctx": request["contextTokens"]}
     })
     print(to_json(result))
 }

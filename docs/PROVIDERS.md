@@ -125,3 +125,5 @@ cost is inferred. The private receipt is
 `.runtime/qualification/providers/codex-schema.json`. Thus both actual provider
 transports have a passing live schema smoke, while neither smoke proves the full
 new-adapter mission lifecycle or the feature-complete release acceptance matrix.
+
+Local Ollama requests explicitly set `num_ctx:65536` and reject combined prompt/schema inputs above 48,000 UTF-8 bytes before a request. This prevents inheriting an unbounded server context default; model support and actual memory use still require qualification. The receipt records requested context and input byte counts. These are transport limits, not proof that a model attended to every source token. A retained first full-review attempt used the earlier server default of 262,144 tokens (about 12.9 GB reported model memory); subsequent runs use the bounded adapter.
