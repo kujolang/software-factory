@@ -201,7 +201,9 @@ try {
   let releaseOld;
   const oldGate = new Promise(resolve => { releaseOld = resolve; });
   const routePattern = '**/api/**';
-  const delayOld = async route => {
+  const pendingRoutes = new Set();
+  const routeErrors = [];
+  const handleOld = async route => {
     const url = new URL(route.request().url());
     if (!['/api/tasks', '/api/activity'].includes(url.pathname) || url.searchParams.get('projectId') !== String(project.id)) return route.continue();
     const response = await route.fetch();
@@ -213,17 +215,25 @@ try {
     }
     delivered.push(url.pathname);
   };
+  const delayOld = route => {
+    const pending = handleOld(route).catch(error => routeErrors.push(error));
+    pendingRoutes.add(pending);
+    void pending.finally(() => pendingRoutes.delete(pending));
+    return pending;
+  };
   await page.route(routePattern, delayOld);
   try {
     await projectFilter.selectOption(String(project.id));
     await waitFor(() => held.size === 2, 'Did not hold both older task and activity responses');
     await projectFilter.selectOption(String(latestProject.id));
     const activityList = page.locator('#activity-list');
-    await waitFor(async () => (await activityList.innerText()).includes('Filter race latest'), 'Latest project activity did not render');
+    const expectedActivity = await api(`/api/activity?projectId=${latestProject.id}`);
+    await waitFor(async () => (await activityList.locator(':scope > *').count()) === expectedActivity.length, 'Latest project activity did not render');
     assert.equal(await page.getByText('Browser edited task', {exact:true}).count(), 0, 'Old project task visible before delayed response');
     const latestActivity = await activityList.innerText();
     releaseOld();
     await waitFor(() => delivered.length === 2, 'Older responses were not released');
+    assert.equal(routeErrors.length, 0, String(routeErrors[0] || ''));
     await page.waitForLoadState('networkidle');
     await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
     assert.equal(await projectFilter.inputValue(), String(latestProject.id), 'Latest project selection changed');
@@ -233,6 +243,7 @@ try {
     check('Rapid project changes discard delayed older task and activity responses');
   } finally {
     releaseOld();
+    await Promise.all([...pendingRoutes]);
     await page.unroute(routePattern, delayOld);
   }
   await button(/^delete project$/i);

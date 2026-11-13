@@ -214,7 +214,8 @@ async function check() {
     r.code = 1;
     r.err += "\nAcceptance attestation missing, incomplete, or source changed";
   }
-  save(path.join(artifact, `acceptance-${Date.now()}.json`), r);
+  const acceptancePath = path.join(artifact, `acceptance-${Date.now()}.json`);
+  save(acceptancePath, r);
   if (r.code === 0) {
     const reportPath = path.join(artifact, `browser-${Date.now()}.json`);
     const b = await command(
@@ -243,6 +244,7 @@ async function check() {
       checks: report?.checks,
     };
   }
+  save(acceptancePath, r);
   return r;
 }
 async function review(n) {
@@ -375,7 +377,11 @@ try {
         break;
       }
       emit("verification.failed", `Attempt ${n + 1} rejected`, {
-        data: { issues: reviewResult.issues, checkExit: checked.code },
+        data: {
+          issues: reviewResult.issues,
+          checkExit: checked.code,
+          checkOutput: (checked.err + checked.out).slice(-12000),
+        },
         artifacts: ["artifacts/review-" + n + "-proposal.json"],
       });
       if (n === 2) break;
