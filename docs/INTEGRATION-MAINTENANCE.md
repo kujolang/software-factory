@@ -14,4 +14,6 @@ Future adapters must reference the audited executable entry points, preserve aut
 
 Native Eval has its own complete immutable closure in `config/eval-source.lock.json`; setup installs it alongside accountability tools. Release policy is controller-owned in `config/release-policy.json`; changes invalidate existing preflight decisions. New-format release records bind native accounting, policy and Eval artifacts, and audit/export/recheck share their offline consistency checks. Preserve the pre-accounting staged state and never promote it on the basis of an event name alone.
 
-Additional complete source inventories live in `config/context.lock.json`, `config/change-tools.lock.json`, and `config/lens-source.lock.json`. Runtime compiler/interpreter identities are separate from their qualification evidence. No HEAD observation proves schema compatibility, package safety, or successful execution.
+Additional complete source inventories live in `config/context.lock.json`, `config/change-tools.lock.json`, `config/lens-source.lock.json`, and `config/telemetry.lock.json`. Runtime compiler/interpreter identities are separate from their qualification evidence. No HEAD observation proves schema compatibility, package safety, or successful execution.
+
+Workcell diagnostics compare every pinned tracked Git blob and executable mode, including changes hidden by index flags. Ignored generated caches remain outside that identity. The readonly workspace extension is pinned to a reviewed upstream branch; inspect its contract before repinning to a future default branch.

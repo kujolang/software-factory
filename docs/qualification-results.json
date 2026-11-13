@@ -470,6 +470,45 @@
       "failed": 1,
       "failure": "SIGTERM worker child-process cleanup regression; investigation and retry required",
       "evidenceReference": "aggregateShutdownFailure"
+    },
+    "installedWorkcellRegressions": {
+      "workcellCommit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+      "allPassed": true,
+      "results": [
+        {
+          "command": "npm run smoke",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 42210,
+          "log": ".runtime/ledger-completion/final-smoke.log",
+          "logSha256": "d478caae717aa2cd4c3d45f45a742d7843f9b4bca426187952242e1a1d015cce"
+        },
+        {
+          "command": "npm run test:isolation",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 24596,
+          "log": ".runtime/ledger-completion/final-test-isolation.log",
+          "logSha256": "b085170d5a6de2f3d647bc03203e68f1763134d4fabcc834a8c82645d2520584"
+        },
+        {
+          "command": "npm run test:controller-death",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 15407,
+          "log": ".runtime/ledger-completion/final-test-controller-death.log",
+          "logSha256": "38d16e9cc724e403e4cd2012f0d75c9033be9bcbeaf58e2db9b11063bcfc8b7e"
+        },
+        {
+          "command": "npm run test:packs",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 37170,
+          "log": ".runtime/ledger-completion/final-test-packs.log",
+          "logSha256": "96d8b078157401b39fc402a4de030521cbacf7a31b55588cc0a0d5fa4d7e2b10"
+        }
+      ],
+      "caveat": "Ran before subsequent worker shutdown fix; no complete final-release claim."
     }
   }
 }
