@@ -128,6 +128,7 @@ test("recheck imports exact approved source and cannot infer release from transp
     source = f.source(),
     result = f.call(source.name);
   assert.equal(result.status, 1, result.stderr);
+  assert.ok(result.stdout.trim(), "Expected controller output; stderr: " + result.stderr);
   const messages = result.stdout.trim().split("\n").map(JSON.parse);
   const dir = messages[0].directory,
     run = json(path.join(dir, "run.json"));
@@ -205,6 +206,7 @@ test("retry preserves failed source and imports unverified bytes without inherit
   const before = digest(source.dir);
   const result = f.call(source.name, "retry");
   assert.equal(result.status, 1, result.stderr);
+  assert.ok(result.stdout.trim(), "Expected controller output; stderr: " + result.stderr);
   const messages = result.stdout.trim().split("\n").map(JSON.parse);
   const dir = messages[0].directory,
     run = json(path.join(dir, "run.json"));
