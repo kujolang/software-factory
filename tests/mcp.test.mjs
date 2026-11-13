@@ -23,3 +23,10 @@ test('real stdio transport handles fragmented-safe lines and malformed JSON with
 test('MCP oversized requests stop the transport',()=>{
  const r=spawnSync(process.execPath,[root+'/bin/software-factory.mjs','mcp'],{input:'a'.repeat(1024*1024+1),encoding:'utf8',timeout:10000});assert.notEqual(r.status,0);assert.match(r.stderr,/limit exceeded/);
 });
+
+test('MCP lifecycle discovery and status remain bounded without execution authority',()=>{
+ assert.equal(callReadTool('factory_list_mission_workflows').workflows.length,20);
+ const admission=callReadTool('factory_validate_workflow',{mission:{schema:'kujo.factory.mission-input/v1',type:'idea-to-specification',mission:'A proposed idea'}});assert.equal(admission.ok,true);assert.equal(admission.executionAuthorized,false);
+ for(const args of [{family:'cli',id:'../private'},{family:'../../',id:'run'},{family:'application',id:'/tmp/run'},{family:'cli',id:'run',path:'/etc/passwd'}])assert.throws(()=>callReadTool('factory_read_mission',args));
+ const blocked=callReadTool('factory_validate_workflow',{mission:{schema:'kujo.factory.mission-input/v1',type:'database-migration'}});assert.equal(blocked.ok,false);
+});

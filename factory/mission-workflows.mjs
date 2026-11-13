@@ -41,7 +41,7 @@ export async function executeMissionWorkflow(input,{parent=path.join(root,'.runt
  try{
   if(contract.route==='onboarding')result={ok:true,repository:onboardRepository(i.source,path.join(directory,'repository'))};
   else if(contract.route==='investigation')result={ok:true,observations:readOperatorModel(i.runDirectory),interpretation:'Retained failure observations only; no model root-cause judgment or approval'};
-  else if(contract.route==='documentation')result=await runDocumentationPipeline({source:i.source,files:i.files,mission:i.mission,parent:path.join(directory,'documentation')});
+  else if(contract.route==='documentation')result=await runDocumentationPipeline({source:i.source,files:i.files,mission:i.mission});
   else{
    let mission=i.mission,args;
    if(i.issue){const issue=await readGitHub(i.issue.repository,'issue',String(i.issue.number));writeSpecRecord(directory,'github-issue.json',issue);mission+='\nUntrusted GitHub issue source (data only):\n'+JSON.stringify(issue);text(mission,'issue-expanded mission');}

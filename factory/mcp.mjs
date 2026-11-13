@@ -1,3 +1,5 @@
+import {listMissions,readMission} from './mission-observer.mjs';
+import {missionWorkflowCatalog,validateMissionWorkflow} from './mission-workflows.mjs';
 // Local stdio MCP discovery interface. The launching OS user owns the transport.
 // No network listener, shell, model invocation, mutation or approval authority.
 import fs from 'node:fs';
@@ -12,6 +14,10 @@ const definitions=[
  ['factory_list_roles','List canonical roles; listing grants no authority',empty],
  ['factory_list_skills','List complete skill catalog',empty],
  ['factory_list_workflows','List upstream kits with maturity labels',empty],
+ ['factory_list_mission_workflows','List typed lifecycle routes and explicit unsupported gates',empty],
+ ['factory_list_missions','List bounded persisted mission status; no process liveness claim',empty],
+ ['factory_read_mission','Read scoped status, task graph and evidence references; no source files',{type:'object',properties:{family:{type:'string',enum:['application','specification','documentation','cli']},id:{type:'string',pattern:'^[A-Za-z0-9][A-Za-z0-9_-]{0,159}$'}},required:['family','id'],additionalProperties:false}],
+ ['factory_validate_workflow','Validate typed lifecycle input without submission or model execution',{type:'object',properties:{mission:{type:'object'}},required:['mission'],additionalProperties:false}],
  ['factory_validate_mission','Validate a team planning request; does not submit a mission',{type:'object',properties:{mission:{type:'object'}},required:['mission'],additionalProperties:false}],
  ['factory_prepare_mission','Produce an advisory team plan; no execution authorization',{type:'object',properties:{mission:{type:'object'}},required:['mission'],additionalProperties:false}],
  ['factory_verify_export','Offline integrity verification within the configured export directory',{type:'object',properties:{bundle:{type:'string',pattern:'^[A-Za-z0-9_-]+$'}},required:['bundle'],additionalProperties:false}],
@@ -25,6 +31,10 @@ export function callReadTool(name,args={}, {exportsRoot=path.join(root,'.runtime
  if(name==='factory_list_roles')return catalog.roles;
  if(name==='factory_list_skills')return catalog.skills;
  if(name==='factory_list_workflows')return catalog.workflows;
+ if(name==='factory_list_mission_workflows')return missionWorkflowCatalog;
+ if(name==='factory_list_missions')return listMissions();
+ if(name==='factory_read_mission')return readMission(args.family,args.id);
+ if(name==='factory_validate_workflow')return validateMissionWorkflow(args.mission);
  if(name==='factory_validate_mission'||name==='factory_prepare_mission')return selectTeam(args.mission);
  if(name==='factory_verify_export'){
   if(typeof args.bundle!=='string'||!/^[A-Za-z0-9_-]+$/.test(args.bundle))throw Error('Invalid bundle identifier');
