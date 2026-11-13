@@ -1,3 +1,4 @@
+import {reserveProviderBudget,reconcileProviderBudget} from './provider-budget.mjs';
 import {requireCredentialSafeInput} from './secret-egress.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -90,11 +91,13 @@ function usageCounts(data) {
 
 /** Host/controller API only. Configuration and mock fixtures must never come from model output. */
 export async function executeProposal(options = {}) {
-  const {provider='codex',model,prompt,schema,signal,timeoutMs=480000,maxBytes=1500000,maxCostUsd=null,maxOutputTokens=null}=options;
+  const {provider='codex',model,prompt,schema,signal,timeoutMs=480000,maxBytes=1500000,maxCostUsd=null}=options;
+  let maxOutputTokens=options.maxOutputTokens??null;
   const start=Date.now();
   const receipt={schema:'kujo.factory.provider-receipt/v1',provider,model:model||null,startedAt:new Date(start).toISOString(),usage:null,cost:null,costNote:'No verified monetary accounting supplied',shellTools:false,observedToolCalls:0,fixture:provider==='mock',status:'failed',code:1,reason:null,retryable:false};
-  let temp;
+  let temp,budgetReservation,budgetReconciled=false;
   try {
+    if(provider!=='mock'&&process.env.FACTORY_BUDGET_POLICY_FILE&&!options.budgetContext)throw failure('budget_context_required');
     if(!providerCatalog.some(p=>p.id===provider))throw failure('unsupported_provider');
     if(typeof prompt!=='string'||Buffer.byteLength(prompt)>1000000||!plain(schema))throw failure('invalid_request');
     if(!integer(timeoutMs,1,480000)||!integer(maxBytes,256,2000000))throw failure('invalid_limits');
@@ -105,6 +108,8 @@ export async function executeProposal(options = {}) {
     if(model!==undefined&&(typeof model!=='string'||!model.trim()||model.length>200||/[\r\n\0]/.test(model)))throw failure('invalid_model');
     if(signal?.aborted)throw failure('cancelled');
     if(provider!=='mock')receipt.secretScan=requireCredentialSafeInput(prompt,schema);
+    if(options.budgetContext&&!sdkProviderCatalog.some(p=>p.id===provider)){budgetReservation=reserveProviderBudget({...options.budgetContext,provider,model:model??null,inputBytes:Buffer.byteLength(prompt)+Buffer.byteLength(JSON.stringify(schema)),requestedMaxOutputTokens:maxOutputTokens});maxOutputTokens=budgetReservation.maxOutputTokens;receipt.budgetReservation={...budgetReservation,directory:undefined};}
+    if(provider==='ollama'&&Buffer.byteLength(prompt)+Buffer.byteLength(JSON.stringify(schema))>Math.min(48000,65536-(maxOutputTokens||8192)-8192))throw failure('context_byte_budget');
     const validate=new Ajv2020({strict:false,allErrors:false}).compile(schema);
     let output;
     if(provider==='mock') {
@@ -118,10 +123,10 @@ export async function executeProposal(options = {}) {
       if(maxOutputTokens!==null&&maxOutputTokens>16000)throw failure('invalid_token_limit');
       const credentialFile=options.credentialFile||process.env['FACTORY_'+provider.toUpperCase()+'_CREDENTIAL_FILE'];
       try {
-        const response=await executeSDKProposal({provider,model,prompt,schema,credentialFile,signal,timeoutMs:Math.min(timeoutMs,300000),maxTokens:maxOutputTokens||8192});
+        const response=await executeSDKProposal({budgetContext:options.budgetContext,provider,model,prompt,schema,credentialFile,signal,timeoutMs:Math.min(timeoutMs,300000),maxTokens:maxOutputTokens||8192});
         if(Buffer.byteLength(JSON.stringify(response.output))>maxBytes)throw failure('output_limit');
-        output=response.output;Object.assign(receipt,{usage:response.receipt.usage,sourceCommits:response.receipt.sourceCommits,structuredOutput:response.receipt.structuredOutput,providerNativeSchema:false,executionEvidence:response.executionEvidence});
-      }catch(error){if(error.receipt)Object.assign(receipt,{usage:error.receipt.usage,retryable:error.receipt.retryable===true,sourceCommits:error.receipt.sourceCommits,executionEvidence:error.executionEvidence});throw error;}
+        output=response.output;Object.assign(receipt,{budgetReservation:response.receipt.budgetReservation,budgetReconciliation:response.receipt.budgetReconciliation,usage:response.receipt.usage,sourceCommits:response.receipt.sourceCommits,structuredOutput:response.receipt.structuredOutput,providerNativeSchema:false,executionEvidence:response.executionEvidence});
+      }catch(error){if(error.receipt)Object.assign(receipt,{budgetReservation:error.receipt.budgetReservation,budgetReconciliation:error.receipt.budgetReconciliation,usage:error.receipt.usage,retryable:error.receipt.retryable===true,sourceCommits:error.receipt.sourceCommits,executionEvidence:error.executionEvidence});throw error;}
     } else {
       temp=fs.mkdtempSync(path.join(os.tmpdir(),'factory-provider-'));
       fs.chmodSync(temp,0o700);
@@ -167,10 +172,13 @@ export async function executeProposal(options = {}) {
       }
     }
     if(!validate(output))throw failure('structured_output_invalid');
+    if(budgetReservation){budgetReconciled=true;receipt.budgetReconciliation=reconcileProviderBudget(budgetReservation,{status:'completed',usage:receipt.usage});}
     receipt.status='completed';receipt.code=0;
     receipt.finishedAt=new Date().toISOString();receipt.durationMs=Date.now()-start;
     return {output,receipt};
   } catch (error) {
+    if(error.budgetReceipt)receipt.budgetReconciliation=error.budgetReceipt;
+    if(budgetReservation&&!budgetReconciled){budgetReconciled=true;try{receipt.budgetReconciliation=reconcileProviderBudget(budgetReservation,{status:error.code==='cancelled'?'cancelled':error.code==='timeout'?'uncertain':'failed',usage:receipt.usage,reason:error.code});}catch(budgetError){receipt.budgetReconciliation=budgetError.budgetReceipt??{status:'uncertain',reason:budgetError.code??'budget_reconciliation_failed',reservationConsumed:true};}}
     if(error.secretScan)receipt.secretScan=error.secretScan;
     if(error.receipt?.secretScan)receipt.secretScan=error.receipt.secretScan;
     receipt.reason=error.code?.startsWith?.('E')?'provider_io_failure':error.code||'invalid_provider_contract';
