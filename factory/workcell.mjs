@@ -117,6 +117,7 @@ export async function startIsolatedApp(
 ) {
   if (!["default", "native-compiled-cli/v1"].includes(executionProfile)) throw Error("Unsupported trusted Workcell execution profile");
   const compiledCLI = executionProfile === "native-compiled-cli/v1";
+  if(compiledCLI)throw Error("Native compiled profile disabled: candidate write protection on shared workspace bind failed qualification");
   const inputMount = compiledCLI ? "/workspace/compiled-input" : "/workspace/private/input";
   if (
     !Number.isSafeInteger(timeoutMs) ||

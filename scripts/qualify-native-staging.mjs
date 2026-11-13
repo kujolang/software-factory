@@ -1,0 +1,17 @@
+import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {startIsolatedApp} from '../factory/workcell.mjs';import {command} from '../factory/core.mjs';
+const disk=fs.statfsSync('.');if(Number(disk.bavail)*Number(disk.bsize)<2*1024**3)throw Error('Native qualification requires2GiB free');
+const dir=fs.mkdtempSync(path.join(fs.realpathSync('.runtime'),'native-staging-qualification-'));const app=path.join(dir,'application');fs.mkdirSync(app);fs.writeFileSync(path.join(app,'server.mjs'),"import http from 'node:http';export const createServer=()=>http.createServer((q,s)=>{s.writeHead(200);s.end('{}');});\n");
+const lease=await startIsolatedApp(app,{evidenceDir:path.join(dir,'workcell'),timeoutMs:60000,executionProfile:'native-compiled-cli/v1'});const checks=[];
+const execute=async code=>{const r=await command('docker',['exec','--workdir','/tmp/factory-data','--user','65534:65534',lease.container,'node','-e',code],{timeout:5000,maxBytes:65536});if(r.code!==0||r.reason)throw Error('Adversarial fixture failed: '+r.err);return r;};
+try{
+ for(const [name,setup]of [
+ ['symlink',"fs.symlinkSync('/etc/passwd',p)"],
+ ['hardlink',"fs.copyFileSync('/bin/true','/tmp/factory-data/linked');fs.linkSync('/tmp/factory-data/linked',p)"],
+ ['oversize',"fs.writeFileSync(p,'');fs.truncateSync(p,16777217)"]
+ ]){await execute("const fs=require('fs'),p='/tmp/factory-data/program';try{fs.unlinkSync(p)}catch{};"+setup);await assert.rejects(lease.stageCompiledArtifact(),/rejected/);fs.copyFileSync(path.join(dir,'workcell/compiled-staging-command.json'),path.join(dir,name+'-rejection.json'));checks.push(name+' rejected');}
+ await execute("const fs=require('fs');fs.unlinkSync('/tmp/factory-data/program');fs.copyFileSync('/bin/true','/tmp/factory-data/program');");const artifact=await lease.stageCompiledArtifact();assert.equal(artifact.uid,0);assert.equal(artifact.mode,365);
+ const ran=await command('docker',['exec','--workdir','/tmp/factory-data','--user','65534:65534',lease.container,artifact.path],{timeout:5000,maxBytes:65536});assert.equal(ran.code,0);checks.push('bounded immutable artifact executed only in Workcell');
+ await execute("const fs=require('fs');if(process.getuid()!==65534)throw Error('wrong UID');for(const p of ['/workspace/compiled-input/forged','/workspace/compiled-input/candidate/server.mjs','/workspace/compiled-input/.factory-executable/other','/workspace/compiled-input/.factory-executable/program','/opt/factory/stage-compiled.mjs']){let denied=false;try{fs.writeFileSync(p,'forged')}catch(e){if(['EACCES','EPERM','EROFS'].includes(e.code))denied=true;else throw e;}if(!denied)throw Error('write allowed '+p);}if(fs.existsSync('/var/run/docker.sock'))throw Error('Docker socket exposed');for(const k of ['OPENAI_API_KEY','ANTHROPIC_API_KEY','CODEX_HOME'])if(process.env[k])throw Error('credential exposed');");checks.push('UID, immutable bind/source/image, credentials and socket boundaries');
+ await execute("const net=require('net');const s=net.connect({host:'1.1.1.1',port:443});s.setTimeout(1000);s.once('connect',()=>process.exit(1));s.once('error',()=>process.exit(0));s.once('timeout',()=>{s.destroy();process.exit(0)});");checks.push('egress denied');
+}finally{await lease.close();}
+const result={ok:true,dir,checks,scope:'Native artifact staging security fixtures; no host artifact execution'};fs.writeFileSync(path.join(dir,'qualification.json'),JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));

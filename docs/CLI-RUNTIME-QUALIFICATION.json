@@ -205,7 +205,7 @@
     },
     "go-cli": {
       "version": "1.27.4",
-      "qualification": "unqualified-native-artifact-profile",
+      "qualification": "blocked-workspace-write-boundary",
       "lastExecution": {
         "scope": "default noexec profile",
         "compileExitCode": 0,
@@ -217,28 +217,164 @@
           "sha256": "e240be1be553aaa9ab6150fd152dae892431e80d31ad7c54b0ff8fbc4a90edd8"
         }
       },
-      "pending": "Optional immutable executable artifact staging requires new helper image and fresh positive/adversarial qualification"
+      "pending": "Upstream explicit readonly workspace capability and renewed native security qualification; factory rejects profile before engine access",
+      "functionalVerification": {
+        "passed": true,
+        "evidence": ".runtime/go-cli-qualification-YPFW9K",
+        "outcomes": [
+          {
+            "name": "positive",
+            "ok": true,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "wrong",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "timeout",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": null,
+                "reason": "timeout"
+              }
+            ]
+          },
+          {
+            "name": "compileFailure",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 1,
+                "code": 1,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "protected",
+            "ok": true,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          }
+        ],
+        "log": {
+          "path": ".runtime/ecosystem-phase-b/go-cli-native-qualification.log",
+          "sha256": "d633d8c105bd299877e57180f8bbe660053e62d6536a95d2fc43e7034902b2d5"
+        }
+      },
+      "securityQualificationPassed": false
     },
     "rust-cli": {
       "version": "1.100.0",
-      "qualification": "unqualified-native-artifact-profile",
+      "qualification": "blocked-workspace-write-boundary",
       "imageBuild": {
         "base": "sha256:c62fa7844cd38dd67d18421162af5016b2973a48d6db0a119982b2bf4b661383",
         "exitCode": 0,
         "imageId": "sha256:ff5420e6093b3c1d0e86fa3cd554657072a7a93886e8ca3a18a1c9bb4b55b952"
       },
       "executionQualification": "not performed",
-      "pending": "Optional immutable executable artifact staging requires new helper image and fresh positive/adversarial qualification"
+      "pending": "Upstream explicit readonly workspace capability and renewed native security qualification; factory rejects profile before engine access",
+      "functionalVerification": {
+        "passed": true,
+        "evidence": ".runtime/rust-cli-qualification-MtDOpB",
+        "outcomes": [
+          {
+            "name": "positive",
+            "ok": true,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "wrong",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "timeout",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": null,
+                "reason": "timeout"
+              }
+            ]
+          },
+          {
+            "name": "compileFailure",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 1,
+                "code": 1,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "protected",
+            "ok": true,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          }
+        ],
+        "log": {
+          "path": ".runtime/ecosystem-phase-b/rust-cli-native-qualification.log",
+          "sha256": "8b320ef44bb30afa171e9780b2bf416e501f0ced4abeb8691d4e7f81d06d5d01"
+        }
+      },
+      "securityQualificationPassed": false
     }
   },
   "nativeProfileBlocker": {
-    "availableGiBObserved": 2.2,
-    "requiredHelperBuildGiB": 3,
-    "buildStarted": false,
-    "reason": "Explicit local helper-image disk guard rejected; no guard bypass or main-image rebuild",
+    "reason": "Actual UID65534 write to host-backed isolated clone succeeded despite reported root ownership/mode; permission metadata is insufficient on this host sharing filesystem",
+    "defaultProfileAffected": false,
+    "profileDisabledBeforeEngineAccess": true,
+    "originalHostRepositoryExposed": false,
     "log": {
-      "path": ".runtime/ecosystem-phase-b/native-go-helper-build.log",
-      "sha256": "47af62292108a907a6f2a2782eee96907a543f5fae2cb3e9d671f94802c54f23"
+      "path": ".runtime/ecosystem-phase-b/native-staging-qualification.log",
+      "sha256": "86fb9916bb4e9099c7e087ed7d6742f66b33dee7fa04082812cc1e2143c84bd1"
+    },
+    "failClosedTest": {
+      "path": ".runtime/ecosystem-phase-b/cli-runtime-failclosed.log",
+      "sha256": "558b9c018f500c7e89b9d0fdf827d8b3c425dd7f929ec4aac7beeefdbc92ceec"
     }
   },
   "deterministicVerification": {

@@ -74,7 +74,7 @@
       "version": "1.27.4",
       "entrypoint": "main.go",
       "image": "kujolang/factory-native-go:local",
-      "qualification": "unqualified-native-artifact-profile",
+      "qualification": "blocked-workspace-write-boundary",
       "dependencies": "standard library only; CGO disabled; no modules/network/toolchain download",
       "sourceLock": "config/cli-runtime-sources.lock.json",
       "buildCommand": [
@@ -108,7 +108,7 @@
       "version": "1.100.0",
       "entrypoint": "main.rs",
       "image": "kujolang/factory-native-rust:local",
-      "qualification": "unqualified-native-artifact-profile",
+      "qualification": "blocked-workspace-write-boundary",
       "dependencies": "standard library only; direct rustc; no Cargo/build.rs/network",
       "sourceLock": "config/cli-runtime-sources.lock.json",
       "buildCommand": [
