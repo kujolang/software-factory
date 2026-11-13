@@ -1,5 +1,5 @@
 import {evaluateLens,verifyLensBinding} from './lens.mjs';
-import {roleContract,admitRoleProposal,skillContext,validateProviderRouting} from './role-runtime.mjs';
+import {roleContract,admitRoleProposal,skillContext,validateProviderRouting,collectCandidateConsultations} from './role-runtime.mjs';
 import {inspectRunAccounting} from './accountability.mjs';
 import {evaluateVerification,verifyEvaluationBinding} from './evaluation.mjs';
 import {prepareReleasePolicy,finalizeReleasePolicy,assertReleasePolicy} from './release-policy.mjs';
@@ -256,7 +256,14 @@ try {
   );
   emit("handoff.accepted", `${task.agentId} accepted scoped work order`);
   if(task.kind === "consultation") {
+    const consultationSource=task.consultationPhase==="verified-candidate"?digest(app):null;
+    const verificationBytes=consultationSource?fs.readFileSync(path.join(artifact,"verification.json")):null;
+    if(consultationSource){const verified=JSON.parse(verificationBytes);if(verified.ok!==true||verified.hash!==consultationSource)throw Error("Consultation requires unchanged verified candidate");}
     const r=await agent(task.agentId,taskId,"Provide bounded advisory role deliverables for the supplied mission and frozen contract. Return files:[]; never claim tests ran or grant approval. Identify prerequisites and unresolved questions. Prior consultation evidence:\n"+task.dependencies.map(id=>fs.readFileSync(path.join(artifact,id==="verify"?"verification.json":id+"-proposal.json"),"utf8")).join("\n")+(task.consultationPhase==="verified-candidate"?"\nCurrent verified source (read only):\n"+snapshot(app):""));
+    if(consultationSource){
+      if(digest(app)!==consultationSource||!fs.readFileSync(path.join(artifact,"verification.json")).equals(verificationBytes))throw Error("Verified candidate changed during consultation");
+      save(path.join(artifact,taskId+"-candidate-binding.json"),{schema:"kujo.factory.candidate-consultation/v1",taskId,role:task.agentId,sourceHash:consultationSource,verificationSha256:createHash("sha256").update(verificationBytes).digest("hex"),proposalSha256:createHash("sha256").update(fs.readFileSync(path.join(artifact,taskId+"-proposal.json"))).digest("hex"),receiptSha256:createHash("sha256").update(fs.readFileSync(path.join(artifact,taskId+"-receipt.json"))).digest("hex"),approvalGranted:false,deploymentAuthorized:false});
+    }
     if(r.verdict==="fail")throw Error("Canonical consultation escalated: "+r.summary);
   } else if (taskId === "command") {
     const r = await agent(
@@ -503,6 +510,7 @@ try {
         .update(fs.readFileSync(browserPath))
         .digest("hex"),
       independentReview: json(path.join(artifact, v.review)),
+      advisoryConsultations: collectCandidateConsultations({dir,config,sourceHash:v.hash}),
       packageMetadata,
       dependencyPolicy: {
         standardLibraryOnly:

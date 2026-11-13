@@ -63,7 +63,7 @@ export function applicationTeam(input,baseline){
  skillContext(plan.skills.map(skill=>skill.id)); // Reject unavailable/oversized guidance before creating a mission.
  const existing=new Set(baseline.map(task=>'chain.'+task.agentId));
  const advisory=plan.roles.filter(role=>!existing.has(role.id));
- const after=advisory.filter(role=>['verification','knowledge','routine'].includes(role.layer)||['test-runner','lint-runner','dependency-scanner','receipt-collector','documentation-writer','context-packager','sitrep-agent','qa-lead','visual-qa-agent','security-reviewer'].some(id=>role.id==='chain.'+id));
+ const after=advisory.filter(role=>['verification','knowledge','routine worker'].includes(role.layer)||['test-runner','lint-runner','dependency-scanner','receipt-collector','documentation-writer','context-packager','sitrep-agent','qa-lead','visual-qa-agent','security-reviewer'].some(id=>role.id==='chain.'+id));
  const before=advisory.filter(role=>!after.includes(role));
  const consult=(items,phase)=>items.map((role,index)=>({id:'consult-'+role.id.slice(6),agentId:role.id.slice(6),title:'Canonical '+role.id+' '+phase+' consultation',kind:'consultation',consultationPhase:phase,dependencies:index?['consult-'+items[index-1].id.slice(6)]:phase==='verified-candidate'?['verify']:[],stage:phase==='verified-candidate'?'Verification':'Planning',handoffFrom:index?items[index-1].id.slice(6):phase==='verified-candidate'?'code-reviewer':'human'}));
  const pre=consult(before,'planning'),post=consult(after,'verified-candidate'),consultations=[...pre,...post];
@@ -72,4 +72,21 @@ export function applicationTeam(input,baseline){
  const ordered=[...pre,...tasks.flatMap(task=>task.id==='release'?[...post,task]:[task])];
  if(tasks.length+consultations.length>32)throw Error('Selected team exceeds native workflow bounds');
  return {plan:{...plan,executionStatus:'canonical consultations followed by qualified Node application workflow',executionAuthorized:true},tasks:ordered};
+}
+
+/** Project advisory findings only after exact source/verification/receipt binding. */
+export function collectCandidateConsultations({dir,config,sourceHash}){
+ if(!/^[a-f0-9]{64}$/.test(sourceHash)||!Array.isArray(config?.tasks))throw Error('Invalid consultation source context');
+ const read=relative=>{if(typeof relative!=='string'||!/^artifacts\/[A-Za-z0-9_-]+\.json$/.test(relative))throw Error('Unsafe consultation evidence path');const file=path.join(dir,relative);for(let p=path.resolve(file);;p=path.dirname(p)){if(fs.lstatSync(p).isSymbolicLink())throw Error('Consultation evidence symlink rejected');if(path.dirname(p)===p)break;}const stat=fs.lstatSync(file);if(!stat.isFile()||stat.nlink!==1||stat.size>2_000_000)throw Error('Consultation evidence exceeds bound');const bytes=fs.readFileSync(file);return {path:relative,sha256:sha(bytes),value:JSON.parse(bytes)};};
+ const verification=read('artifacts/verification.json');if(verification.value.ok!==true||verification.value.hash!==sourceHash)throw Error('Consultation requires exact verified source');
+ const tasks=config.tasks.filter(task=>task.kind==='consultation'&&task.consultationPhase==='verified-candidate');
+ if(tasks.length>28||new Set(tasks.map(task=>task.id)).size!==tasks.length)throw Error('Invalid consultation inventory');
+ return tasks.map(task=>{
+  if(!/^[a-z0-9_-]{1,80}$/.test(task.id)||inspectCatalog('roles','chain.'+task.agentId).package!=='chain-of-command')throw Error('Invalid consultation role identity');
+  const proposal=read('artifacts/'+task.id+'-proposal.json'),receipt=read('artifacts/'+task.id+'-receipt.json'),binding=read('artifacts/'+task.id+'-candidate-binding.json');
+  const b=binding.value,r=receipt.value,p=proposal.value;
+  if(b.schema!=='kujo.factory.candidate-consultation/v1'||b.taskId!==task.id||b.role!==task.agentId||b.sourceHash!==sourceHash||b.verificationSha256!==verification.sha256||b.proposalSha256!==proposal.sha256||b.receiptSha256!==receipt.sha256||b.approvalGranted!==false||b.deploymentAuthorized!==false)throw Error('Consultation source or record identity changed');
+  if(r.role!==task.agentId||r.taskId!==task.id||r.status!=='completed'||r.code!==0||r.observedToolCalls!==0||r.fixture!==false||!['codex','ollama'].includes(r.provider)||!['pass','proposed'].includes(p.verdict)||!Array.isArray(p.files)||p.files.length)throw Error('Consultation missing successful restricted advisory receipt');
+  return {taskId:task.id,role:task.agentId,sourceHash,verificationSha256:verification.sha256,proposal:{path:proposal.path,sha256:proposal.sha256,output:p},receipt:{path:receipt.path,sha256:receipt.sha256,record:r},binding:{path:binding.path,sha256:binding.sha256},authority:'Advisory findings for independent release review; no implementation effects or approval authority',approvalGranted:false,deploymentAuthorized:false};
+ });
 }
