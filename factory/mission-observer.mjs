@@ -1,8 +1,8 @@
 /** Read-only mission-family projection. Identity selection never accepts filesystem paths. */
 import fs from 'node:fs';import path from 'node:path';import {createHash} from 'node:crypto';import {root,runsRoot} from './settings.mjs';
 const hash=b=>createHash('sha256').update(b).digest('hex'),text=v=>typeof v==='string'?v.slice(0,4000):null,count=v=>Number.isSafeInteger(v)&&v>=0?v:null;
-const roots=Object.freeze({application:runsRoot,specification:path.join(root,'.runtime/specifications'),documentation:path.join(root,'.runtime/documentation'),cli:path.join(root,'.runtime/cli-missions')});
-const schemas={specification:'kujo.factory.spec-mission/v1',documentation:'kujo.factory.documentation-mission/v1',cli:'kujo.factory.cli-mission/v1'};
+const roots=Object.freeze({application:runsRoot,specification:path.join(root,'.runtime/specifications'),documentation:path.join(root,'.runtime/documentation'),cli:path.join(root,'.runtime/cli-missions'),sqlite:path.join(root,'.runtime/sqlite-missions'),package:path.join(root,'.runtime/node-package-missions')});
+const schemas={specification:'kujo.factory.spec-mission/v1',documentation:'kujo.factory.documentation-mission/v1',cli:'kujo.factory.cli-mission/v1',sqlite:'kujo.factory.sqlite-mission-run/v1',package:'kujo.factory.node-package-mission/v1'};
 function plain(file){for(let p=path.resolve(file);;p=path.dirname(p)){if(fs.lstatSync(p).isSymbolicLink())throw Error('Mission symlink refused');if(p===path.dirname(p))break;}}
 function exists(file){try{return fs.lstatSync(file);}catch(e){if(e.code==='ENOENT')return null;throw e;}}
 function identity(family,id,approved){if(!Object.hasOwn(approved,family)||typeof id!=='string'||!/^[a-zA-Z0-9][a-zA-Z0-9_-]{0,159}$/.test(id))throw Error('Invalid scoped mission identity');return path.join(approved[family],id);}
