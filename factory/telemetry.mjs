@@ -21,7 +21,7 @@ export function collectMissionTelemetry(runDirectory,{parent=path.join(root,'.ru
   const type=types.has(e.type)?e.type:'internal.unknown';
   events.push({schema_version:'watchdog.native-event.v1',event_id:identity(journal.sha256+':'+index),trace_id:trace,event_kind:'workflow',name:type,instantaneous:true,started_at_ms:time,ended_at_ms:time,status:/failed|blocked/.test(type)?'error':/completed|passed|approved/.test(type)?'ok':'unset',attributes:{'factory.source.sha256':journal.sha256,'factory.sequence':e.seq,'factory.occurred_at_ms':time},usage:null,costs:[]});
  }
- const artifacts=path.join(directory,'artifacts');if(fs.existsSync(artifacts)){
+ const artifacts=path.join(directory,'artifacts');let artifactStat;try{artifactStat=fs.lstatSync(artifacts);}catch(error){if(error.code!=='ENOENT')throw error;}if(artifactStat){
   plain(artifacts);const names=fs.readdirSync(artifacts);if(names.length>1000)throw Error('Telemetry artifact bound');let receiptCount=0;
   for(const name of names.sort())if(/^[a-zA-Z0-9-]+-receipt\.json$/.test(name)){
    if(++receiptCount>100)throw Error('Telemetry receipt bound');const raw=read(path.join(artifacts,name),1000000),r=JSON.parse(raw.bytes);if(!Object.hasOwn(r,'provider'))continue;
@@ -36,7 +36,10 @@ export function collectMissionTelemetry(runDirectory,{parent=path.join(root,'.ru
  write(path.join(workspace,'input.json'),batches);write(path.join(workspace,'sources.json'),sources);
  const harness=path.join(root,'factory/telemetry-harness.kujo'),harnessBytes=read(harness,20000).bytes;
  // Import only pinned native modules in a private cwd; no candidate configuration or inherited provider environment.
- for(const name of Object.keys(lock.repositories.watchdog.files))fs.copyFileSync(path.join(dep.directory,name),path.join(workspace,name),fs.constants.COPYFILE_EXCL);
+ for(const [name,expected] of Object.entries(lock.repositories.watchdog.files)){
+  const copied=path.join(workspace,name);fs.copyFileSync(path.join(dep.directory,name),copied,fs.constants.COPYFILE_EXCL);
+  const bytes=read(copied,expected.bytes).bytes;if(bytes.length!==expected.bytes||sha(bytes)!==expected.sha256)throw Error('Copied telemetry dependency integrity mismatch');
+ }
  fs.writeFileSync(path.join(workspace,'runner.kujo'),harnessBytes,{flag:'wx',mode:0o600});
  const started=Date.now(),result=spawnSync(kujoBinary(),['run','runner.kujo','--','input.json','telemetry.sqlite'],{cwd:workspace,env:{PATH:'/usr/bin:/bin',HOME:path.join(workspace,'.home'),TMPDIR:path.join(workspace,'.tmp'),LANG:'C.UTF-8'},encoding:'utf8',timeout:30000,maxBuffer:16000000});
  const receipt={schema:'kujo.factory.telemetry-execution/v1',sourceCommit:dep.commit,harnessSha256:sha(harnessBytes),code:result.status,signal:result.signal??null,durationMs:Date.now()-started,stdoutSha256:sha(result.stdout||''),stderrSha256:sha(result.stderr||''),authority:'observational only'};write(path.join(workspace,'execution.json'),receipt);
