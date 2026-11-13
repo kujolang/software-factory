@@ -1,3 +1,4 @@
+import {validatePerformancePolicy} from './performance.mjs';
 import {prepareRepositoryMission} from './repository-mission.mjs';
 import {bindMissionRecovery,prepareMissionResume,reclaimMissionAdmissionForResume} from './operations.mjs';
 import {acquireMissionAdmission} from './operations-policy.mjs';
@@ -210,13 +211,17 @@ if(verb === "resume"){
   if (!file) throw Error("Usage: node factory/cli.mjs run mission.txt");
   const extra = process.argv.slice(4);
   const options={};
-  for(let i=0;i<extra.length;i+=2){if(!['--pack','--team','--routing','--source'].includes(extra[i])||!extra[i+1]||Object.hasOwn(options,extra[i]))throw Error('Usage: run mission.txt [--pack FILE] [--team FILE] [--routing FILE] [--source REPOSITORY]');options[extra[i]]=extra[i+1];}
+  for(let i=0;i<extra.length;i+=2){if(!['--pack','--team','--routing','--source','--performance'].includes(extra[i])||!extra[i+1]||Object.hasOwn(options,extra[i]))throw Error('Usage: run mission.txt [--pack FILE] [--team FILE] [--routing FILE] [--source REPOSITORY]');options[extra[i]]=extra[i+1];}
   const readOption=file=>{if(fs.lstatSync(file).isSymbolicLink()||!fs.statSync(file).isFile()||fs.statSync(file).size>65536)throw Error('Unsafe mission policy input');return json(file);};
   const pack = options['--pack'] ? readSealedPack(path.resolve(options['--pack'])) : null;
   const team=options['--team']?(options['--source']?repositoryTeam:applicationTeam)(readOption(options['--team']),tasks):null;
+  const performancePolicy=options['--performance']?readOption(options['--performance']):null;
+  if(performancePolicy){if(!options['--source']||!pack||team?.plan.type!=='performance')throw Error('Performance requires a sealed pack, source and performance team');validatePerformancePolicy(performancePolicy,pack);}
+  if(team?.plan.type==='performance'&&!performancePolicy)throw Error('Performance team requires a reviewed benchmark policy');
   const providerRouting=validateProviderRouting(options['--routing']?readOption(options['--routing']):{});
   if(options['--source']&&!pack)throw Error('Existing repository development requires --pack');
   const runTasks=options['--source']&&!team?tasks.filter(t=>['verify','release'].includes(t.id)).map(t=>({...t,dependencies:t.id==='verify'?[]:['verify'],handoffFrom:t.id==='verify'?'human':'code-reviewer'})):team?.tasks||tasks;
+  if(performancePolicy){for(const task of runTasks)if(task.dependencies.length===0)task.dependencies=['benchmark-contract'];runTasks.unshift({id:'benchmark-contract',agentId:'code-reviewer',kind:'performance-contract',title:'Independently review frozen benchmark',dependencies:[],stage:'Planning',handoffFrom:'human'});}
   const runRoles=[...roles,...(team?.plan.roles||[]).filter(r=>!roles.some(x=>'chain.'+x.id===r.id)).map(r=>({id:r.id.slice(6),name:r.id.slice(6),layer:r.layer,parent:null}))];
   const mission = fs.readFileSync(path.resolve(file), "utf8");
   if (!mission.trim() || mission.length > 12000)
@@ -226,6 +231,7 @@ if(verb === "resume"){
   fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
   const repositorySource=options["--source"]?prepareRepositoryMission({source:options["--source"],packFile:path.resolve(options["--pack"]),mission,runDirectory:dir}):null;
   if(!repositorySource)fs.mkdirSync(path.join(dir, "application"));
+  if(performancePolicy){fs.cpSync(path.join(dir,"application"),path.join(dir,"artifacts/performance-baseline"),{recursive:true,errorOnExist:true,force:false});save(path.join(dir,"artifacts/performance-policy.json"),performancePolicy);}
   const config = {
     id,
     ...(pack ? { packHash: hashPack(pack), packId: pack.id } : {}),
@@ -238,6 +244,7 @@ if(verb === "resume"){
     tasks:runTasks,
     ...(repositorySource?{kind:"repository-repair",repositorySource:{commit:repositorySource.sourceCommit,tree:repositorySource.sourceTree,record:"artifacts/repository-source.json"}}:{}),
     ...(team?{teamPlan:team.plan}:{}),
+    ...(performancePolicy?{performanceRequired:true,performancePolicySha256:createHash("sha256").update(JSON.stringify(performancePolicy)).digest("hex")}:{}),
     providerRouting,
     stages: [
       "Command",

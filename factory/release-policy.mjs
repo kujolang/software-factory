@@ -1,3 +1,4 @@
+import {verifyPerformanceGate} from './performance.mjs';
 // A subordinate controller gate. Never executes candidate files or grants approval.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -97,6 +98,7 @@ function context({dir,app,packet}){
  requireCheck(packet.dependencyPolicy?.standardLibraryOnly===true&&packet.dependencyPolicy?.installHooks===false,'Missing dependency policy');
  requireCheck(packet.deploymentAuthorized===false,'Local release cannot authorize deployment');
  requireCheck(identity(packet.files)===identity(source.files),'Packet file inventory does not match source');
+ if(run.performanceRequired||fs.existsSync(path.join(dir,'artifacts/performance-policy.json'))){const performance=verifyPerformanceGate(dir,run,pack,source.hash);requireCheck(identity(packet.performance)===identity(performance),'Performance release packet changed');}
  return {run,pack,source,harnesses:harnesses(app,pack),checks};
 }
 function baseReceipt(stage){return {schema:'kujo.factory.release-policy-decision/v1',stage,recordedAt:new Date().toISOString(),passed:false,blockers:[],deploymentAuthorized:false,approvalGranted:false,authority:'Subordinate controller gate; independent release authority and repeated tests remain mandatory'};}

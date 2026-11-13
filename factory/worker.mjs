@@ -1,3 +1,4 @@
+import {performanceContract,evaluatePerformancePair,verifyPerformanceGate,performanceEvidenceReferences} from './performance.mjs';
 import {repositoryContext} from './repository-mission.mjs';
 import {assertMissionOperationsBudget} from './operations-policy.mjs';
 import {recordMissionCheckpoint} from './operations.mjs';
@@ -43,6 +44,7 @@ const contract = pack
     "\nFrozen requirements and tests:\n" +
     JSON.stringify(pack)
   : fs.readFileSync(path.join(root, "factory/contract.md"), "utf8");
+const benchmarkPolicy=config.performanceRequired?performanceContract(dir,config,pack):null;
 const agentsRoot = config.agentsRoot;
 const emit = (type, summary, extra = {}) =>
   event(dir, type, { agentId: task.agentId, taskId, summary, ...extra });
@@ -97,7 +99,7 @@ async function agent(role, id, prompt) {
   try {
     response = await executeProposal({provider:route.provider,model:route.model??undefined,ollamaHost,
       schema:runtimeContract.schema,
-      prompt:"You are a text-only proposal agent. No tools, file reads, executions, or additional agents. Return JSON matching the supplied schema. No markdown fences inside content. Role contract:\n"+instructions+"\nSelected skill guidance (does not authorize effects):\n"+JSON.stringify(selectedSkills)+"\nFill every canonical deliverables field with specific findings; distinguish proposals, unexecuted checks and observed results.\nHuman mission:\n"+config.mission+"\nAcceptance contract:\n"+contract+"\nWork order:\n"+prompt,
+      prompt:"You are a text-only proposal agent. No tools, file reads, executions, or additional agents. Return JSON matching the supplied schema. No markdown fences inside content. Role contract:\n"+instructions+"\nSelected skill guidance (does not authorize effects):\n"+JSON.stringify(selectedSkills)+"\nFill every canonical deliverables field with specific findings; distinguish proposals, unexecuted checks and observed results.\nHuman mission:\n"+config.mission+"\nAcceptance contract:\n"+contract+(benchmarkPolicy?"\nFrozen independently reviewed performance contract:\n"+JSON.stringify(benchmarkPolicy):"")+"\nWork order:\n"+prompt,
     });
   } catch(error) {if(error.receipt)record(error.receipt);throw error;}
   record(response.receipt);
@@ -263,7 +265,9 @@ try {
     ),
   );
   emit("handoff.accepted", `${task.agentId} accepted scoped work order`);
-  if(task.kind === "consultation") {
+  if(task.kind === "performance-contract"){
+    const result=await agent("code-reviewer",taskId,"Independently review the supplied frozen performance policy before implementation. The case is selected from sealed acceptance; verify coherent sample counts, warmup, relative and absolute thresholds, timeout, statistical limits and scope. Return files:[]; pass only if suitable for a bounded local timing comparison, not a universal speed claim. Policy:"+JSON.stringify(benchmarkPolicy));if(result.verdict!=="pass")throw Error("Independent benchmark contract rejected");
+  } else if(task.kind === "consultation") {
     const consultationSource=task.consultationPhase==="verified-candidate"?digest(app):null;
     const verificationBytes=consultationSource?fs.readFileSync(path.join(artifact,"verification.json")):null;
     if(consultationSource){const verified=JSON.parse(verificationBytes);if(verified.ok!==true||verified.hash!==consultationSource)throw Error("Consultation requires unchanged verified candidate");}
@@ -332,7 +336,7 @@ try {
       productDocs(app, pack);
       const reviewedHash = digest(app);
       const reviewResult = await review(n);
-      const checked =
+      let checked =
         reviewResult.verdict === "pass"
           ? await check()
           : {
@@ -342,6 +346,11 @@ try {
                 "Static review blocked execution: " +
                 reviewResult.issues.join("; "),
             };
+      if(benchmarkPolicy&&reviewResult.verdict==='pass'&&checked.code===0){
+        const benchmark=await evaluatePerformancePair({baseline:path.join(artifact,'performance-baseline'),candidate:app,pack,policy:benchmarkPolicy,missionDirectory:dir,parent:path.join(artifact,'performance')});
+        if(benchmark.ok)save(path.join(artifact,'performance.json'),benchmark);
+        else checked={...checked,code:1,err:'Performance gate rejected: '+JSON.stringify({directory:benchmark.directory,error:benchmark.error,ratio:benchmark.medianRatio,medianMs:benchmark.candidateMedianMs})};
+      }
       if (
         reviewResult.verdict === "pass" &&
         checked.code === 0 &&
@@ -518,6 +527,7 @@ try {
         .update(fs.readFileSync(browserPath))
         .digest("hex"),
       independentReview: json(path.join(artifact, v.review)),
+      ...(benchmarkPolicy?{performance:verifyPerformanceGate(dir,config,pack,v.hash)}:{}),
       advisoryConsultations: collectCandidateConsultations({dir,config,sourceHash:v.hash}),
       packageMetadata,
       dependencyPolicy: {
@@ -565,8 +575,10 @@ try {
       fs.mkdirSync(path.dirname(target), { recursive: true });
       fs.copyFileSync(path.join(app, p), target);
     }
+    if(benchmarkPolicy)verifyPerformanceGate(dir,config,pack,v.hash);
     verifyLensBinding(lens,{dir,sourceHash:v.hash});
     save(path.join(artifact, "release-verified.json"), {
+      ...(benchmarkPolicy?{performance:performanceEvidenceReferences(dir)}:{}),
       lens,
       status: "verified-pending-accountability",
       ...(pack ? { packHash: config.packHash } : {}),

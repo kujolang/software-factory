@@ -60,7 +60,7 @@ export function applicationTeam(input,baseline){
  return selectedExecutionTeam(input,baseline);
 }
 export function repositoryTeam(input,baseline){
- if(!['github-issue','bug-repair','feature','refactoring','security-remediation','test-coverage','maintenance'].includes(input?.type))throw Error('Unsupported repository development lifecycle');
+ if(!['github-issue','bug-repair','feature','refactoring','security-remediation','test-coverage','maintenance','performance'].includes(input?.type))throw Error('Unsupported repository development lifecycle');
  const result=selectedExecutionTeam(input,baseline);
  result.plan.executionStatus='Source-bound Node development with canonical consultations and independent acceptance; no external writes';
  return result;

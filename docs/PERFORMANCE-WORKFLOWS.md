@@ -1,0 +1,9 @@
+# Bounded performance workflow
+
+The optional Node repository performance path uses a fixed GET case from the sealed application pack. The operator supplies a closed `kujo.factory.performance-policy/v1` record with `caseId`, `samples` (5–30), `warmup` (1–5), `requestTimeoutMs` (100–5000), `maximumMedianRatio` (greater than zero and less than one), and `maximumMedianMs` (positive and no greater than the request timeout).
+
+`run MISSION --pack PACK --source REPOSITORY --team TEAM --performance POLICY` requires a `performance` team. Before implementation, a separate Code Reviewer reviews the frozen benchmark. The controller retains the original committed source and independently tests candidate behavior. It measures the same accepted request inside separate rootless Workcell leases for the original and candidate, with matching image identities. The fixed trusted harness creates each HTTP connection, checks status and expected JSON, bounds response bytes, and records warmups and samples. It never imports candidate code on the host.
+
+A failed benchmark blocks verification and uses the existing bounded correction loop. Independent release review receives the benchmark, and both the subordinate release policy and final accounting promotion check its source, policy, retained harness, original repository context, observations and Workcell receipts. No benchmark can grant release or deployment authority itself.
+
+The comparison reports median, p95 and observed median ratio. It does not claim statistical confidence, production workload coverage, universal speedup, or absence of environmental noise. It covers one fixed stateless GET scenario, not databases, load tests, multi-user concurrency or arbitrary benchmark commands. Actual Workcell and model-backed qualification is pending; the typed performance mission route remains blocked until those checks pass.

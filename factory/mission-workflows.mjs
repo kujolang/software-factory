@@ -1,3 +1,4 @@
+import {validatePerformancePolicy} from './performance.mjs';
 /** Typed mission admission/delegation. Native Dispatch remains the only task scheduler. */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -17,7 +18,7 @@ function file(name,max=1500000){const p=specPlain(name),s=fs.lstatSync(p);if(!s.
 export function validateMissionWorkflow(input){
  if(!input||typeof input!=='object'||Array.isArray(input)||input.schema!=='kujo.factory.mission-input/v1')throw Error('Invalid mission input schema');
  const contract=inspectMissionWorkflow(input.type),route=contract.route;
- const fields={specification:['mission'],application:['mission','pack'],repository:['mission','pack','source',...(input.type==='github-issue'?['issue']:[])],onboarding:['source'],documentation:['source','files','mission'],revalidation:['runId'],investigation:['runDirectory'],blocked:[]}[route];
+ const fields={specification:['mission'],application:['mission','pack'],repository:['mission','pack','source',...(input.type==='github-issue'?['issue']:[]),...(input.type==='performance'?['performance']:[])],onboarding:['source'],documentation:['source','files','mission'],revalidation:['runId'],investigation:['runDirectory'],blocked:[]}[route];
  if(Object.keys(input).some(k=>!['schema','type',...fields].includes(k)))throw Error('Unknown or unauthorized mission field');
  if(contract.blockedReason)return {schema:'kujo.factory.mission-admission/v1',ok:false,contract,blockedReasons:[contract.blockedReason],executionAuthorized:false};
  if(fields.some(k=>input[k]===undefined))throw Error('Missing required mission input: '+fields.filter(k=>input[k]===undefined).join(', '));
@@ -26,6 +27,7 @@ export function validateMissionWorkflow(input){
  if(fields.includes('mission'))normalized.mission=text(input.mission,'mission');
  if(fields.includes('source')){normalized.source=specPlain(text(input.source,'source path',4000));if(!fs.statSync(normalized.source).isDirectory())throw Error('Source must be a directory');}
  if(fields.includes('pack')){normalized.pack=file(text(input.pack,'pack path',4000));file(normalized.pack+'.seal.json',100000);readSealedPack(normalized.pack);}
+ if(fields.includes('performance')){validatePerformancePolicy(input.performance,readSealedPack(normalized.pack));normalized.performance=structuredClone(input.performance);}
  if(fields.includes('runId')){if(typeof input.runId!=='string'||!/^factory-[a-zA-Z0-9_-]{1,100}$/.test(input.runId))throw Error('Invalid source run identity');normalized.runId=input.runId;}
  if(fields.includes('runDirectory')){normalized.runDirectory=specPlain(text(input.runDirectory,'run directory',4000));const record=JSON.parse(fs.readFileSync(file(path.join(normalized.runDirectory,'run.json'),200000)));if(record.status!=='failed')throw Error('Investigation requires a failed run');}
  if(fields.includes('files')){snapshotDocumentationSource(normalized.source,input.files);normalized.files=[...input.files];}
@@ -52,6 +54,7 @@ export async function executeMissionWorkflow(input,{parent=path.join(root,'.runt
     const packBytes=fs.readFileSync(i.pack),sealBytes=fs.readFileSync(file(i.pack+'.seal.json',100000));fs.writeFileSync(path.join(directory,'pack.json'),packBytes,{flag:'wx',mode:0o600});fs.writeFileSync(path.join(directory,'pack.json.seal.json'),sealBytes,{flag:'wx',mode:0o600});readSealedPack(path.join(directory,'pack.json'));
     args=['run',path.join(directory,'mission.txt'),'--pack',path.join(directory,'pack.json')];
     if(contract.route==='repository')args.push('--source',i.source);
+    if(i.performance){writeSpecRecord(directory,'performance-policy.json',i.performance);args.push('--performance',path.join(directory,'performance-policy.json'));}
     {const team={type:contract.route==='repository'?i.type:'new-application',skills:contract.skills,additionalRoles:selectTeam({type:i.type}).roles.map(r=>r.id)};const selected=selectTeam(team);if(selected.blockedReasons.length)throw Error(selected.blockedReasons.join('; '));writeSpecRecord(directory,'team.json',team);args.push('--team',path.join(directory,'team.json'));}
    }
    writeSpecRecord(directory,'delegation.json',{executable:'node',entrypoint:'bin/software-factory.mjs',args,authority:'Existing controller command owns verification; adapter cannot approve',inputSha256:admission.inputSha256});

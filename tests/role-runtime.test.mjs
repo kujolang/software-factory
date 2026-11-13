@@ -48,11 +48,11 @@ test('every Chain role is explicitly selectable without enabling unrelated speci
 
 test('repository team plans implementation before independent verification and rejects unrelated runtimes',()=>{
  const baseline=[{id:'command',agentId:'general-commander',dependencies:[]},{id:'backend',agentId:'backend-developer',dependencies:['command']},{id:'frontend',agentId:'frontend-developer',dependencies:['command']},{id:'verify',agentId:'code-reviewer',dependencies:['backend','frontend']},{id:'release',agentId:'release-verifier',dependencies:['verify']}];
- for(const type of ['github-issue','bug-repair','feature','refactoring','security-remediation','test-coverage','maintenance']){
+ for(const type of ['github-issue','bug-repair','feature','refactoring','security-remediation','test-coverage','maintenance','performance']){
   const result=repositoryTeam({type},baseline),seen=new Set();
   for(const task of result.tasks){assert.ok(task.dependencies.every(id=>seen.has(id)));seen.add(task.id);}
   assert.equal(result.tasks.at(-1).id,'release');assert.deepEqual(result.tasks.find(task=>task.id==='verify').dependencies,['backend','frontend']);
  }
- for(const type of ['new-application','database-migration','dependency-upgrade','performance','media-production'])assert.throws(()=>repositoryTeam({type},baseline));
+ for(const type of ['new-application','database-migration','dependency-upgrade','media-production'])assert.throws(()=>repositoryTeam({type},baseline));
  assert.throws(()=>repositoryTeam({type:'feature',risk:'high'},baseline),/human review/);
 });

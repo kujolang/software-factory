@@ -1,3 +1,4 @@
+import {verifyPerformanceGate,performanceEvidenceReferences} from './performance.mjs';
 import {verifyLensBinding} from './lens.mjs';
 // Controller-owned lifecycle accounting. No candidate commands or provider prompts
 // are interpreted here; canonical tools receive bounded observed records only.
@@ -126,6 +127,7 @@ export function promoteAccountedRelease(dir,config){
  const evalDir=path.relative(dir,evaluation.executionEvidence);
  if(!evalDir.startsWith('artifacts/eval/'))throw Error('Evaluation evidence outside mission');
  if(config.lensRequired){if(verified.lens?.ok!==true)throw Error('Native Lens did not pass');verifyLensBinding(verified.lens,{dir,sourceHash:appHash});}
+ if(config.performanceRequired||fs.existsSync(path.join(dir,'artifacts/performance-policy.json'))){verifyPerformanceGate(dir,config,JSON.parse(fs.readFileSync(path.join(dir,'pack.json'))),appHash);if(JSON.stringify(verified.performance)!==JSON.stringify(performanceEvidenceReferences(dir)))throw Error('Performance promotion evidence changed');}
  const release={...verified,status:'approved-local-candidate',gateVersion:config.lensRequired?'kujo.factory.release-gates/v3':'kujo.factory.release-gates/v2',accountability:artifactIdentity(dir,'artifacts/mission-accountability.json'),policy:artifactIdentity(dir,'artifacts/release-policy-final.json'),evaluation:artifactIdentity(dir,'artifacts/evaluation.json'),evaluationArtifacts:{input:artifactIdentity(dir,evalDir+'/evidence.json'),suite:artifactIdentity(dir,evalDir+'/suite.json'),result:artifactIdentity(dir,evalDir+'/results/evaluation-result.json'),binding:artifactIdentity(dir,evalDir+'/binding.json')},deploymentAuthorized:false};
  fs.renameSync(stage,path.join(dir,'build'));
  save(path.join(dir,'artifacts/release.json'),release);
