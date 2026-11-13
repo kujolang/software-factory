@@ -4,7 +4,7 @@ import {spawnSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 const MAX_FILES=20000, MAX_FILE=16*1024*1024, MAX_TOTAL=128*1024*1024;
 function plain(target){let item=path.resolve(target);while(true){if(fs.lstatSync(item).isSymbolicLink())throw Error('Tracked source symlink forbidden');const parent=path.dirname(item);if(parent===item)break;item=parent;}return path.resolve(target);}
-function git(root,args,maxBuffer=4*1024*1024){const r=spawnSync('git',['-C',root,'-c','core.fsmonitor=false',...args],{encoding:'utf8',timeout:10000,maxBuffer});if(r.error||r.status!==0)throw Error('Tracked source Git identity unavailable');return r.stdout;}
+function git(root,args,maxBuffer=4*1024*1024){const r=spawnSync('git',['-C',root,'-c','core.fsmonitor=false',...args],{encoding:'utf8',timeout:10000,maxBuffer,env:{...process.env,GIT_NO_REPLACE_OBJECTS:'1'}});if(r.error||r.status!==0)throw Error('Tracked source Git identity unavailable');return r.stdout;}
 // Authenticates only tracked file bytes/modes against the pinned Git tree. Ignored caches
 // and external packages are outside this identity; their own integrity controls still apply.
 export function verifyTrackedSourceIdentity(directory,expectedCommit){

@@ -9,3 +9,8 @@ test('tracked byte comparison ignores assume-unchanged concealment in a copied W
  try{execFileSync('git',['clone','--quiet','--local','--no-hardlinks',source,clone],{stdio:'pipe'});const commit=git(clone,'rev-parse','HEAD');assert.equal(verifyTrackedSourceIdentity(clone,commit).clean,true);const target='src/policy/policy.kujo';git(clone,'update-index','--assume-unchanged',target);fs.appendFileSync(path.join(clone,target),'\n# concealed modification\n');assert.equal(git(clone,'status','--porcelain'),'');assert.throws(()=>verifyTrackedSourceIdentity(clone,commit),/byte mismatch/);}finally{fs.rmSync(root,{recursive:true,force:true});}
 });
 test('tracked executable mode mutation cannot be hidden by index flags',()=>fixture((root,commit)=>{git(root,'update-index','--assume-unchanged','native.kujo');fs.chmodSync(path.join(root,'native.kujo'),0o755);assert.throws(()=>verifyTrackedSourceIdentity(root,commit),/mode mismatch/);}));
+
+test('replacement commit graphs cannot redefine the pinned tracked source authority',()=>fixture((root,expected)=>{
+ const file=path.join(root,'native.kujo');fs.writeFileSync(file,'print("substituted")\n');git(root,'add','.');git(root,'-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-qm','substitute');const substitute=git(root,'rev-parse','HEAD');git(root,'replace',expected,substitute);git(root,'reset','--hard',expected);
+ assert.equal(git(root,'rev-parse','HEAD'),expected);assert.equal(git(root,'status','--porcelain'),'');assert.throws(()=>verifyTrackedSourceIdentity(root,expected),/byte mismatch/);
+}));
