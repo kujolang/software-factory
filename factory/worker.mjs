@@ -1,4 +1,5 @@
-import {codexBinary, model, providerHome} from './settings.mjs';
+import { runPack, runtimeContract, hashPack } from "./pack.mjs";
+import { codexBinary, model, providerHome } from "./settings.mjs";
 import { startIsolatedApp } from "./workcell.mjs";
 import fs from "node:fs";
 import path from "node:path";
@@ -23,10 +24,14 @@ if (!task) throw Error("Unknown task");
 const app = path.join(dir, "application");
 const artifact = path.join(dir, "artifacts");
 fs.mkdirSync(artifact, { recursive: true });
-const contract = fs.readFileSync(
-  path.join(root, "factory/contract.md"),
-  "utf8",
-);
+const pack = runPack(dir, config);
+const contract = pack
+  ? runtimeContract +
+    "\nProduct contract:\n" +
+    pack.contract +
+    "\nFrozen requirements and tests:\n" +
+    JSON.stringify(pack)
+  : fs.readFileSync(path.join(root, "factory/contract.md"), "utf8");
 const agentsRoot = config.agentsRoot;
 const emit = (type, summary, extra = {}) =>
   event(dir, type, { agentId: task.agentId, taskId, summary, ...extra });
@@ -103,7 +108,7 @@ async function agent(role, id, prompt) {
   if (model) args.splice(1, 0, "--model", model);
   const r = await command(codexBinary, args, {
     cwd: temp,
-    env: {CODEX_HOME: providerHome},
+    env: { CODEX_HOME: providerHome },
     timeout: 480000,
     maxBytes: 1500000,
     input:
@@ -187,6 +192,44 @@ const frontendAllowed = (p) =>
   /^public\/[a-zA-Z0-9_-]+\.(html|css|js|svg)$/.test(p);
 async function check() {
   const before = digest(app);
+  if (pack) {
+    runPack(dir, config);
+    const evidence = path.join(artifact, `pack-check-${Date.now()}`);
+    const r = await command(
+      process.execPath,
+      [
+        path.join(root, "factory/pack-acceptance.mjs"),
+        app,
+        path.join(dir, "pack.json"),
+        evidence,
+      ],
+      { timeout: 300000, maxBytes: 200000 },
+    );
+    let result;
+    try {
+      result = JSON.parse(r.out.trim());
+    } catch {}
+    if (
+      r.code !== 0 ||
+      !result?.ok ||
+      result.packHash !== config.packHash ||
+      result.checks.length !== pack.api.length ||
+      digest(app) !== before
+    ) {
+      r.code = 1;
+      r.err +=
+        "\nPack acceptance failed: " +
+        (result?.failure || "Missing or stale report");
+    }
+    if (result?.browser)
+      r.browser = {
+        ...result.browser,
+        report: path.relative(dir, result.browser.report),
+      };
+    r.packHash = config.packHash;
+    save(path.join(artifact, `acceptance-${Date.now()}.json`), r);
+    return r;
+  }
   const r = await command(
     process.execPath,
     [
@@ -248,7 +291,7 @@ async function check() {
   return r;
 }
 async function review(n) {
-  productDocs(app);
+  productDocs(app, pack);
   const hash = digest(app);
   const r = await agent(
     "code-reviewer",
@@ -316,7 +359,7 @@ try {
     const scope =
       taskId === "backend"
         ? "Implement complete backend in server.mjs and optional db.mjs. Standard library only. No frontend files."
-        : "Implement polished complete responsive frontend in public/index.html, public/style.css, public/app.js. Standard library browser APIs. No backend files. Include all CRUD actions with accessible labels. All required controls usable without drag/drop.";
+        : "Implement polished complete responsive frontend in public/index.html, public/style.css, public/app.js. Standard library browser APIs. No backend files. Include the interactions required by the product contract, with accessible labels. All required controls usable without drag/drop.";
     const r = await agent(
       task.agentId,
       taskId,
@@ -342,7 +385,7 @@ try {
         "verification.started",
         `Independent review and acceptance attempt ${n + 1}`,
       );
-      productDocs(app);
+      productDocs(app, pack);
       const reviewedHash = digest(app);
       const reviewResult = await review(n);
       const checked =
@@ -362,6 +405,7 @@ try {
       ) {
         save(path.join(artifact, "verification.json"), {
           ok: true,
+          ...(pack ? { packHash: config.packHash } : {}),
           hash: digest(app),
           attempt: n + 1,
           review: "review-" + n + "-binding.json",
@@ -438,11 +482,33 @@ try {
     if (!v.ok || v.hash !== digest(app))
       throw Error("Missing/stale verification");
     const testContract = json(path.join(app, "tests/contract.json"));
-    const trustedHarnesses = ["factory/acceptance.mjs", "factory/workcell-image/browser-check.mjs", "factory/workcell.mjs"];
-    if (testContract.sources?.length !== trustedHarnesses.length || trustedHarnesses.some(file => {
-      const expected = createHash("sha256").update(fs.readFileSync(path.join(root, file))).digest("hex");
-      return testContract.sources.find(source => source.path === file)?.sha256 !== expected;
-    })) throw Error("Trusted test harness changed since review; fresh verification required");
+    const trustedHarnesses = pack
+      ? [
+          "factory/pack.mjs",
+          "factory/pack-acceptance.mjs",
+          "factory/workcell-image/pack-browser.mjs",
+          "factory/workcell.mjs",
+        ]
+      : [
+          "factory/acceptance.mjs",
+          "factory/workcell-image/browser-check.mjs",
+          "factory/workcell.mjs",
+        ];
+    if (
+      testContract.sources?.length !== trustedHarnesses.length ||
+      trustedHarnesses.some((file) => {
+        const expected = createHash("sha256")
+          .update(fs.readFileSync(path.join(root, file)))
+          .digest("hex");
+        return (
+          testContract.sources.find((source) => source.path === file)
+            ?.sha256 !== expected
+        );
+      })
+    )
+      throw Error(
+        "Trusted test harness changed since review; fresh verification required",
+      );
     const buildCommand = ["workcell", "trusted-image-syntax-build"];
     const buildLease = await startIsolatedApp(app, {
       evidenceDir: path.join(artifact, `workcell-build-${Date.now()}`),
@@ -468,15 +534,26 @@ try {
       nodeVersion: process.version,
       platform: process.platform,
       sourceHash: digest(app),
+      ...(pack ? { packHash: config.packHash, packId: pack.id } : {}),
       verification: v,
       commands: {
-        api: [process.execPath, path.join(root, "factory/acceptance.mjs"), app],
-        browser: [
-          process.execPath,
-          path.join(root, "factory/browser-acceptance.mjs"),
-          app,
-          browserPath,
-        ],
+        api: pack
+          ? [
+              process.execPath,
+              path.join(root, "factory/pack-acceptance.mjs"),
+              app,
+              path.join(dir, "pack.json"),
+              "EVIDENCE_DIR",
+            ]
+          : [process.execPath, path.join(root, "factory/acceptance.mjs"), app],
+        browser: pack
+          ? ["workcell", "pack-browser.mjs", config.packHash]
+          : [
+              process.execPath,
+              path.join(root, "factory/browser-acceptance.mjs"),
+              app,
+              browserPath,
+            ],
         build: buildCommand,
       },
       build: built,
@@ -516,6 +593,8 @@ try {
       throw Error("Release verifier rejected candidate");
     // Repeat acceptance after the independent verdict and before copying exact bytes.
     const checked = await check();
+    if (pack && runPack(dir, config) && v.packHash !== config.packHash)
+      throw Error("Verification pack binding mismatch");
     if (checked.code !== 0 || v.hash !== digest(app))
       throw Error("Final recheck failed");
     const buildDir = path.join(dir, "build");
@@ -527,6 +606,7 @@ try {
     }
     save(path.join(artifact, "release.json"), {
       status: "approved-local-candidate",
+      ...(pack ? { packHash: config.packHash } : {}),
       hash: digest(app),
       buildHash: digest(buildDir),
       checks: checked,

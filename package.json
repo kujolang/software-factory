@@ -29,7 +29,9 @@
     "test:controller-death": "node factory/workcell-controller-death-test.mjs",
     "verify": "npm test && npm run test:dispatch && node scripts/check-docs.mjs",
     "engine:connect": "node scripts/connect-colima.mjs",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "pack": "node scripts/pack.mjs",
+    "test:packs": "node scripts/test-packs.mjs"
   },
   "dependencies": {
     "@kujolang/kujo-runtime": "1.9.0",

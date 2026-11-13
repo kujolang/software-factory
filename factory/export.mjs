@@ -10,6 +10,7 @@ audit(dir);
 fs.mkdirSync(dest, { recursive: true });
 for (const name of [
   "run.json",
+  "pack.json",
   "workflow.json",
   "events.jsonl",
   "dispatch-events.jsonl",

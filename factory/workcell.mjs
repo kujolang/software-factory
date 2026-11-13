@@ -1,4 +1,4 @@
-import {workcellBinary, kujoBinary} from './settings.mjs';
+import { workcellBinary, kujoBinary } from "./settings.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
@@ -68,19 +68,25 @@ function copyCandidate(source, target) {
 }
 export async function workcellPreflight() {
   if (process.env.DOCKER_HOST && process.env.DOCKER_CONTEXT)
-    throw Error('Set only one Docker endpoint selector');
+    throw Error("Set only one Docker endpoint selector");
   let endpoint = process.env.DOCKER_HOST;
   if (!endpoint) {
-    const context = process.env.DOCKER_CONTEXT || (await docker(['context', 'show'])).out.trim();
-    endpoint = JSON.parse((await docker(['context', 'inspect', context])).out)[0]?.Endpoints?.docker?.Host;
+    const context =
+      process.env.DOCKER_CONTEXT ||
+      (await docker(["context", "show"])).out.trim();
+    endpoint = JSON.parse(
+      (await docker(["context", "inspect", context])).out,
+    )[0]?.Endpoints?.docker?.Host;
   }
-  if (typeof endpoint !== 'string' || !endpoint.startsWith('unix:///'))
-    throw Error('Factory requires a local Unix Docker socket; remote engines are unsupported');
+  if (typeof endpoint !== "string" || !endpoint.startsWith("unix:///"))
+    throw Error(
+      "Factory requires a local Unix Docker socket; remote engines are unsupported",
+    );
   const info = JSON.parse(
     (await docker(["info", "--format", "{{json .SecurityOptions}}"])).out,
   );
-  if (!Array.isArray(info) || info.some(x => typeof x !== 'string'))
-    throw Error('docker info failed: missing security metadata');
+  if (!Array.isArray(info) || info.some((x) => typeof x !== "string"))
+    throw Error("docker info failed: missing security metadata");
   if (
     !info.some((x) => x.includes("rootless")) ||
     !info.some((x) => x.includes("seccomp"))
@@ -533,13 +539,18 @@ export async function startIsolatedApp(
       }
     });
     await new Promise((r) => proxy.listen(0, "127.0.0.1", r));
-    const browserOperation = async (mode, target) => {
+    const browserOperation = async (mode, target, pack) => {
       const script =
-        mode === "check" ? "browser-check.mjs" : "browser-demo.mjs";
+        mode === "check"
+          ? "browser-check.mjs"
+          : mode === "pack"
+            ? "pack-browser.mjs"
+            : "browser-demo.mjs";
       const run = await command(
         "docker",
         [
           "exec",
+          "-i",
           "--workdir",
           "/tmp",
           "--user",
@@ -548,16 +559,20 @@ export async function startIsolatedApp(
           "node",
           "/opt/factory/" + script,
         ],
-        { timeout: 180000, maxBytes: 200000 },
+        {
+          timeout: 180000,
+          maxBytes: 200000,
+          ...(pack ? { input: JSON.stringify(pack) } : {}),
+        },
       );
       save(path.join(evidenceDir, "browser-" + mode + "-command.json"), run);
       const dest =
-        mode === "check"
+        mode !== "demo"
           ? path.dirname(path.resolve(target))
           : path.resolve(target);
       fs.mkdirSync(dest, { recursive: true });
       const names =
-        mode === "check"
+        mode !== "demo"
           ? [
               "browser-acceptance.json",
               "browser-acceptance-desktop.png",
@@ -567,7 +582,7 @@ export async function startIsolatedApp(
           : ["demo.json", "demo.png", "demo.webm"];
       for (const name of names) {
         const output =
-          mode === "check"
+          mode !== "demo"
             ? path
                 .resolve(target)
                 .replace(/\.json$/, name.slice("browser-acceptance".length))
@@ -624,6 +639,7 @@ export async function startIsolatedApp(
       container,
       request,
       runBrowserCheck: (target) => browserOperation("check", target),
+      runPackBrowser: (target, pack) => browserOperation("pack", target, pack),
       runBrowserDemo: (target) => browserOperation("demo", target),
       async restart() {
         await control("restart", "65534:65534");

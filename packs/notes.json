@@ -1,0 +1,116 @@
+{
+  "schema": "kujo.factory.pack/v1",
+  "id": "local-notes",
+  "title": "Local notes",
+  "contract": "Build a local SQLite note list. POST /api/notes accepts {title:string}, trims a nonempty title of at most 120 characters and returns 201 {id:number,title:string}. Invalid or unknown fields return 400. GET /api/notes returns notes ordered by id. GET /api/notes/:id returns the note or 404. Persist across restarts. Browser form uses #title and an Add note button. Render titles as text in #notes li, including after reload.",
+  "requirements": [
+    {
+      "id": "notes",
+      "description": "Create and retrieve notes."
+    },
+    {
+      "id": "invalid",
+      "description": "Reject blank titles."
+    },
+    {
+      "id": "persistence",
+      "description": "Retain notes across server restart and page reload."
+    },
+    {
+      "id": "ui",
+      "description": "Add notes through the browser."
+    }
+  ],
+  "api": [
+    {
+      "id": "create",
+      "covers": [
+        "notes"
+      ],
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": "API note"
+      },
+      "status": 201,
+      "expect": {
+        "title": "API note"
+      },
+      "save": "note"
+    },
+    {
+      "id": "blank",
+      "covers": [
+        "invalid"
+      ],
+      "method": "POST",
+      "path": "/api/notes",
+      "body": {
+        "title": " "
+      },
+      "status": 400
+    },
+    {
+      "id": "restart",
+      "covers": [],
+      "restart": true
+    },
+    {
+      "id": "retained",
+      "covers": [
+        "persistence"
+      ],
+      "method": "GET",
+      "path": "/api/notes/${note.id}",
+      "status": 200,
+      "expect": {
+        "id": "${note.id}",
+        "title": "API note"
+      }
+    }
+  ],
+  "browser": [
+    {
+      "id": "open",
+      "covers": [],
+      "action": "goto",
+      "value": "/"
+    },
+    {
+      "id": "type",
+      "covers": [],
+      "action": "fill",
+      "selector": "#title",
+      "value": "Browser note"
+    },
+    {
+      "id": "add",
+      "covers": [],
+      "action": "click",
+      "selector": "button"
+    },
+    {
+      "id": "shown",
+      "covers": [
+        "ui"
+      ],
+      "action": "text",
+      "selector": "#notes",
+      "value": "Browser note"
+    },
+    {
+      "id": "reload",
+      "covers": [],
+      "action": "reload"
+    },
+    {
+      "id": "still-shown",
+      "covers": [
+        "persistence"
+      ],
+      "action": "text",
+      "selector": "#notes",
+      "value": "Browser note"
+    }
+  ]
+}

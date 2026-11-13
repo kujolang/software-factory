@@ -1,0 +1,114 @@
+{
+  "schema": "kujo.factory.pack/v1",
+  "id": "temperature-converter",
+  "title": "Temperature converter",
+  "contract": "Build a local Celsius-to-Fahrenheit converter. GET /api/convert?celsius=N returns {celsius:N,fahrenheit:N*9/5+32}. Reject missing, nonnumeric or unknown parameters with 400 JSON {error:string}. Serve a responsive form with input #celsius, a Convert button, and result #result showing the number followed by \u00b0F. No persistence or external services are needed.",
+  "requirements": [
+    {
+      "id": "conversion",
+      "description": "Convert freezing, boiling and negative Celsius values correctly."
+    },
+    {
+      "id": "validation",
+      "description": "Reject invalid input."
+    },
+    {
+      "id": "interface",
+      "description": "Convert values through the browser form."
+    }
+  ],
+  "api": [
+    {
+      "id": "freezing",
+      "covers": [
+        "conversion"
+      ],
+      "method": "GET",
+      "path": "/api/convert?celsius=0",
+      "status": 200,
+      "expect": {
+        "fahrenheit": 32
+      }
+    },
+    {
+      "id": "boiling",
+      "covers": [
+        "conversion"
+      ],
+      "method": "GET",
+      "path": "/api/convert?celsius=100",
+      "status": 200,
+      "expect": {
+        "fahrenheit": 212
+      }
+    },
+    {
+      "id": "negative",
+      "covers": [
+        "conversion"
+      ],
+      "method": "GET",
+      "path": "/api/convert?celsius=-40",
+      "status": 200,
+      "expect": {
+        "fahrenheit": -40
+      }
+    },
+    {
+      "id": "invalid",
+      "covers": [
+        "validation"
+      ],
+      "method": "GET",
+      "path": "/api/convert?celsius=nope",
+      "status": 400
+    },
+    {
+      "id": "restart",
+      "covers": [],
+      "restart": true
+    },
+    {
+      "id": "after-restart",
+      "covers": [
+        "conversion"
+      ],
+      "method": "GET",
+      "path": "/api/convert?celsius=0",
+      "status": 200,
+      "expect": {
+        "fahrenheit": 32
+      }
+    }
+  ],
+  "browser": [
+    {
+      "id": "open",
+      "covers": [],
+      "action": "goto",
+      "value": "/"
+    },
+    {
+      "id": "enter",
+      "covers": [],
+      "action": "fill",
+      "selector": "#celsius",
+      "value": "100"
+    },
+    {
+      "id": "convert",
+      "covers": [],
+      "action": "click",
+      "selector": "button"
+    },
+    {
+      "id": "result",
+      "covers": [
+        "interface"
+      ],
+      "action": "text",
+      "selector": "#result",
+      "value": "212 \u00b0F"
+    }
+  ]
+}

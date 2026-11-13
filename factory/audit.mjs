@@ -1,4 +1,5 @@
-import {agentsRoot} from './settings.mjs';
+import { runPack } from "./pack.mjs";
+import { agentsRoot } from "./settings.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import assert from "node:assert/strict";
@@ -8,13 +9,27 @@ import { json, save, events, digest } from "./core.mjs";
 export function audit(dir) {
   const run = json(path.join(dir, "run.json")),
     list = events(dir);
+  const pack = runPack(dir, run);
+  if (pack) {
+    const v = json(path.join(dir, "artifacts/verification.json")),
+      r = json(path.join(dir, "artifacts/release.json"));
+    assert.equal(v.packHash, run.packHash);
+    assert.equal(r.packHash, run.packHash);
+    assert.equal(v.acceptance.packHash, run.packHash);
+    assert.equal(r.checks.packHash, run.packHash);
+  }
   const checks = [];
   const check = (name, fn) => {
     fn();
     checks.push(name);
   };
-  const eventValidator = addFormats(new Ajv2020({strict:false})).compile(json(path.join(import.meta.dirname,"event.schema.json")));
-  check("versioned event schema",()=>{for(const e of list)assert.ok(eventValidator(e),JSON.stringify(eventValidator.errors));});
+  const eventValidator = addFormats(new Ajv2020({ strict: false })).compile(
+    json(path.join(import.meta.dirname, "event.schema.json")),
+  );
+  check("versioned event schema", () => {
+    for (const e of list)
+      assert.ok(eventValidator(e), JSON.stringify(eventValidator.errors));
+  });
   check("contiguous unique event sequence", () => {
     assert.equal(new Set(list.map((e) => e.id)).size, list.length);
     list.forEach((e, i) => {

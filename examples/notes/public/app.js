@@ -1,0 +1,3 @@
+async function load(){const r=await fetch('/api/notes');if(!r.ok)throw Error('Could not load notes');const notes=await r.json();document.querySelector('#notes').replaceChildren(...notes.map(n=>{const li=document.createElement('li');li.textContent=n.title;return li;}));}
+const show=e=>document.querySelector('#error').textContent=e.message;
+document.querySelector('form').addEventListener('submit',async e=>{e.preventDefault();try{const r=await fetch('/api/notes',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({title:document.querySelector('#title').value})});if(!r.ok)throw Error((await r.json()).error);await load();e.target.reset();}catch(error){show(error);}});load().catch(show);

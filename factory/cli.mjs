@@ -1,4 +1,11 @@
-import {agentsRoot, dispatchRoot, kujoBinary, runsRoot, settings} from './settings.mjs';
+import { readSealedPack, hashPack, runPack } from "./pack.mjs";
+import {
+  agentsRoot,
+  dispatchRoot,
+  kujoBinary,
+  runsRoot,
+  settings,
+} from "./settings.mjs";
 import fs from "node:fs";
 import path from "node:path";
 import { createServer } from "node:http";
@@ -16,13 +23,13 @@ const definitions = [
   [
     "backend",
     "backend-developer",
-    "Build SQLite REST service",
+    "Build application service",
     ["architecture"],
   ],
   [
     "frontend",
     "frontend-developer",
-    "Build responsive issue board",
+    "Build browser interface",
     ["architecture"],
   ],
   [
@@ -81,10 +88,24 @@ function readRun(id) {
   } = json(path.join(dir, "run.json"));
   const journal = events(dir);
   const declared = publicRun.roles || [];
-  const observed = roles.filter(role => !declared.some(r => r.id === role.id) && journal.some(e => e.agentId === role.id)).map(role => {
-    const handoff = journal.find(e => e.type === "handoff.created" && e.data?.to === role.id);
-    return {...role, parent: declared.some(r => r.id === handoff?.data?.from) ? handoff.data.from : null, observedFromEvents: true};
-  });
+  const observed = roles
+    .filter(
+      (role) =>
+        !declared.some((r) => r.id === role.id) &&
+        journal.some((e) => e.agentId === role.id),
+    )
+    .map((role) => {
+      const handoff = journal.find(
+        (e) => e.type === "handoff.created" && e.data?.to === role.id,
+      );
+      return {
+        ...role,
+        parent: declared.some((r) => r.id === handoff?.data?.from)
+          ? handoff.data.from
+          : null,
+        observedFromEvents: true,
+      };
+    });
   return { ...publicRun, roles: [...declared, ...observed], events: journal };
 }
 function requirePlainTree(dir) {
@@ -107,10 +128,8 @@ async function executeRun(dir, config) {
       kind: config.kind || "build",
     }),
   );
-  const kujo =
-    kujoBinary();
-  const dispatch =
-    dispatchRoot;
+  const kujo = kujoBinary();
+  const dispatch = dispatchRoot;
   const r = await command(
     kujo,
     ["run", path.join(root, "factory/dispatch.kujo")],
@@ -156,6 +175,10 @@ async function executeRun(dir, config) {
 if (verb === "run") {
   const file = process.argv[3];
   if (!file) throw Error("Usage: node factory/cli.mjs run mission.txt");
+  const extra = process.argv.slice(4);
+  if (extra.length && (extra.length !== 2 || extra[0] !== "--pack"))
+    throw Error("Usage: run mission.txt [--pack pack.json]");
+  const pack = extra.length ? readSealedPack(path.resolve(extra[1])) : null;
   const mission = fs.readFileSync(path.resolve(file), "utf8");
   if (!mission.trim() || mission.length > 12000)
     throw Error("Mission must be 1–12000 characters");
@@ -165,13 +188,12 @@ if (verb === "run") {
   fs.mkdirSync(path.join(dir, "application"));
   const config = {
     id,
+    ...(pack ? { packHash: hashPack(pack), packId: pack.id } : {}),
     mission,
     status: "running",
     startedAt: new Date().toISOString(),
     workspace,
-    agentsRoot: path.resolve(
-      agentsRoot,
-    ),
+    agentsRoot: path.resolve(agentsRoot),
     roles,
     tasks,
     stages: [
@@ -182,6 +204,7 @@ if (verb === "run") {
       "Release",
     ],
   };
+  if (pack) save(path.join(dir, "pack.json"), pack);
   save(path.join(dir, "run.json"), config);
   save(path.join(dir, "workflow.json"), {
     id: "factory-01",
@@ -205,6 +228,10 @@ if (verb === "run") {
     });
   await executeRun(dir, config);
 } else if (verb === "recheck" || verb === "retry") {
+  if (process.argv.length !== 4)
+    throw Error(
+      "Usage: retry|recheck RUN_ID; the original frozen pack is reused",
+    );
   const retry = verb === "retry";
   const kind = retry ? "retry-verification" : "revalidation";
   const sourceId = process.argv[3];
@@ -234,6 +261,7 @@ if (verb === "run") {
   const sourceArtifacts = path.join(sourceDir, "artifacts");
   if (fs.lstatSync(sourceArtifacts).isSymbolicLink())
     throw Error("Source artifact symlink rejected");
+  const pack = runPack(sourceDir, source);
   const sourceApp = path.join(sourceDir, "application");
   requirePlainTree(sourceApp);
   if (retry) {
@@ -253,6 +281,9 @@ if (verb === "run") {
     release = json(path.join(sourceArtifacts, "release.json"));
     verification = json(path.join(sourceArtifacts, "verification.json"));
     if (
+      (pack &&
+        (release.packHash !== source.packHash ||
+          verification.packHash !== source.packHash)) ||
       release.status !== "approved-local-candidate" ||
       release.hash !== sourceHash ||
       release.buildHash !== sourceHash ||
@@ -355,12 +386,11 @@ if (verb === "run") {
   const config = {
     id,
     mission: source.mission,
+    ...(pack ? { packHash: hashPack(pack), packId: pack.id } : {}),
     status: "running",
     startedAt: new Date().toISOString(),
     workspace,
-    agentsRoot: path.resolve(
-      agentsRoot,
-    ),
+    agentsRoot: path.resolve(agentsRoot),
     roles: recheckRoles,
     tasks: recheckTasks,
     stages: ["Verification", "Release"],
@@ -369,6 +399,7 @@ if (verb === "run") {
     sourceRun: sourceId,
     sourceHash,
   };
+  if (pack) save(path.join(dir, "pack.json"), pack);
   save(path.join(dir, "run.json"), config);
   save(path.join(dir, "workflow.json"), {
     id: retry ? "factory-verification-retry" : "factory-revalidation",
@@ -559,5 +590,5 @@ if (verb === "run") {
   );
 } else
   console.log(
-    "Commands: run <mission.txt> | recheck <sourceRunId> | retry <failedRunId> | serve. Configure FACTORY_RUNS, FACTORY_AGENTS_ROOT, FACTORY_DISPATCH_ROOT, KUJO_BIN, FACTORY_PORT.",
+    "Commands: run <mission.txt> [--pack pack.json] | recheck <sourceRunId> | retry <failedRunId> | serve. Configure FACTORY_RUNS, FACTORY_AGENTS_ROOT, FACTORY_DISPATCH_ROOT, KUJO_BIN, FACTORY_PORT.",
   );
