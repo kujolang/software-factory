@@ -1,3 +1,7 @@
+import {inspectRunAccounting} from './accountability.mjs';
+import {evaluateVerification,verifyEvaluationBinding} from './evaluation.mjs';
+import {prepareReleasePolicy,finalizeReleasePolicy,assertReleasePolicy} from './release-policy.mjs';
+import {captureMissionFailure} from './lifecycle.mjs';
 import {executeProposal} from './providers.mjs';
 import {loadRole,validateRolePayload,validateHandoff} from './catalog.mjs';
 import { runPack, runtimeContract, hashPack } from "./pack.mjs";
@@ -76,7 +80,7 @@ async function agent(role, id, prompt) {
   });
   let response;
   try {
-    response = await executeProposal({provider,model,ollamaHost,
+    response = await executeProposal({provider:config.executionProvider?.provider||provider,model:config.executionProvider ? config.executionProvider.model??undefined : model,ollamaHost,
       schema:json(path.join(root,"factory/bundle.schema.json")),
       prompt:"You are a text-only proposal agent. No tools, file reads, executions, or additional agents. Return JSON matching the supplied schema. No markdown fences inside content. Role contract:\n"+instructions+"\nHuman mission:\n"+config.mission+"\nAcceptance contract:\n"+contract+"\nWork order:\n"+prompt,
     });
@@ -127,7 +131,8 @@ async function check() {
         report: path.relative(dir, result.browser.report),
       };
     r.packHash = config.packHash;
-    save(path.join(artifact, `acceptance-${Date.now()}.json`), r);
+    r.evidenceFile="artifacts/acceptance-"+Date.now()+".json";
+    save(path.join(dir,r.evidenceFile),r);
     return r;
   }
   const r = await command(
@@ -158,6 +163,7 @@ async function check() {
     r.err += "\nAcceptance attestation missing, incomplete, or source changed";
   }
   const acceptancePath = path.join(artifact, `acceptance-${Date.now()}.json`);
+  r.evidenceFile=path.relative(dir,acceptancePath);
   save(acceptancePath, r);
   if (r.code === 0) {
     const reportPath = path.join(artifact, `browser-${Date.now()}.json`);
@@ -208,6 +214,9 @@ async function review(n) {
 }
 let proposalBlocked = false;
 try {
+  if(config.accountabilityRequired!==true)throw Error("Worker requires controller-started mission accounting");
+  const accounting=await inspectRunAccounting(json(path.join(artifact,"accounting-start.json")));
+  if(accounting.record.status!=="in_progress"||accounting.record.task_name!==config.id)throw Error("Worker accounting identity is not active for this mission");
   emit("task.started", task.title, { dependencies: task.dependencies });
   handoff(
     task.handoffFrom ??
@@ -269,6 +278,7 @@ try {
     );
     if (r.verdict === "fail" || r.files.length === 0) {
       proposalBlocked = true;
+      await captureMissionFailure(dir,{kind:"proposal-rejection",taskId,summary:r.summary.slice(0,16000),evidence:["artifacts/"+taskId+"-proposal.json"]});
       emit("task.blocked", "Proposal requires correction", {
         artifacts: ["artifacts/" + taskId + "-proposal.json"],
       });
@@ -303,7 +313,7 @@ try {
         checked.code === 0 &&
         digest(app) === reviewedHash
       ) {
-        save(path.join(artifact, "verification.json"), {
+        const verification={
           ok: true,
           ...(pack ? { packHash: config.packHash } : {}),
           hash: digest(app),
@@ -311,7 +321,11 @@ try {
           review: "review-" + n + "-binding.json",
           acceptance: checked,
           verifiedAt: new Date().toISOString(),
-        });
+        };
+        const evaluation=await evaluateVerification({dir,sourceHash:verification.hash,verification,review:json(path.join(artifact,verification.review)),browser:json(path.join(dir,checked.browser.report)),packHash:config.packHash||null});
+        save(path.join(artifact,"evaluation.json"),evaluation);
+        if(!evaluation.ok)throw Error("Native Eval rejected verification evidence; release blocked");
+        save(path.join(artifact,"verification.json"),verification);
         emit(
           "verification.passed",
           "Independent review and functional acceptance passed",
@@ -328,6 +342,7 @@ try {
         },
         artifacts: ["artifacts/review-" + n + "-proposal.json"],
       });
+      await captureMissionFailure(dir,{kind:"verification-failure",taskId,summary:`Attempt ${n+1} rejected: `+(reviewResult.issues.join('; ')+" "+checked.err).slice(0,15000),evidence:["artifacts/review-"+n+"-proposal.json","artifacts/review-"+n+"-binding.json",...(checked.evidenceFile?[checked.evidenceFile]:[])]});
       if (n === 2) break;
       emit("correction.requested", "Route findings back to implementation", {
         data: {
@@ -381,6 +396,7 @@ try {
     const v = json(path.join(artifact, "verification.json"));
     if (!v.ok || v.hash !== digest(app))
       throw Error("Missing/stale verification");
+    verifyEvaluationBinding(json(path.join(artifact,"evaluation.json")),{sourceHash:v.hash,packHash:config.packHash||null,dir});
     const testContract = json(path.join(app, "tests/contract.json"));
     const trustedHarnesses = pack
       ? [
@@ -483,11 +499,13 @@ try {
       deploymentAuthorized: false,
     };
     save(path.join(artifact, "release-packet.json"), packet);
+    const releasePolicy=await prepareReleasePolicy({dir,app,packet});
+    assertReleasePolicy(releasePolicy);
     const r = await agent(
       "release-verifier",
       "release",
       "Assess this complete evidence packet for the bounded LOCAL release candidate only. No deployment is requested. Return files:[], verdict pass/fail with concrete blockers grounded in evidence. Build and broad equivalent acceptance checks were actually executed; do not require optional branded tools merely for their names. Evidence:\n" +
-        JSON.stringify(packet),
+        JSON.stringify({...packet,releasePolicy}),
     );
     if (r.verdict !== "pass")
       throw Error("Release verifier rejected candidate");
@@ -497,15 +515,17 @@ try {
       throw Error("Verification pack binding mismatch");
     if (checked.code !== 0 || v.hash !== digest(app))
       throw Error("Final recheck failed");
-    const buildDir = path.join(dir, "build");
+    assertReleasePolicy(finalizeReleasePolicy({dir,app,packet,checked}));
+    verifyEvaluationBinding(json(path.join(artifact,"evaluation.json")),{sourceHash:v.hash,packHash:config.packHash||null,dir});
+    const buildDir = path.join(artifact, "verified-build");
     fs.mkdirSync(buildDir, { recursive: true });
     for (const p of files(app)) {
       const target = path.join(buildDir, p);
       fs.mkdirSync(path.dirname(target), { recursive: true });
       fs.copyFileSync(path.join(app, p), target);
     }
-    save(path.join(artifact, "release.json"), {
-      status: "approved-local-candidate",
+    save(path.join(artifact, "release-verified.json"), {
+      status: "verified-pending-accountability",
       ...(pack ? { packHash: config.packHash } : {}),
       hash: digest(app),
       buildHash: digest(buildDir),
@@ -514,9 +534,9 @@ try {
       deploymentAuthorized: false,
     });
     emit(
-      "release.approved",
-      "Verified local release candidate; no deployment",
-      { artifacts: ["artifacts/release.json"], data: { hash: digest(app) } },
+      "release.verified",
+      "Independent gates passed; awaiting mandatory accounting before local approval",
+      { artifacts: ["artifacts/release-verified.json"], data: { hash: digest(app) } },
     );
   }
   emit(
@@ -528,6 +548,7 @@ try {
   console.log(JSON.stringify({ ok: true, data: { taskId } }));
 } catch (e) {
   emit("task.failed", String(e.message));
+  try{await captureMissionFailure(dir,{kind:"task-failure",taskId,summary:String(e.message).slice(0,16000)});}catch(captureError){emit("accountability.failed","Failure evidence retained but CaseFile unavailable: "+captureError.message);}
   if (taskId === "verify" || taskId === "release")
     emit("release.blocked", String(e.message));
   console.log(

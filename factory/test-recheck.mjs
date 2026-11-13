@@ -1,3 +1,4 @@
+import {kujoBinary} from './settings.mjs';
 /** CLI import tests use a zero-exit transport fixture, never a live model. */
 import fs from "node:fs";
 import path from "node:path";
@@ -10,21 +11,21 @@ import { digest, events, json } from "./core.mjs";
 const cli = path.join(import.meta.dirname, "cli.mjs");
 function fixture(t) {
   const base = fs.mkdtempSync(
-    path.join(os.tmpdir(), "factory-recheck-contract-"),
+    path.join(fs.realpathSync(os.tmpdir()), "factory-recheck-contract-"),
   );
   t.after(() => fs.rmSync(base, { recursive: true, force: true }));
-  // CLI invokes KUJO_BIN run <adapter>. Using Node plus this `run` fixture
-  // exercises setup without a Kujo dependency or a provider/model request.
-  fs.writeFileSync(path.join(base, "run"), "process.exit(0);\n");
+  // Only Dispatch is a zero-exit transport fixture; accounting uses pinned Kujo.
+  const shim=path.join(base,"kujo-shim");
+  fs.writeFileSync(shim,`#!${process.execPath}\nimport {spawnSync} from 'node:child_process';const args=process.argv.slice(2);if(args.some(a=>a.endsWith('/factory/dispatch.kujo')))process.exit(0);const r=spawnSync(${JSON.stringify(kujoBinary())},args,{stdio:'inherit'});process.exit(r.status??1);\n`,{mode:0o700});
   function call(id, verb = "recheck") {
     return spawnSync(process.execPath, [cli, verb, id], {
       encoding: "utf8",
-      timeout: 10000,
+      timeout: 30000,
       env: {
         ...process.env,
         FACTORY_RUNS: base,
         FACTORY_DISPATCH_ROOT: base,
-        KUJO_BIN: process.execPath,
+        KUJO_BIN: shim,
       },
     });
   }

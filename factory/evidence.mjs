@@ -7,6 +7,7 @@ import {execFileSync} from 'node:child_process';
 export const limits = Object.freeze({files: 20000, entries: 25000, depth: 32, fileBytes: 32 * 1024 * 1024, totalBytes: 512 * 1024 * 1024, manifestBytes: 8 * 1024 * 1024});
 const sha = bytes => createHash('sha256').update(bytes).digest('hex');
 const object = value => value && typeof value === 'object' && !Array.isArray(value);
+const commit = value => typeof value === 'string' && /^[a-f0-9]{40}$/.test(value);
 const hex = value => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
 const inventoryId = hashes => 'sha256:' + sha(JSON.stringify(Object.keys(hashes).sort().map(name => [name, hashes[name]])));
 const signatureDomain = Buffer.from('kujo.factory.evidence.signature/v1\0');
@@ -88,6 +89,79 @@ function recordSummary(rows) {
     meaning: 'References to recorded claims, not independently authenticated execution or human approval.',
   };
 }
+const canonical = value => JSON.stringify(value, (_, item) => object(item) ? Object.fromEntries(Object.keys(item).sort().map(key => [key, item[key]])) : item);
+const same = (left, right) => canonical(left) === canonical(right);
+function requireRecord(condition, message) { if (!condition) throw Error('Recorded release ' + message); }
+function artifactReference(dir, names, reference, label, fixedPath) {
+  requireRecord(object(reference) && Object.keys(reference).sort().join(',') === 'path,sha256' && hex(reference.sha256), label + ' reference invalid');
+  relativeName(reference.path);
+  requireRecord(reference.path.startsWith('artifacts/') && (!fixedPath || reference.path === fixedPath) && names.has(reference.path), label + ' record missing');
+  const bytes = readPlain(path.join(dir, reference.path));
+  requireRecord(sha(bytes) === reference.sha256, label + ' record hash mismatch');
+  return {value: JSON.parse(bytes), bytes, path: reference.path};
+}
+function namedArtifact(dir, names, name, label) {
+  relativeName(name);
+  requireRecord(name.startsWith('artifacts/') && names.has(name), label + ' record missing');
+  const bytes = readPlain(path.join(dir, name));
+  return {value: JSON.parse(bytes), bytes, path: name};
+}
+function nativeGateConsistency(dir, names, run, release, verification, review) {
+  requireRecord(run.status === 'completed' && release.gateVersion === 'kujo.factory.release-gates/v2', 'accountability gate version/state missing');
+  const account = artifactReference(dir, names, release.accountability, 'accounting', 'artifacts/mission-accountability.json').value;
+  const observations = namedArtifact(dir, names, 'artifacts/mission-observations.json', 'observations');
+  requireRecord(account.schema === 'kujo.factory.mission-accountability/v1' && account.ok === true && account.status === 'pass' && account.runId === run.id && account.candidateHash === release.hash && account.deploymentAuthorized === false && account.observationsSha256 === sha(observations.bytes), 'accounting missing or inconsistent');
+  const gateNames = ['evaluation.json', 'release-policy-final.json', 'release-verified.json', 'verification.json'];
+  requireRecord(object(account.gates) && same(Object.keys(account.gates).sort(), gateNames) && same(account.gates, observations.value.gates), 'accounting gate inventory missing');
+  for (const name of gateNames) requireRecord(hex(account.gates[name]) && sha(namedArtifact(dir, names, 'artifacts/' + name, 'accounted gate').bytes) === account.gates[name], 'gate changed after accounting');
+  const verified = namedArtifact(dir, names, 'artifacts/release-verified.json', 'verified candidate').value;
+  requireRecord(verified.status === 'verified-pending-accountability' && verified.hash === release.hash && verified.buildHash === release.buildHash && verified.reviewHash === release.reviewHash && verified.deploymentAuthorized === false && same(verified.checks, release.checks) && verified.packHash === release.packHash, 'promoted release differs from accounted candidate');
+  requireRecord(typeof account.ledgerId === 'string' && /^[a-zA-Z0-9_-]{1,300}$/.test(account.ledgerId), 'ledger identity invalid');
+  const ledger = artifactReference(dir, names, account.ledgerRecord, 'RunLedger record');
+  const ledgerBinding = artifactReference(dir, names, account.ledgerBinding, 'RunLedger binding');
+  const ledgerDirectory = path.posix.dirname(ledgerBinding.path);
+  requireRecord(ledgerBinding.path === ledgerDirectory + '/binding.json' && ledger.path === ledgerDirectory + '/.runledger/runs/' + account.ledgerId + '.json', 'ledger record location inconsistent');
+  requireRecord(ledger.value.id === account.ledgerId && ledger.value.status === 'pass' && ledger.value.task_name === run.id && ledgerBinding.value.schema === 'kujo.factory.runledger-binding/v1' && ledgerBinding.value.id === account.ledgerId && commit(ledgerBinding.value.sourceCommit) && same(ledgerBinding.value.record, ledger.value), 'native ledger terminal records disagree');
+  const finish = namedArtifact(dir, names, ledgerDirectory + '/finish-intent.json', 'RunLedger finish intent');
+  requireRecord(ledgerBinding.value.finishIdentity === 'sha256:' + sha(canonical(finish.value)) && finish.value.summary?.status === 'pass' && finish.value.metadataIdentity === ledgerBinding.value.lifecycleBinding?.metadataIdentity && finish.value.summary?.evidence === 'artifacts/mission-observations.json sha256:' + sha(observations.bytes), 'ledger finalization intent inconsistent');
+
+  const final = artifactReference(dir, names, release.policy, 'policy', 'artifacts/release-policy-final.json').value;
+  const preflight = namedArtifact(dir, names, 'artifacts/release-policy-preflight.json', 'policy preflight');
+  requireRecord(final.schema === 'kujo.factory.release-policy-decision/v1' && final.stage === 'after-independent-release-review' && final.passed === true && Array.isArray(final.blockers) && final.blockers.length === 0 && final.approvalGranted === false && final.deploymentAuthorized === false && final.sourceHash === release.hash && final.preflightSha256 === sha(preflight.bytes), 'policy finalization inconsistent');
+  const prior = preflight.value;
+  requireRecord(prior.schema === final.schema && prior.stage === 'before-independent-release-review' && prior.passed === true && Array.isArray(prior.blockers) && prior.blockers.length === 0 && prior.sourceHash === release.hash && prior.approvalGranted === false && prior.deploymentAuthorized === false && prior.policyId === 'local-node-independent-release' && final.policyId === prior.policyId && hex(prior.policySha256) && prior.policySha256 === final.policySha256 && hex(prior.packetSha256) && prior.packetSha256 === final.packetSha256 && same(prior.harnesses, final.harnesses) && same(prior.evaluator, final.evaluator), 'policy preflight identity inconsistent');
+  const harnessNames = run.packHash !== undefined ? ['factory/pack.mjs', 'factory/pack-acceptance.mjs', 'factory/workcell-image/pack-browser.mjs', 'factory/workcell.mjs'] : ['factory/acceptance.mjs', 'factory/workcell-image/browser-check.mjs', 'factory/workcell.mjs'];
+  requireRecord(object(prior.harnesses) && same(Object.keys(prior.harnesses).sort(), harnessNames.sort()) && Object.values(prior.harnesses).every(hex) && object(prior.evaluator) && ['factory/release-policy.mjs', 'factory/accountability.mjs', 'config/accountability.lock.json'].every(name => hex(prior.evaluator[name])), 'trusted policy/harness identities missing');
+  const packet = namedArtifact(dir, names, 'artifacts/release-packet.json', 'release packet');
+  requireRecord(sha(canonical(packet.value)) === prior.packetSha256 && packet.value.sourceHash === release.hash && same(packet.value.verification, verification) && same(packet.value.independentReview, review), 'policy packet identity inconsistent');
+  const repeatedBrowser = namedArtifact(dir, names, release.checks?.browser?.report, 'repeated browser report');
+  requireRecord(release.checks?.code === 0 && !release.checks.reason && final.repeatedAcceptanceSha256 === sha(canonical(release.checks)) && final.repeatedBrowserSha256 === sha(repeatedBrowser.bytes) && repeatedBrowser.value.ok === true, 'repeated acceptance binding inconsistent');
+  const selectedChecks = ['readme', 'version-metadata', 'changelog'];
+  requireRecord(same(prior.shipcheck?.requiredChecks, selectedChecks), 'ShipCheck policy checks missing');
+  const shipcheck = artifactReference(dir, names, {path: prior.shipcheck?.bindingPath, sha256: prior.shipcheck?.bindingSha256}, 'ShipCheck binding').value;
+  const report = shipcheck.report;
+  requireRecord(shipcheck.schema === 'kujo.factory.shipcheck-binding/v1' && commit(shipcheck.sourceCommit) && shipcheck.sourceCommit === prior.shipcheck.sourceCommit && report?.tool === 'shipcheck' && Array.isArray(report.checks) && report.summary?.total_checks === report.checks.length && new Set(report.checks.map(check => check.name)).size === report.checks.length && selectedChecks.every(name => report.checks.some(check => check.name === name && check.passed === 1)), 'native ShipCheck required observations failed');
+
+  const evaluation = artifactReference(dir, names, release.evaluation, 'Eval binding', 'artifacts/evaluation.json').value;
+  requireRecord(object(release.evaluationArtifacts) && Object.keys(release.evaluationArtifacts).sort().join(',') === 'binding,input,result,suite', 'Eval artifact references missing');
+  const parts = Object.fromEntries(Object.entries(release.evaluationArtifacts).map(([key, reference]) => [key, artifactReference(dir, names, reference, 'Eval ' + key)]));
+  const evalDirectory = path.posix.dirname(parts.binding.path);
+  requireRecord(parts.binding.path === evalDirectory + '/binding.json' && parts.input.path === evalDirectory + '/evidence.json' && parts.suite.path === evalDirectory + '/suite.json' && parts.result.path === evalDirectory + '/results/evaluation-result.json' && evalDirectory.startsWith('artifacts/eval/'), 'Eval artifacts span inconsistent attempts');
+  requireRecord(same(evaluation, parts.binding.value) && evaluation.schema === 'kujo.factory.verification-evaluation/v1' && evaluation.ok === true && commit(evaluation.sourceCommit) && evaluation.sourceHash === release.hash && evaluation.packHash === (run.packHash ?? null) && evaluation.inputSha256 === sha(parts.input.bytes) && evaluation.suiteSha256 === sha(parts.suite.bytes) && evaluation.resultSha256 === sha(parts.result.bytes) && same(evaluation.evaluation, parts.result.value), 'Eval artifacts or identity inconsistent');
+  const input = parts.input.value, suite = parts.suite.value, result = parts.result.value;
+  const browserPath = verification.acceptance?.browser?.report;
+  const browser = namedArtifact(dir, names, browserPath, 'evaluated browser report').value;
+  requireRecord(same(input.verification, verification) && same(input.review, review) && same(input.browser, browser) && input.browserHasChecks === true && browser.ok === true && Array.isArray(browser.checks) && browser.checks.length > 0, 'Eval input differs from retained verification');
+  const equals = (name, jsonPath, expected, type) => ({name, check: 'json_value_equals', params: {path: 'evidence.json', json_path: jsonPath, expected, expected_type: type}});
+  const tests = [equals('verification passed', 'verification.ok', true, 'boolean'), equals('verification exact source', 'verification.hash', release.hash, 'string'), equals('trusted acceptance passed', 'verification.acceptance.code', 0, 'number'), equals('independent review passed', 'review.verdict', 'pass', 'string'), equals('independent review exact source', 'review.hash', release.hash, 'string'), equals('browser acceptance passed', 'browser.ok', true, 'boolean'), equals('browser checks present', 'browserHasChecks', true, 'boolean')];
+  if (run.packHash !== undefined) tests.push(equals('verification frozen specification', 'verification.packHash', run.packHash, 'string'), equals('acceptance frozen specification', 'verification.acceptance.packHash', run.packHash, 'string'));
+  requireRecord(suite.name === 'factory-trusted-verification' && suite.version === '1.0.0' && suite.policy_profile === 'release-gate' && suite.path_policy_mode === 'allowlist-required' && suite.require_command_policy === true && same(suite.allowed_paths, ['evidence.json']) && same(suite.allowed_commands, []) && same(suite.allowed_env_vars, []) && same(suite.tests, tests), 'Eval suite differs from bounded controller policy');
+  requireRecord(result.schema === 'kujo.evaluation-result/v1' && result.verdict === 'pass' && result.evaluator?.name === 'eval' && typeof result.evaluator.version === 'string' && /^[0-9]+\.[0-9]+\.[0-9]+$/.test(result.evaluator.version) && result.evaluator.configuration_sha256 === evaluation.suiteSha256 && result.subject?.run_id === run.id && result.subject.step_id === 'trusted-verification' && same(result.input_evidence_ids, ['sha256:' + evaluation.inputSha256]) && result.checks?.passed === tests.length && result.checks.failed === 0 && result.checks.skipped === 0 && result.checks.warned === 0 && same(evaluation.checks, result.checks), 'native Eval result is not a bound passing evaluation');
+  for (const file of ['execution.json', 'manifest-verification.json']) {
+    const execution = namedArtifact(dir, names, evalDirectory + '/' + file, 'Eval process').value;
+    requireRecord(execution.schema === 'kujo.factory.eval-execution/v1' && execution.component === 'eval' && execution.sourceCommit === evaluation.sourceCommit && execution.code === 0 && !execution.reason, 'native Eval process did not pass');
+  }
+}
 function consistency(dir, manifest, rows) {
   const names = new Set(rows.map(row => row.path));
   if (!names.has('run.json')) throw Error('Missing run.json');
@@ -110,9 +184,18 @@ function consistency(dir, manifest, rows) {
       if (review.hash !== release.hash || review.verdict !== 'pass' || verification.ok !== true) throw Error('Recorded independent review binding mismatch');
       if (run.packHash !== undefined && (release.packHash !== run.packHash || verification.packHash !== run.packHash)) throw Error('Recorded release specification binding mismatch');
       checks.push('recorded source/build/review identity agreement');
+      if (run.accountabilityRequired) { nativeGateConsistency(dir, names, run, release, verification, review); checks.push('recorded native accounting/policy/Eval identity agreement'); }
     }
   }
   return {checks, recordedStatus: typeof run.status === 'string' ? run.status : null};
+}
+
+/** Validates a completed run's retained approval records without ecosystem dependencies. */
+export function verifyRunReleaseRecords(directory) {
+  const dir = plainRoot(directory), rows = scan(dir, {selected: true});
+  const run = json(dir, 'run.json'), release = json(dir, 'artifacts/release.json');
+  if (run.status !== 'completed' || release.status !== 'approved-local-candidate') throw Error('Run has no completed local release');
+  return {ok: true, runId: run.id, ...consistency(dir, {runId: run.id}, rows), deploymentAuthorized: false, executionProof: 'not-established-by-this-verifier'};
 }
 
 /** Offline verification does not authorize execution, release, merge or deployment. */

@@ -1,3 +1,4 @@
+import {verifyRunReleaseRecords} from './evidence.mjs';
 import { runPack } from "./pack.mjs";
 import { agentsRoot } from "./settings.mjs";
 import fs from "node:fs";
@@ -19,6 +20,13 @@ export function audit(dir) {
     assert.equal(r.checks.packHash, run.packHash);
   }
   const checks = [];
+  if(run.accountabilityRequired){
+    verifyRunReleaseRecords(dir);
+    const account=json(path.join(dir,'artifacts/mission-accountability.json'));
+    assert.equal(account.ok,true);assert.equal(account.status,'pass');assert.equal(account.runId,run.id);
+    assert.equal(account.candidateHash,digest(path.join(dir,'application')));
+    assert.equal(run.status,'completed');
+  }
   const check = (name, fn) => {
     fn();
     checks.push(name);

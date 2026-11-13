@@ -1,4 +1,6 @@
-import {validatePackWithSpec} from './accountability.mjs';
+import {verifyRunReleaseRecords} from './evidence.mjs';
+import {startMissionAccounting,finishMissionAccounting,captureMissionFailure,blockUnaccountedRelease,promoteAccountedRelease} from './lifecycle.mjs';
+import {validatePackWithSpec,annotateRunAccounting} from './accountability.mjs';
 import {controllerProvenance} from './provenance.mjs';
 import {catalog} from './catalog.mjs';
 import { readSealedPack, hashPack, runPack } from "./pack.mjs";
@@ -7,7 +9,7 @@ import {
   dispatchRoot,
   kujoBinary,
   runsRoot,
-  settings,
+  settings, provider, model,
 } from "./settings.mjs";
 import fs from "node:fs";
 import path from "node:path";
@@ -124,68 +126,49 @@ function requirePlainTree(dir) {
   }
 }
 async function executeRun(dir, config) {
-  save(path.join(dir,"artifacts/controller-provenance.json"),controllerProvenance());
-  if(config.packHash){
-    try {
+  config.accountabilityRequired=true;
+  config.executionProvider={provider,model:model||null};
+  save(path.join(dir,"run.json"),config);
+  const provenance=controllerProvenance();
+  save(path.join(dir,"artifacts/controller-provenance.json"),provenance);
+  console.log(JSON.stringify({runId:config.id,directory:dir,kind:config.kind||"build"}));
+  let dispatchResult=null,passed=false,reason="Mission did not reach independent release";
+  try {
+    await startMissionAccounting(dir,config,provenance,{provider,model});
+    if(config.packHash){
       const binding=await validatePackWithSpec(runPack(dir,config),{parent:path.join(dir,"artifacts/spec")});
       save(path.join(dir,"artifacts/spec-binding.json"),binding);
-    } catch(error) {
-      config.status="failed";config.finishedAt=new Date().toISOString();save(path.join(dir,"run.json"),config);
-      event(dir,"mission.failed",{summary:"Spec validation blocked implementation: "+error.message});
-      process.exitCode=1;return;
     }
+    dispatchResult=await command(kujoBinary(),["run",path.join(root,"factory/dispatch.kujo")],{
+      cwd:dispatchRoot,timeout:7200000,
+      env:{FACTORY_RUN_DIR:dir,FACTORY_ROOT:root,NODE_BIN:process.execPath,DISPATCH_ALLOW_ANY_OUTPUT_ROOT:"true"},
+    });
+    save(path.join(dir,"dispatch-process.json"),dispatchResult);
+    passed=dispatchResult.code===0&&!dispatchResult.reason&&events(dir).some(e=>e.type==="release.verified")&&!events(dir).some(e=>e.type==="accountability.failed");
+    reason=passed?"Independent local release gates passed; no deployment authorized":"Mission stopped before all independent release gates passed";
+    if(!passed)await captureMissionFailure(dir,{kind:"mission-failure",summary:reason+"; Dispatch exit "+dispatchResult.code,evidence:["dispatch-process.json"]});
+  } catch(error) {
+    passed=false;reason=error.message;
+    event(dir,"mission.failed",{summary:"Mission stopped: "+reason});
+    try{await captureMissionFailure(dir,{kind:"controller-failure",summary:reason.slice(0,16000)});}catch(captureError){reason+="; failure capture unavailable: "+captureError.message;}
   }
-  console.log(
-    JSON.stringify({
-      runId: config.id,
-      directory: dir,
-      kind: config.kind || "build",
-    }),
-  );
-  const kujo = kujoBinary();
-  const dispatch = dispatchRoot;
-  const r = await command(
-    kujo,
-    ["run", path.join(root, "factory/dispatch.kujo")],
-    {
-      cwd: dispatch,
-      timeout: 7200000,
-      env: {
-        FACTORY_RUN_DIR: dir,
-        FACTORY_ROOT: root,
-        NODE_BIN: process.execPath,
-        DISPATCH_ALLOW_ANY_OUTPUT_ROOT: "true",
-      },
-    },
-  );
-  save(path.join(dir, "dispatch-process.json"), r);
-  const approved = events(dir).some((e) => e.type === "release.approved");
-  config.status = r.code === 0 && approved ? "completed" : "failed";
-  config.finishedAt = new Date().toISOString();
-  save(path.join(dir, "run.json"), config);
-  event(
-    dir,
-    config.status === "completed" ? "mission.completed" : "mission.failed",
-    {
-      summary:
-        config.status === "completed"
-          ? config.sourceRun
-            ? config.kind === "retry-verification"
-              ? "Previously unverified candidate passed independent recovery gates"
-              : "Imported candidate independently revalidated; no new build mission"
-            : "Application built and verified"
-          : "Mission stopped; inspect evidence",
-    },
-  );
-  console.log(
-    JSON.stringify({
-      runId: config.id,
-      status: config.status,
-      dispatchCode: r.code,
-    }),
-  );
-  process.exitCode = config.status === "completed" ? 0 : 1;
+  try {
+    await finishMissionAccounting(dir,config,{passed,reason:reason.slice(0,16000)});
+    if(passed)promoteAccountedRelease(dir,config);
+    if(!passed&&fs.existsSync(path.join(dir,"artifacts/release.json")))blockUnaccountedRelease(dir,new Error(reason));
+  } catch(error) {
+    passed=false;reason="Required lifecycle accounting failed: "+error.message;
+    blockUnaccountedRelease(dir,error);
+    try{await annotateRunAccounting(json(path.join(dir,"artifacts/accounting-start.json")),"Controller mission failed after accounting/promotion attempt: "+error.message.slice(0,15000));}catch(noteError){event(dir,"accountability.failed",{summary:"Later failure annotation unavailable; original ledger preserved",data:{error:noteError.message}});}
+    try{await captureMissionFailure(dir,{kind:"accounting-failure",summary:reason.slice(0,16000)});}catch{}
+  }
+  config.status=passed?"completed":"failed";config.finishedAt=new Date().toISOString();
+  save(path.join(dir,"run.json"),config);
+  event(dir,passed?"mission.completed":"mission.failed",{summary:reason});
+  console.log(JSON.stringify({runId:config.id,status:config.status,dispatchCode:dispatchResult?.code??null}));
+  process.exitCode=passed?0:1;
 }
+
 if (verb === "run") {
   const file = process.argv[3];
   if (!file) throw Error("Usage: node factory/cli.mjs run mission.txt");
@@ -289,6 +272,7 @@ if (verb === "run") {
   const sourceHash = digest(sourceApp);
   let release, verification;
   if (!retry) {
+    if(source.accountabilityRequired)verifyRunReleaseRecords(sourceDir);
     for (const name of ["release.json", "verification.json"])
       if (fs.lstatSync(path.join(sourceArtifacts, name)).isSymbolicLink())
         throw Error("Source evidence symlink rejected");
@@ -550,7 +534,7 @@ if (verb === "run") {
       });
       const runMatch = pathname.match(/^\/api\/runs\/([a-zA-Z0-9_-]+)$/);
       if (runMatch) return send(200, readRun(runMatch[1]));
-      let file;
+      let file,servingEvidence=false,evidenceBase;
       if (pathname.startsWith("/evidence/")) {
         const [, , id, ...parts] = decodeURIComponent(pathname).split("/");
         if (
@@ -568,7 +552,8 @@ if (verb === "run") {
           ].includes(relative)
         )
           return send(403, { error: "Not exportable evidence" });
-        file = path.join(runPath(id), relative);
+        servingEvidence=true;evidenceBase=runPath(id);
+        file = path.join(evidenceBase, relative);
       } else {
         const relative =
           decodeURIComponent(pathname) === "/"
@@ -578,10 +563,15 @@ if (verb === "run") {
         if (!file.startsWith(web + path.sep))
           return send(403, { error: "Invalid path" });
       }
+      if(servingEvidence){
+        let cursor=evidenceBase;
+        if(fs.lstatSync(cursor).isSymbolicLink())return send(403,{error:"Evidence symlink rejected"});
+        for(const part of path.relative(evidenceBase,file).split(path.sep)){cursor=path.join(cursor,part);if(fs.lstatSync(cursor).isSymbolicLink())return send(403,{error:"Evidence symlink rejected"});}
+      }
       if (!fs.statSync(file).isFile() || fs.lstatSync(file).isSymbolicLink())
         return send(404, { error: "Not found" });
       const ext = path.extname(file);
-      const mime =
+      const mime = servingEvidence ? (ext===".json"?"application/json":"text/plain; charset=utf-8") :
         {
           ".html": "text/html; charset=utf-8",
           ".js": "text/javascript; charset=utf-8",
@@ -598,6 +588,7 @@ if (verb === "run") {
           "Content-Type": mime,
           "Cache-Control": "no-store",
           "X-Content-Type-Options": "nosniff",
+          "Content-Security-Policy": "default-src 'none'; sandbox; frame-ancestors 'none'",
         });
         return res.end(body);
       }

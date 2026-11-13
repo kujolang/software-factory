@@ -89,7 +89,7 @@ test("run snapshots sealed pack and fails without release approval", (t) => {
         FACTORY_DISPATCH_ROOT: dir,
         KUJO_BIN: shim,
       },
-      timeout: 10000,
+      timeout: 30000,
     },
   );
   assert.equal(r.status, 1, r.stderr);
@@ -101,7 +101,7 @@ test("run snapshots sealed pack and fails without release approval", (t) => {
   assert.deepEqual(runPack(path.join(dir, id), run), original);
 });
 test("retry copies its frozen pack and rejects changed pack evidence", (t) => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "factory-pack-retry-"));
+  const dir = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), "factory-pack-retry-"));
   t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
   const source = path.join(dir, "factory-source");
   fs.mkdirSync(path.join(source, "application/public"), { recursive: true });
@@ -143,9 +143,9 @@ test("retry copies its frozen pack and rejects changed pack evidence", (t) => {
           ...process.env,
           FACTORY_RUNS: dir,
           FACTORY_DISPATCH_ROOT: dir,
-          KUJO_BIN: process.execPath,
+          KUJO_BIN: shim,
         },
-        timeout: 10000,
+        timeout: 30000,
       },
     );
   const result = call();
@@ -156,6 +156,8 @@ test("retry copies its frozen pack and rejects changed pack evidence", (t) => {
     JSON.parse(fs.readFileSync(path.join(dir, id, "pack.json"))),
     original,
   );
+  assert.equal(JSON.parse(fs.readFileSync(path.join(dir,id,"dispatch-process.json"))).code,0);
+  assert.equal(JSON.parse(fs.readFileSync(path.join(dir,id,"artifacts/mission-accountability.json"))).status,'fail');
   const changed = structuredClone(original);
   changed.contract += " Changed";
   fs.writeFileSync(path.join(source, "pack.json"), JSON.stringify(changed));

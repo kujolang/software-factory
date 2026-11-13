@@ -23,5 +23,9 @@ test('standalone observer serves local assets and cannot mutate factory state',a
  assert.equal(badHost,403);
  assert.equal((await fetch(url+'/assets/DepartureMono-Regular.woff2')).status,200);
  assert.equal((await fetch(url+'/%2e%2e%2ffactory%2fworker.mjs')).status,403);
- assert.deepEqual(fs.readdirSync(runs),[]);
+ const run=path.join(runs,'factory-fixture');fs.mkdirSync(path.join(run,'artifacts/verified-build'),{recursive:true});
+ fs.writeFileSync(path.join(run,'artifacts/verified-build/index.html'),'<script>throw Error("untrusted")</script>');
+ const candidate=await fetch(url+'/evidence/factory-fixture/artifacts/verified-build/index.html');assert.equal(candidate.status,200);assert.match(candidate.headers.get('content-type'),/^text\/plain/);assert.equal(candidate.headers.get('x-content-type-options'),'nosniff');
+ fs.symlinkSync(path.join(root,'factory'),path.join(run,'artifacts/link'));
+ assert.equal((await fetch(url+'/evidence/factory-fixture/artifacts/link/worker.mjs')).status,403);
 });

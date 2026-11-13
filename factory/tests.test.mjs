@@ -1,3 +1,6 @@
+import {evaluateVerification} from './evaluation.mjs';
+import {startMissionAccounting} from './lifecycle.mjs';
+import {controllerProvenance} from './provenance.mjs';
 import {dependency} from './settings.mjs';
 import test from "node:test";
 import { productDocs } from "./product-docs.mjs";
@@ -9,7 +12,7 @@ import { pathToFileURL } from "node:url";
 import { materialize, digest, event, events, command } from "./core.mjs";
 
 function fixture(t) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "factory-test-"));
+  const dir = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), "factory-test-"));
   t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
   return dir;
 }
@@ -200,6 +203,7 @@ test("release worker rejects generated source that exits successfully before ass
   fs.writeFileSync(
     path.join(dir, "run.json"),
     JSON.stringify({
+      id:path.basename(dir),accountabilityRequired:true,
       mission: "Controlled gate regression",
       workspace: dir,
       agentsRoot: dependency("kujo-agents"),
@@ -213,6 +217,10 @@ test("release worker rejects generated source that exits successfully before ass
       ],
     }),
   );
+  const read=name=>JSON.parse(fs.readFileSync(path.join(artifacts,name)));
+  const evaluation=await evaluateVerification({dir,sourceHash:digest(app),verification:read('verification.json'),review:read('review-binding.json'),browser:read('browser.json')});
+  fs.writeFileSync(path.join(artifacts,'evaluation.json'),JSON.stringify(evaluation));
+  await startMissionAccounting(dir,{id:path.basename(dir)},controllerProvenance(),{provider:'offline-fixture',model:'none'});
   // Offline provider fixture explicitly scoped to this test; no live model call.
   const provider = `#!${process.execPath}\nimport fs from 'node:fs'; const args=process.argv.slice(2);fs.writeFileSync(args[args.indexOf('-o')+1],JSON.stringify({summary:'Fixture only',verdict:'pass',issues:[],files:[]}));console.log(JSON.stringify({type:'turn.completed',usage:{input_tokens:0,output_tokens:0}}));\n`;
   fs.writeFileSync(path.join(bin, "codex"), provider, { mode: 0o700 });
@@ -220,7 +228,7 @@ test("release worker rejects generated source that exits successfully before ass
     process.execPath,
     [path.join(import.meta.dirname, "worker.mjs"), dir, "release"],
     {
-      timeout: 10000,
+      timeout: 30000,
       env: {
         PATH: bin + path.delimiter + process.env.PATH,
         DOCKER_HOST: "unix:///tmp/factory-test-missing-engine.sock",
