@@ -6,8 +6,8 @@
   "qualification": "qualified-sqlite-fixtures-linux-amd64",
   "scope": "Disposable SQLite database; bounded SQL forward migration and transaction-failure rollback; no production authorization",
   "qualificationEvidence": {
-    "record": ".runtime/sqlite-migration-qualification/qualification-U1M9Ue/qualification.json",
-    "sha256": "3197cffb1fe02f2fbfc0fbcb87e09e912203e6f1eff08b8f8eb3f0c804444a2a",
+    "record": ".runtime/sqlite-migration-qualification/qualification-PjFx9h/qualification.json",
+    "sha256": "f34066eb56ba7064eb37da81afd0c3bf091f5b146afed9b6da07c88f4f68ce68",
     "cases": 9
   }
 }

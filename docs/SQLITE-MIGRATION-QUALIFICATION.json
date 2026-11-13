@@ -3,15 +3,15 @@
   "qualification": "qualified-sqlite-fixtures-linux-amd64",
   "cases": 9,
   "passed": 9,
-  "privateRecord": ".runtime/sqlite-migration-qualification/qualification-U1M9Ue/qualification.json",
-  "privateRecordSha256": "3197cffb1fe02f2fbfc0fbcb87e09e912203e6f1eff08b8f8eb3f0c804444a2a",
+  "privateRecord": ".runtime/sqlite-migration-qualification/qualification-PjFx9h/qualification.json",
+  "privateRecordSha256": "f34066eb56ba7064eb37da81afd0c3bf091f5b146afed9b6da07c88f4f68ce68",
   "source": {
-    "commit": "99f9f0f6e73949f5e51054c9055504a8dcd77a82",
-    "tree": "3159678356bebf8d2fbd1b58203f3eff6e5ae495",
+    "commit": "b5ae0429da0bf09e11de8ab0d0d4b534f0e8a849",
+    "tree": "e6464bddf18b3d946045721065757e5465deff2c",
     "dirty": true,
     "identityScope": "Git HEAD; dirty working-tree bytes are separately hashed below"
   },
-  "runnerSha256": "8c560e0827eb1ad7e26f213d1dba1887cc7d5336a0600b4822ec1de89d1faa78",
+  "runnerSha256": "ef7ea25e65b951c1c39583e58f6621cd79f51888cba256f5db21336cfc9b5da8",
   "imageId": "sha256:c62fa7844cd38dd67d18421162af5016b2973a48d6db0a119982b2bf4b661383",
   "workcellSource": {
     "commit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
@@ -27,6 +27,9 @@
   "failedEvidence": [
     ".runtime/sqlite-migration-qualification/qualification-sWByvp",
     ".runtime/sqlite-missions/sqlite-BLVN2X",
-    ".runtime/sqlite-missions/sqlite-VmGUSG"
+    ".runtime/sqlite-missions/sqlite-VmGUSG",
+    ".runtime/sqlite-missions/sqlite-dJC1t8",
+    ".runtime/sqlite-missions/sqlite-Ro8qmS",
+    ".runtime/sqlite-missions/sqlite-psxFS2"
   ]
 }
