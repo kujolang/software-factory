@@ -7,6 +7,10 @@
 
 Give a team of agents a software mission. Inspect what they built, what reviewers rejected, and which tests actually passed.
 
+[![Watch the Software Factory demo](docs/media/software-factory-demo.png)](docs/media/software-factory-demo.mp4)
+
+[Watch the narrated demo — 49 seconds](docs/media/software-factory-demo.mp4)
+
 Software Factory coordinates scoped proposals through Kujo Dispatch, runs generated code inside rootless Workcell containers, and approves a local candidate only after independent checks. The Factory Floor lets you follow and replay the evidence.
 
 **Standalone, local, early release.** Give your agent an idea and the [software-pack guide](docs/PACKS.md). It can define the product contract and tests without rewriting the controller. Packs support Node APIs, SQLite when needed, and static browser interfaces. The issue tracker remains the default; converter and notes packs show other products. Agent City is not required.

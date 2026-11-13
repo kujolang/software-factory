@@ -11,3 +11,5 @@ The extracted runtime includes the controller, observer, native Dispatch adapter
 `examples/issue-tracker` comes from the original final approved candidate, run `factory-retry-2026-11-12T23-52-20-851Z`. It is included only as a representative, untrusted smoke-test fixture. Its historical documentation is not current approval; the standalone smoke always executes fresh controller-owned tests inside Workcell.
 
 Canonical role contracts, Dispatch and Workcell are fetched at the public commits in `sources.lock.json`; the factory does not maintain copies of those engines. Kujo and Codex runtime versions are locked npm dependencies. The observer font retains its license in `factory/web/assets/`.
+
+The README preview links to `docs/media/software-factory-demo.mp4`, an unchanged copy of the final narrated demo with the Kujo bumper. Its SHA-256 is `4046393dc1e7c836ee8b944a6006ab81c8ea28aeae1c9a8a387581104ff0288e`. The preview image is the existing one-second frame from that video. This historical issue-tracker demonstration predates software packs.
