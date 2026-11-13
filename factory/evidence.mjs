@@ -11,7 +11,7 @@ const commit = value => typeof value === 'string' && /^[a-f0-9]{40}$/.test(value
 const hex = value => typeof value === 'string' && /^[a-f0-9]{64}$/.test(value);
 const inventoryId = hashes => 'sha256:' + sha(JSON.stringify(Object.keys(hashes).sort().map(name => [name, hashes[name]])));
 const signatureDomain = Buffer.from('kujo.factory.evidence.signature/v1\0');
-const exportedNames = new Set(['run.json', 'pack.json', 'workflow.json', 'events.jsonl', 'dispatch-events.jsonl', 'dispatch-result.json', 'dispatch-process.json', 'audit.json', 'artifacts', 'application', 'build', 'dispatch']);
+const exportedNames = new Set(['run.json', 'input.json', 'reviewed-cli.json', 'reviewed-specification.json', 'reviewed-documentation.json', 'result.json', 'pack.json', 'workflow.json', 'events.jsonl', 'dispatch-events.jsonl', 'dispatch-result.json', 'dispatch-process.json', 'audit.json', 'artifacts', 'application', 'build', 'dispatch']);
 
 function relativeName(name) {
   if (typeof name !== 'string' || !name || name.length > 1024 || /[\\:\x00-\x1f\x7f]/.test(name) || name !== name.normalize('NFC') || name.split('/').some(part => !part || part === '.' || part === '..' || /[. ]$/.test(part))) throw Error('Unsafe evidence path: ' + name);
@@ -198,12 +198,127 @@ function nativeGateConsistency(dir, names, run, release, verification, review) {
     requireRecord(execution.schema === 'kujo.factory.eval-execution/v1' && execution.component === 'eval' && execution.sourceCommit === evaluation.sourceCommit && execution.code === 0 && !execution.reason, 'native Eval process did not pass');
   }
 }
+
+function missionArtifact(dir,names,name){relativeName(name);requireRecord(names.has(name),'mission artifact missing: '+name);const bytes=readPlain(path.join(dir,name));return {value:JSON.parse(bytes),bytes,path:name};}
+function portableNativePath(reference,kind){
+ requireRecord(typeof reference==='string','native path missing');const normalized=reference.replaceAll('\\','/');
+ const matches=[...normalized.matchAll(new RegExp('(?:^|/)(artifacts/'+kind+'/receipt-[A-Za-z0-9]+)(?=/|$)','g'))];
+ requireRecord(matches.length===1 && normalized.endsWith(matches[0][1]),'native path not a unique retained artifact');return relativeName(matches[0][1]);
+}
+function checkMissionRole(dir,names,run,step,role){
+ const receipt=missionArtifact(dir,names,'artifacts/'+step+'-receipt.json'),proposal=missionArtifact(dir,names,'artifacts/'+step+'-proposal.json');const r=receipt.value;
+ requireRecord(r.fixture===run.fixture&&r.role===role&&r.status==='completed'&&r.code===0&&r.observedToolCalls===0&&['mock','codex','ollama','openai','anthropic','gemini'].includes(r.provider)&&(!run.fixture?r.provider===run.provider&&r.provider!=='mock'&&(run.model==null||r.model===run.model):r.provider==='mock'),'mission role receipt invalid');
+ requireRecord(Array.isArray(proposal.value.files),'mission proposal file contract missing');return {receipt,proposal};
+}
+function missionBindings(dir,names,run,final,required,marker){
+ const fresh=run.evidenceContract!==undefined||final.evidenceBindings!==undefined||names.has('artifacts/mission-evidence-contract.json');
+ if(!fresh)return false;
+ requireRecord(run.evidenceContract===marker&&object(final.evidenceBindings),'mission evidence contract/binding downgrade');
+ requireRecord(missionArtifact(dir,names,'artifacts/mission-evidence-contract.json').value.schema===marker,'mission evidence marker mismatch');
+ required=[...required,'artifacts/mission-evidence-contract.json'];
+ requireRecord(Object.keys(final.evidenceBindings).length<=limits.files,'mission binding bound');
+ for(const [file,digest] of Object.entries(final.evidenceBindings)){relativeName(file);requireRecord((file.startsWith('artifacts/')||file==='input.json')&&hex(digest)&&names.has(file)&&sha(readPlain(path.join(dir,file)))===digest,'mission artifact binding changed: '+file);}
+ for(const file of required)requireRecord(hex(final.evidenceBindings[file]),'required mission binding absent: '+file);
+ return true;
+}
+function missionNativeSpec(dir,names,binding,schema='kujo.factory.native-spec-binding/v1'){
+ requireRecord(binding.schema===schema&&commit(binding.sourceCommit)&&binding.validation?.valid===true,'native Spec validation missing');
+ const base=portableNativePath(binding.executionEvidence,'spec'),native=missionArtifact(dir,names,base+'/binding.json').value;
+ requireRecord(same(native,binding)&&sha(missionArtifact(dir,names,base+'/mission.spec.json').bytes)===binding.specSha256&&sha(missionArtifact(dir,names,base+'/spec-envelope.json').bytes)===binding.envelopeSha256,'native Spec source/envelope mismatch');
+ const envelope=missionArtifact(dir,names,base+'/spec-envelope.json').value;requireRecord(envelope.metadata?.checksum_sha256===binding.specSha256,'native Spec envelope identity mismatch');
+ const validations=[...names].filter(n=>n.startsWith(base+'/spec-')&&n.endsWith('.json')&&n!==base+'/spec-envelope.json').map(n=>missionArtifact(dir,names,n).value).filter(r=>r.component==='spec'&&Array.isArray(r.argv)&&r.argv.includes('validate'));
+ requireRecord(validations.length===1&&validations[0].code===0&&!validations[0].reason&&validations[0].sourceCommit===binding.sourceCommit&&same(JSON.parse(validations[0].stdout),binding.validation),'native Spec execution receipt invalid');return base;
+}
+function missionLedger(dir,names,run,final,expectedEvidence,expectedTests,roleReceipts){
+ const terminal=missionArtifact(dir,names,'artifacts/accounting-terminal.json');const b=terminal.value;
+ requireRecord(final.accountingSha256===sha(terminal.bytes)&&(final.accountingId??final.accountingRecord)===b.id&&b.schema==='kujo.factory.runledger-binding/v1'&&commit(b.sourceCommit),'mission terminal accounting binding invalid');
+ const base=portableNativePath(b.executionEvidence,'runledger'),native=missionArtifact(dir,names,base+'/binding.json').value,record=missionArtifact(dir,names,base+'/.runledger/runs/'+relativeName(b.id)+'.json').value,finish=missionArtifact(dir,names,base+'/finish-intent.json').value;
+ requireRecord(same(native,b)&&same(record,b.record)&&record.id===b.id&&record.task_name===run.id&&record.status==='pass'&&b.finishIdentity==='sha256:'+sha(canonical(finish))&&finish.metadataIdentity===b.lifecycleBinding?.metadataIdentity,'mission native ledger disagreement');
+ requireRecord(record.provider===(run.fixture?'mock-fixture':run.provider)&&record.model===(run.fixture?'offline-fixture':run.model||'unreported'),'mission ledger provider/model mismatch');
+ const summary=finish.summary;requireRecord(summary?.status==='pass'&&summary.evidence===expectedEvidence&&same(summary.tests,expectedTests)&&record.verdict===summary.verdict&&same(record.tests?.map(t=>({name:t.name,status:t.status,evidence:t.details})),expectedTests),'mission ledger verdict/test history mismatch');
+ const observed={};for(const key of ['input_tokens','output_tokens']){let n=0,known=roleReceipts.length>0;for(const r of roleReceipts){const entries=Array.isArray(r.usage)?r.usage:object(r.usage)?[r.usage]:[];if(!entries.length||r.usageKnown===false)known=false;for(const u of entries){if(!Number.isSafeInteger(u[key])||u[key]<0)known=false;else n+=u[key];}}if(known&&Number.isSafeInteger(n))observed[key]=n;}
+ requireRecord(same(summary.usage,Object.keys(observed).length?observed:null)&&same(record.usage,{input_tokens:observed.input_tokens??null,output_tokens:observed.output_tokens??null,cache_read_tokens:null,cache_write_tokens:null})&&same(record.cost,{currency:'USD',input_cost:null,output_cost:null,cache_cost:null,total_cost:null}),'mission usage/cost mismatch');return base;
+}
+function cliWorkcell(dir,names,base,caseRecord,compiled){
+ const required=['preflight.json','definition.json','execution-profile.json','effective.json','cleanup.json'];
+ for(const [field,prefix,keys] of [['workcellRecords',caseRecord.evidence,required],...(compiled?[['executionRecords',caseRecord.executionEvidence,[...required,'container.json','compiled-artifact.json']]]:[])]){
+  relativeName(prefix);const location=base+'/'+prefix,records=caseRecord[field];requireRecord(object(records)&&keys.every(k=>hex(records[k])),'CLI Workcell receipt inventory missing');
+  for(const [name,digest] of Object.entries(records)){relativeName(name);requireRecord(!name.includes('/')&&hex(digest)&&sha(missionArtifact(dir,names,location+'/'+name).bytes)===digest,'CLI Workcell receipt changed');}
+  const pre=missionArtifact(dir,names,location+'/preflight.json').value,definition=missionArtifact(dir,names,location+'/definition.json').value,profile=missionArtifact(dir,names,location+'/execution-profile.json').value,effective=missionArtifact(dir,names,location+'/effective.json').value,cleanup=missionArtifact(dir,names,location+'/cleanup.json').value;
+  const image=field==='workcellRecords'?caseRecord.imageId:caseRecord.executionImageId;
+  requireRecord(pre.imageId===image&&Array.isArray(pre.securityOptions)&&pre.securityOptions.some(v=>v.includes('rootless'))&&pre.securityOptions.some(v=>v.includes('seccomp'))&&definition.runtime?.image_digest===image&&definition.workspace?.run_as==='rootless'&&definition.network?.mode==='none'&&definition.filesystem?.read_only_root===true&&same(definition.environment,{allow:[],set:{}})&&same(definition.secrets,[])&&profile.candidateUid===65534&&profile.candidateWritableBind===false&&cleanup.ok===true&&/NoNewPrivs:\s+1/.test(effective.status)&&/Seccomp:\s+2/.test(effective.status),'CLI Workcell boundary receipt inconsistent');
+  requireRecord(profile.executionProfile===(field==='workcellRecords'?'default':'native-compiled-cli/v2'),'CLI execution profile mismatch');
+  if(field==='executionRecords'){const container=missionArtifact(dir,names,location+'/container.json').value;requireRecord(definition.workspace?.read_only===true&&container.Mounts?.some(m=>m.Destination==='/workspace/compiled-input'&&m.RW===false),'CLI compiled workspace not recorded read-only');}
+ }
+}
+function cliMissionConsistency(dir,names,run,rows){
+ requireRecord(run.schema==='kujo.factory.cli-mission/v1'&&run.kind==='cli-construction','CLI family marker downgrade');
+ const scope={family:'cli',checks:['CLI mission footprint'],scope:'failed or incomplete mission; no recorded approval validated'};
+ if(run.status!=='completed')return scope;
+ const final=missionArtifact(dir,names,'reviewed-cli.json').value,input=missionArtifact(dir,names,'input.json').value;
+ requireRecord(input.schema==='kujo.factory.cli-mission-input/v1'&&Array.isArray(input.cases)&&input.cases.length>0&&input.cases.length<=50&&run.inputSha256===sha(JSON.stringify(input))&&final.inputSha256===run.inputSha256&&final.profile===input.profile&&run.profile===input.profile&&typeof run.fixture==='boolean'&&final.fixture===run.fixture&&final.softwareReleaseApproval===!run.fixture&&final.humanApproval===false&&final.deploymentAuthorized===false,'CLI frozen input/final identity mismatch');
+ const sourceRows=rows.filter(r=>r.path.startsWith('application/')).sort((a,b)=>a.path<b.path?-1:a.path>b.path?1:0);const source=sha(sourceRows.map(r=>r.path.slice(12)+'\0'+readPlain(path.join(dir,r.path)).toString('base64')).join('\n'));
+ requireRecord(sourceRows.length===1&&source===final.sourceHash,'CLI candidate source mismatch');
+ const required=['input.json','artifacts/spec.json','artifacts/verify.json','artifacts/reverify.json','artifacts/accounting-terminal.json'],receipts=[];
+ for(const [step,role] of [['review-contract','code-reviewer'],['implement','core-developer'],['review','code-reviewer'],['release','release-verifier']]){
+  const r=checkMissionRole(dir,names,run,step,role),binding=missionArtifact(dir,names,'artifacts/'+step+'-binding.json').value;receipts.push(r.receipt.value);required.push(...['receipt','proposal','binding'].map(s=>'artifacts/'+step+'-'+s+'.json'));
+  requireRecord(binding.inputSha256===run.inputSha256&&binding.proposalSha256===sha(r.proposal.bytes)&&binding.receiptSha256===sha(r.receipt.bytes),'CLI proposal/receipt binding changed');
+  if(step!=='implement')requireRecord(r.proposal.value.verdict==='pass'&&r.proposal.value.files.length===0,'CLI independent review failed or requested effects');
+  if(['review','release'].includes(step))requireRecord(binding.sourceHash===source,'CLI independent source identity mismatch');
+  if(step==='release')requireRecord(binding.verificationSha256===sha(missionArtifact(dir,names,'artifacts/verify.json').bytes),'CLI release test identity mismatch');
+ }
+ const native=missionArtifact(dir,names,'artifacts/spec.json').value,specBase=missionNativeSpec(dir,names,native),spec=missionArtifact(dir,names,specBase+'/mission.spec.json').value;
+ requireRecord(spec.metadata?.inputSha256===run.inputSha256&&spec.goal===input.mission&&same(spec.acceptance_criteria,input.cases.map((c,i)=>'case-'+i+': arguments '+JSON.stringify(c.args)+' yield exact stdout '+JSON.stringify(c.stdout)+' and exit '+c.exitCode)),'CLI native Spec differs from frozen cases');
+ const fresh=names.has('artifacts/mission-evidence-contract.json')||run.evidenceContract!==undefined||names.has('artifacts/runtime-profile.json')||names.has('artifacts/runtime-source-lock.json')||final.evidenceBindings!==undefined;
+ let profile=null,runtimeLock=null;if(fresh){runtimeLock=missionArtifact(dir,names,'artifacts/runtime-source-lock.json').value;profile=missionArtifact(dir,names,'artifacts/runtime-profile.json').value;requireRecord(run.evidenceContract==='kujo.factory.cli-evidence/v1'&&sha(JSON.stringify(profile))===run.runtimeProfileSha256&&sha(missionArtifact(dir,names,'artifacts/runtime-source-lock.json').bytes)===run.runtimeSourceLockSha256,'CLI runtime provenance missing or changed');required.push('artifacts/runtime-profile.json','artifacts/runtime-source-lock.json');requireRecord(sourceRows[0].path==='application/'+profile.entrypoint,'CLI source differs from frozen runtime entrypoint');}
+ for(const step of ['verify','reverify']){
+  const record=missionArtifact(dir,names,'artifacts/'+step+'.json').value;
+  requireRecord(record.schema==='kujo.factory.cli-runtime-evaluation/v1'&&record.ok===true&&record.profile===input.profile&&record.sourceHash===source&&record.casesHash===sha(JSON.stringify(input.cases))&&record.qualification==='qualified-cli-fixtures-linux-amd64'&&record.results?.length===input.cases.length&&record.workcellSource?.clean===true&&commit(record.workcellSource?.commit)&&record.workcellSource.commit===record.workcellSource.expectedCommit&&(!fresh||record.workcellSource.commit===runtimeLock.nativeExecution?.workcell?.commit),'CLI acceptance identity mismatch');
+  const resultPaths=[...names].filter(n=>new RegExp('^artifacts/'+step+'-workcell/cli-runtime-[A-Za-z0-9]+/result\\.json$').test(n));requireRecord(resultPaths.length===1,'CLI native result must be uniquely retained');const base=path.posix.dirname(resultPaths[0]);requireRecord(same(missionArtifact(dir,names,resultPaths[0]).value,record),'CLI native result differs from gate');
+  const cases=missionArtifact(dir,names,base+'/reviewed-cases.json');requireRecord(sha(cases.bytes)===record.casesFileSha256&&same(cases.value,input.cases)&&sha(missionArtifact(dir,names,base+'/runtime-source-lock.json').bytes)===record.sourceLockSha256&&(!fresh||record.sourceLockSha256===run.runtimeSourceLockSha256),'CLI frozen test/runtime bytes mismatch');
+  for(const [i,item] of record.results.entries()){
+   requireRecord(item.index===i&&item.ok===true&&same(item.expected,input.cases[i])&&!item.observed?.reason&&item.observed?.code===input.cases[i].exitCode&&item.observed?.out===input.cases[i].stdout&&/^sha256:[a-f0-9]{64}$/.test(item.imageId)&&(!profile||item.imageId===profile.qualifiedImage)&&same(missionArtifact(dir,names,base+'/case-'+i+'.json').value,item),'CLI actual case observation mismatch');
+   cliWorkcell(dir,names,base,item,profile?profile.nativeCompiled===true:item.staged!=null);
+  }
+ }
+ const ledger=missionLedger(dir,names,run,final,'source sha256:'+source,[{name:'independent-cli-cases',status:'pass',evidence:'artifacts/verify.json'},{name:'repeated-cli-cases',status:'pass',evidence:'artifacts/reverify.json'}],receipts);
+ if(fresh){required.push(...[...names].filter(n=>n.startsWith(specBase+'/')||n.startsWith(ledger+'/')||/^artifacts\/(verify|reverify)-workcell\//.test(n)));missionBindings(dir,names,run,final,required,'kujo.factory.cli-evidence/v1');}
+ scope.checks.push('CLI source/input/independent role/native Spec/Workcell/RunLedger record agreement');scope.scope=fresh?'Bounded CLI recorded evidence consistency; not authentication or execution proof':'Legacy CLI record agreement; frozen runtime profile and promotion receipt bindings unavailable';return scope;
+}
+function missionFamilyConsistency(dir,names,run,rows){
+ const marker=names.has('artifacts/mission-evidence-contract.json')?missionArtifact(dir,names,'artifacts/mission-evidence-contract.json').value.schema:null;
+ requireRecord(marker===null||['kujo.factory.cli-evidence/v1','kujo.factory.spec-evidence/v1','kujo.factory.documentation-evidence/v1'].includes(marker),'unknown mission evidence marker');
+ const cli=marker==='kujo.factory.cli-evidence/v1'||run.schema==='kujo.factory.cli-mission/v1'||run.kind==='cli-construction'||names.has('reviewed-cli.json')||names.has('artifacts/runtime-profile.json')||names.has('artifacts/runtime-source-lock.json');
+ if(cli)return cliMissionConsistency(dir,names,run,rows);
+ const family=marker==='kujo.factory.spec-evidence/v1'||run.schema==='kujo.factory.spec-mission/v1'||run.kind==='idea-to-reviewed-specification'||names.has('reviewed-specification.json')||names.has('artifacts/frozen-spec.json')?'specification':marker==='kujo.factory.documentation-evidence/v1'||run.schema==='kujo.factory.documentation-mission/v1'||run.kind==='source-to-reviewed-documentation'||names.has('reviewed-documentation.json')||names.has('artifacts/documentation.json')?'documentation':null;
+ if(!family)return null;
+ requireRecord(run.schema===(family==='specification'?'kujo.factory.spec-mission/v1':'kujo.factory.documentation-mission/v1'),'mission family schema downgrade');
+ const result={family,checks:[family+' mission footprint'],scope:'Failed/incomplete review evidence preserved; no software approval'};
+ const finalName=family==='specification'?'reviewed-specification.json':'reviewed-documentation.json';if(names.has(finalName)){const value=missionArtifact(dir,names,finalName).value;requireRecord(value.softwareReleaseApproval===false&&value.humanApproval===false&&value.deploymentAuthorized===false,'planning/documentation cannot grant release authority');}
+ if(run.status!=='completed')return result;
+ const final=missionArtifact(dir,names,finalName).value,receipts=[],required=['artifacts/accounting-terminal.json'];let expectedEvidence,tests,specBase=null;
+ if(family==='specification'){
+  const frozen=missionArtifact(dir,names,'artifacts/frozen-spec.json'),pack=missionArtifact(dir,names,'artifacts/pack.json').value,review=missionArtifact(dir,names,'artifacts/review-spec-proposal.json'),binding=missionArtifact(dir,names,'artifacts/review-binding.json').value,native=missionArtifact(dir,names,'artifacts/spec-binding.json').value;
+  requireRecord(frozen.value.schema==='kujo.factory.reviewed-spec/v1'&&frozen.value.packHash===sha(JSON.stringify(pack))&&frozen.value.reviewSha256===sha(review.bytes)&&frozen.value.fixture===run.fixture&&frozen.value.modelReview===!run.fixture&&frozen.value.implementationTestsExecuted===false&&frozen.value.specSha256===native.specSha256&&native.packHash===frozen.value.packHash&&binding.packHash===frozen.value.packHash&&binding.specSha256===native.specSha256&&binding.validationSha256===sha(JSON.stringify(native))&&review.value.verdict==='pass'&&review.value.files?.length===0,'specification frozen/review identities inconsistent');
+  for(const key of Object.keys(frozen.value))requireRecord(same(final[key],frozen.value[key]),'promoted specification differs from frozen review');specBase=missionNativeSpec(dir,names,native,'kujo.factory.spec-binding/v1');
+  for(const [step,role] of [['plan','planner'],['write-spec','spec-writer'],['review-spec','code-reviewer']]){receipts.push(checkMissionRole(dir,names,run,step,role).receipt.value);required.push('artifacts/'+step+'-receipt.json','artifacts/'+step+'-proposal.json');}
+  required.push('artifacts/frozen-spec.json','artifacts/pack.json','artifacts/review-binding.json','artifacts/spec-binding.json');expectedEvidence='artifacts/frozen-spec.json sha256:'+sha(frozen.bytes);tests=[{name:'native-spec-contract-validation',status:'pass',evidence:'artifacts/spec-binding.json'}];
+ }else{
+  const source=missionArtifact(dir,names,'artifacts/source.json').value,docs=missionArtifact(dir,names,'artifacts/documentation.json').value,review=missionArtifact(dir,names,'artifacts/review-docs-proposal.json'),binding=missionArtifact(dir,names,'artifacts/review-binding.json').value;
+  requireRecord(Array.isArray(source)&&source.every(f=>typeof f.content==='string'&&sha(f.content)===f.sha256)&&docs.schema==='kujo.factory.documentation/v1'&&docs.sourceSha256===sha(JSON.stringify(source))&&binding.sourceSha256===docs.sourceSha256&&binding.documentationSha256===sha(JSON.stringify(docs))&&review.value.verdict==='pass'&&review.value.files?.length===0&&final.sourceSha256===docs.sourceSha256&&final.documentationSha256===binding.documentationSha256&&final.reviewSha256===sha(review.bytes)&&final.fixture===run.fixture&&final.modelReview===!run.fixture&&final.implementationTestsExecuted===false,'documentation source/review identities inconsistent');
+  for(const [step,role] of [['write-docs','documentation-writer'],['review-docs','code-reviewer']]){receipts.push(checkMissionRole(dir,names,run,step,role).receipt.value);required.push('artifacts/'+step+'-receipt.json','artifacts/'+step+'-proposal.json');}
+  required.push('artifacts/source.json','artifacts/documentation.json','artifacts/review-binding.json');expectedEvidence='artifacts/documentation.json sha256:'+final.documentationSha256;tests=[];
+ }
+ const ledger=missionLedger(dir,names,run,final,expectedEvidence,tests,receipts);required.push(...[...names].filter(n=>n.startsWith(ledger+'/')||(specBase&&n.startsWith(specBase+'/'))));
+ const fresh=missionBindings(dir,names,run,final,required,family==='specification'?'kujo.factory.spec-evidence/v1':'kujo.factory.documentation-evidence/v1');result.checks.push('review/source/native accounting identity agreement');result.scope=fresh?'Promotion-bound review artifact; no implementation execution or software approval':'Legacy review artifact identity; promotion receipt binding unavailable';return result;
+}
 function consistency(dir, manifest, rows) {
   const names = new Set(rows.map(row => row.path));
   if (!names.has('run.json')) throw Error('Missing run.json');
   const run = json(dir, 'run.json');
   if (typeof run.id !== 'string' || !run.id || run.id.length > 200 || run.id !== manifest.runId) throw Error('Run identity mismatch');
   const checks = ['run identity'];
+  const family = missionFamilyConsistency(dir, names, run, rows);if(family)checks.push(...family.checks);
   if (run.packHash !== undefined && (!hex(run.packHash) || !names.has('pack.json'))) throw Error('Missing or invalid frozen specification identity');
   if (names.has('pack.json') && run.packHash !== undefined) {
     if (sha(JSON.stringify(json(dir, 'pack.json'))) !== run.packHash) throw Error('Frozen specification hash mismatch');
@@ -228,7 +343,7 @@ function consistency(dir, manifest, rows) {
       }
     }
   }
-  return {checks, recordedStatus: typeof run.status === 'string' ? run.status : null};
+  return {checks, recordedStatus: typeof run.status === 'string' ? run.status : null,...(family?{missionFamily:family.family,missionEvidence:family.scope,softwareReleaseApproval:false}:{})};
 }
 
 /** Validates a completed run's retained approval records without ecosystem dependencies. */
