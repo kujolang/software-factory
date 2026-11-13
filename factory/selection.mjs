@@ -37,7 +37,9 @@ export function selectTeam(input){
  if(complexity==='substantial')for(const r of ['general-commander','chief-of-staff','systems-architect','qa-lead','sitrep-agent'])roles.add(r);
  if(risk==='high')for(const r of ['risk-officer','security-reviewer'])roles.add(r);
  const selected=[...roles].map(r=>inspectCatalog('roles','chain.'+r));
- const specialist=type==='website-operations'?'webops':type==='publication'?'publishing-house':type==='media-production'?'videoops':null;
+ const specialistRoles=type==='website-operations'?['webops.site-qa-operator','webops.seo-auditor']:['documentation','publication'].includes(type)?['publishing-house.technical-editor-writer','publishing-house.standards-evidence-editor']:type==='media-production'?['videoops.creative-director']:[];
+ for(const id of specialistRoles)selected.push(inspectCatalog('roles',id));
+ const specialist=type==='website-operations'?'webops':['documentation','publication'].includes(type)?'publishing-house':type==='media-production'?'videoops':null;
  const activation=skills.map(id=>{
   const skill=inspectCatalog('skills',id);
   if(skill.package!=='software'&&skill.package!==specialist)throw Error('Specialist skill is not routed for this mission: '+id);

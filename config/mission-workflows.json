@@ -846,10 +846,12 @@
       "output": "reviewed-markdown",
       "runtime": "inert-markdown",
       "skills": [
-        "kujo-docgen-agent-readable"
+        "kujo-docgen-agent-readable",
+        "kujo-publishing-house-workflows"
       ],
       "roles": [
         "documentation-writer",
+        "publishing-house.standards-evidence-editor",
         "code-reviewer"
       ],
       "effects": [

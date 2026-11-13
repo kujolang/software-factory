@@ -25,7 +25,7 @@ export function validateMissionWorkflow(input){
  if(Object.keys(input).some(k=>!['schema','type',...fields].includes(k)))throw Error('Unknown or unauthorized mission field');
  if(contract.blockedReason)return {schema:'kujo.factory.mission-admission/v1',ok:false,contract,blockedReasons:[contract.blockedReason],executionAuthorized:false};
  if(fields.some(k=>input[k]===undefined))throw Error('Missing required mission input: '+fields.filter(k=>input[k]===undefined).join(', '));
- for(const skill of contract.skills)inspectCatalog('skills',skill);for(const role of contract.roles)inspectCatalog('roles','chain.'+role);
+ for(const skill of contract.skills)inspectCatalog('skills',skill);for(const role of contract.roles)inspectCatalog('roles',role.includes('.')?role:'chain.'+role);
  const normalized={schema:input.schema,type:input.type};
  if(fields.includes('packageInput')){validateNodePackageMission(input.packageInput);normalized.packageInput=structuredClone(input.packageInput);for(const name of ['baselineCache','targetCache']){normalized[name]=specPlain(text(input[name],name,4000));verifyNodePackageCache(normalized[name],name==='baselineCache'?packageBaselineContract(normalized.packageInput):normalized.packageInput.contract);}}
  if(fields.includes('mission'))normalized.mission=text(input.mission,'mission');
