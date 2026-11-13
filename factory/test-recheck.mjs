@@ -1,4 +1,4 @@
-import {kujoBinary} from './settings.mjs';
+import {kujoBinary,dispatchRoot} from './settings.mjs';
 /** CLI import tests use a zero-exit transport fixture, never a live model. */
 import fs from "node:fs";
 import path from "node:path";
@@ -24,7 +24,7 @@ function fixture(t) {
       env: {
         ...process.env,
         FACTORY_RUNS: base,
-        FACTORY_DISPATCH_ROOT: base,
+        FACTORY_DISPATCH_ROOT: dispatchRoot,
         KUJO_BIN: shim,
       },
     });

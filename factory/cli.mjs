@@ -1,3 +1,7 @@
+import {prepareRepositoryMission} from './repository-mission.mjs';
+import {bindMissionRecovery} from './operations.mjs';
+import {readOperatorModel} from './operator-model.mjs';
+import {applicationTeam,validateProviderRouting} from './role-runtime.mjs';
 import {verifyRunReleaseRecords} from './evidence.mjs';
 import {startMissionAccounting,finishMissionAccounting,captureMissionFailure,blockUnaccountedRelease,promoteAccountedRelease} from './lifecycle.mjs';
 import {validatePackWithSpec,annotateRunAccounting} from './accountability.mjs';
@@ -111,7 +115,7 @@ function readRun(id) {
         observedFromEvents: true,
       };
     });
-  return { ...publicRun, roles: [...declared, ...observed], events: journal };
+  return { ...publicRun, roles: [...declared, ...observed], events: journal, operator:readOperatorModel(dir) };
 }
 function requirePlainTree(dir) {
   if (fs.lstatSync(dir).isSymbolicLink() || !fs.statSync(dir).isDirectory())
@@ -127,6 +131,7 @@ function requirePlainTree(dir) {
 }
 async function executeRun(dir, config) {
   config.accountabilityRequired=true;
+  config.lensRequired=true;
   config.executionProvider={provider,model:model||null};
   save(path.join(dir,"run.json"),config);
   const provenance=controllerProvenance();
@@ -134,6 +139,7 @@ async function executeRun(dir, config) {
   console.log(JSON.stringify({runId:config.id,directory:dir,kind:config.kind||"build"}));
   let dispatchResult=null,passed=false,reason="Mission did not reach independent release";
   try {
+    bindMissionRecovery(dir);
     await startMissionAccounting(dir,config,provenance,{provider,model});
     if(config.packHash){
       const binding=await validatePackWithSpec(runPack(dir,config),{parent:path.join(dir,"artifacts/spec")});
@@ -141,7 +147,7 @@ async function executeRun(dir, config) {
     }
     dispatchResult=await command(kujoBinary(),["run",path.join(root,"factory/dispatch.kujo")],{
       cwd:dispatchRoot,timeout:7200000,
-      env:{FACTORY_RUN_DIR:dir,FACTORY_ROOT:root,NODE_BIN:process.execPath,DISPATCH_ALLOW_ANY_OUTPUT_ROOT:"true"},
+      env:{FACTORY_RUN_DIR:dir,FACTORY_ROOT:root,FACTORY_WORKFLOW_KIND:"application",NODE_BIN:process.execPath,DISPATCH_ALLOW_ANY_OUTPUT_ROOT:"true"},
     });
     save(path.join(dir,"dispatch-process.json"),dispatchResult);
     passed=dispatchResult.code===0&&!dispatchResult.reason&&events(dir).some(e=>e.type==="release.verified")&&!events(dir).some(e=>e.type==="accountability.failed");
@@ -173,16 +179,23 @@ if (verb === "run") {
   const file = process.argv[3];
   if (!file) throw Error("Usage: node factory/cli.mjs run mission.txt");
   const extra = process.argv.slice(4);
-  if (extra.length && (extra.length !== 2 || extra[0] !== "--pack"))
-    throw Error("Usage: run mission.txt [--pack pack.json]");
-  const pack = extra.length ? readSealedPack(path.resolve(extra[1])) : null;
+  const options={};
+  for(let i=0;i<extra.length;i+=2){if(!['--pack','--team','--routing','--source'].includes(extra[i])||!extra[i+1]||Object.hasOwn(options,extra[i]))throw Error('Usage: run mission.txt [--pack FILE] [--team FILE] [--routing FILE] [--source REPOSITORY]');options[extra[i]]=extra[i+1];}
+  const readOption=file=>{if(fs.lstatSync(file).isSymbolicLink()||!fs.statSync(file).isFile()||fs.statSync(file).size>65536)throw Error('Unsafe mission policy input');return json(file);};
+  const pack = options['--pack'] ? readSealedPack(path.resolve(options['--pack'])) : null;
+  const team=options['--team']?applicationTeam(readOption(options['--team']),tasks):null;
+  const providerRouting=validateProviderRouting(options['--routing']?readOption(options['--routing']):{});
+  if(options['--source']&&(!pack||team))throw Error('Existing repository repair requires --pack and cannot use a new-application --team plan');
+  const runTasks=options['--source']?tasks.filter(t=>['verify','release'].includes(t.id)).map(t=>({...t,dependencies:t.id==='verify'?[]:['verify'],handoffFrom:t.id==='verify'?'human':'code-reviewer'})):team?.tasks||tasks;
+  const runRoles=[...roles,...(team?.plan.roles||[]).filter(r=>!roles.some(x=>'chain.'+x.id===r.id)).map(r=>({id:r.id.slice(6),name:r.id.slice(6),layer:r.layer,parent:null}))];
   const mission = fs.readFileSync(path.resolve(file), "utf8");
   if (!mission.trim() || mission.length > 12000)
     throw Error("Mission must be 1–12000 characters");
   const id = "factory-" + new Date().toISOString().replace(/[:.]/g, "-");
   const dir = runPath(id);
   fs.mkdirSync(dir, { recursive: true, mode: 0o700 });
-  fs.mkdirSync(path.join(dir, "application"));
+  const repositorySource=options["--source"]?prepareRepositoryMission({source:options["--source"],packFile:path.resolve(options["--pack"]),mission,runDirectory:dir}):null;
+  if(!repositorySource)fs.mkdirSync(path.join(dir, "application"));
   const config = {
     id,
     ...(pack ? { packHash: hashPack(pack), packId: pack.id } : {}),
@@ -191,8 +204,11 @@ if (verb === "run") {
     startedAt: new Date().toISOString(),
     workspace,
     agentsRoot: path.resolve(agentsRoot),
-    roles,
-    tasks,
+    roles:runRoles.filter(role=>runTasks.some(t=>t.agentId===role.id)),
+    tasks:runTasks,
+    ...(repositorySource?{kind:"repository-repair",repositorySource:{commit:repositorySource.sourceCommit,tree:repositorySource.sourceTree,record:"artifacts/repository-source.json"}}:{}),
+    ...(team?{teamPlan:team.plan}:{}),
+    providerRouting,
     stages: [
       "Command",
       "Architecture",
@@ -206,7 +222,7 @@ if (verb === "run") {
   save(path.join(dir, "workflow.json"), {
     id: "factory-01",
     name: "Factory 01 — App Factory",
-    tasks: tasks.map((t) => ({
+    tasks: runTasks.map((t) => ({
       id: t.id,
       name: t.title,
       agentId: t.agentId,
@@ -216,7 +232,7 @@ if (verb === "run") {
     })),
   });
   event(dir, "mission.created", { summary: mission });
-  for (const t of tasks)
+  for (const t of runTasks)
     event(dir, "agent.assigned", {
       agentId: t.agentId,
       taskId: t.id,
@@ -346,6 +362,7 @@ if (verb === "run") {
   save(path.join(artifacts, "source-import.json"), {
     schema: "kujo.factory.source-import/v1",
     sourceRun: sourceId,
+    providerRouting:validateProviderRouting(source.providerRouting||{}),
     sourceHash,
     importedHash: digest(app),
     importedAt: new Date().toISOString(),
@@ -395,6 +412,7 @@ if (verb === "run") {
     kind,
     sourceApproved: !retry,
     sourceRun: sourceId,
+    providerRouting:validateProviderRouting(source.providerRouting||{}),
     sourceHash,
   };
   if (pack) save(path.join(dir, "pack.json"), pack);

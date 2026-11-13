@@ -1,4 +1,4 @@
-import {kujoBinary} from '../factory/settings.mjs';
+import {kujoBinary,dispatchRoot} from '../factory/settings.mjs';
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -86,7 +86,7 @@ test("run snapshots sealed pack and fails without release approval", (t) => {
       env: {
         ...process.env,
         FACTORY_RUNS: dir,
-        FACTORY_DISPATCH_ROOT: dir,
+        FACTORY_DISPATCH_ROOT: dispatchRoot,
         KUJO_BIN: shim,
       },
       timeout: 30000,
@@ -142,7 +142,7 @@ test("retry copies its frozen pack and rejects changed pack evidence", (t) => {
         env: {
           ...process.env,
           FACTORY_RUNS: dir,
-          FACTORY_DISPATCH_ROOT: dir,
+          FACTORY_DISPATCH_ROOT: dispatchRoot,
           KUJO_BIN: shim,
         },
         timeout: 30000,
