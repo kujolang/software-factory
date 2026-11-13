@@ -27,12 +27,13 @@ const profiles={
 };
 export function selectTeam(input){
  if(!input||typeof input!=='object'||Array.isArray(input))throw Error('Mission selection requires an object');
- const allowed=['type','complexity','risk','skills','costBudget','providerCapabilities','requireHumanApproval','mediaRequested'];
+ const allowed=['type','complexity','risk','skills','costBudget','providerCapabilities','requireHumanApproval','mediaRequested','additionalRoles'];
  if(Object.keys(input).some(k=>!allowed.includes(k)))throw Error('Unknown mission selection field');
- const {type,complexity='small',risk='low',skills=[],costBudget=null,providerCapabilities=[],requireHumanApproval=false,mediaRequested=false}=input;
+ const {type,complexity='small',risk='low',skills=[],costBudget=null,providerCapabilities=[],requireHumanApproval=false,mediaRequested=false,additionalRoles=[]}=input;
  if(!Object.hasOwn(profiles,type)||!['small','substantial'].includes(complexity)||!['low','high'].includes(risk)||!Array.isArray(skills)||skills.length>32||new Set(skills).size!==skills.length||!skills.every(x=>typeof x==='string')||!Array.isArray(providerCapabilities)||!providerCapabilities.every(x=>typeof x==='string')||providerCapabilities.length>64||typeof requireHumanApproval!=='boolean'||typeof mediaRequested!=='boolean'||(costBudget!==null&&(!Number.isFinite(costBudget)||costBudget<0)))throw Error('Invalid mission selection contract');
  if(type==='media-production'&&!mediaRequested)throw Error('Media production requires an explicit media request');
- const roles=new Set(['planner',...profiles[type],'test-runner','code-reviewer','release-verifier']);
+ if(!Array.isArray(additionalRoles)||additionalRoles.length>28||new Set(additionalRoles).size!==additionalRoles.length||additionalRoles.some(id=>typeof id!=='string'||!catalog.roles.some(role=>role.id===id&&role.package==='chain-of-command')))throw Error('Additional roles must name canonical Chain of Command roles');
+ const roles=new Set(['planner',...profiles[type],...additionalRoles.map(id=>id.slice(6)),'test-runner','code-reviewer','release-verifier']);
  if(complexity==='substantial')for(const r of ['general-commander','chief-of-staff','systems-architect','qa-lead','sitrep-agent'])roles.add(r);
  if(risk==='high')for(const r of ['risk-officer','security-reviewer'])roles.add(r);
  const selected=[...roles].map(r=>inspectCatalog('roles','chain.'+r));
