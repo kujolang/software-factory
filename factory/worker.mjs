@@ -1,3 +1,5 @@
+import {evaluateLens,verifyLensBinding} from './lens.mjs';
+import {roleContract,admitRoleProposal,skillContext,validateProviderRouting} from './role-runtime.mjs';
 import {inspectRunAccounting} from './accountability.mjs';
 import {evaluateVerification,verifyEvaluationBinding} from './evaluation.mjs';
 import {prepareReleasePolicy,finalizeReleasePolicy,assertReleasePolicy} from './release-policy.mjs';
@@ -22,6 +24,7 @@ import {
   digest,
   files,
 } from "./core.mjs";
+const workerIdentity=createHash("sha256").update(fs.readFileSync(import.meta.filename)).digest("hex");
 const [dir, taskId] = process.argv.slice(2);
 const config = json(path.join(dir, "run.json"));
 const task = config.tasks.find((t) => t.id === taskId);
@@ -65,7 +68,10 @@ function handoff(from, to, id, scope, evidence = []) {
 }
 async function agent(role, id, prompt) {
   const rolePath = path.join(agentsRoot, "chain-of-command", role);
-  const canonicalRole = loadRole("chain." + role, {base: agentsRoot});
+  const runtimeContract = roleContract("chain." + role, {base: agentsRoot});
+  const canonicalRole = runtimeContract.role;
+  const selectedSkills=skillContext(config.teamPlan?.skills.map(skill=>skill.id)||[]);
+  const route=validateProviderRouting(config.providerRouting||{})[role]||config.executionProvider||{provider,model};
   const instructions = canonicalRole.instructions;
   validateRolePayload(canonicalRole, "input", Object.fromEntries(canonicalRole.manifest.inputs.map(field => [field.name, prompt])));
   const start = Date.now();
@@ -74,19 +80,29 @@ async function agent(role, id, prompt) {
   const record = receipt => save(path.join(artifact,id+"-receipt.json"), {
     ...receipt, role, taskId,
     roleContractSha256:createHash("sha256").update(instructions).digest("hex"),
-    workerSha256:createHash("sha256").update(fs.readFileSync(import.meta.filename)).digest("hex"),
+    canonicalContractSha256:runtimeContract.identity,
+    skillActivations:selectedSkills.map(({guidance,...receipt})=>receipt),
+    workerSha256:workerIdentity,
     usageKnown:receipt.usage!==null,
     usage:receipt.usage===null?[]:Array.isArray(receipt.usage)?receipt.usage:[receipt.usage],
   });
   let response;
   try {
-    response = await executeProposal({provider:config.executionProvider?.provider||provider,model:config.executionProvider ? config.executionProvider.model??undefined : model,ollamaHost,
-      schema:json(path.join(root,"factory/bundle.schema.json")),
-      prompt:"You are a text-only proposal agent. No tools, file reads, executions, or additional agents. Return JSON matching the supplied schema. No markdown fences inside content. Role contract:\n"+instructions+"\nHuman mission:\n"+config.mission+"\nAcceptance contract:\n"+contract+"\nWork order:\n"+prompt,
+    response = await executeProposal({provider:route.provider,model:route.model??undefined,ollamaHost,
+      schema:runtimeContract.schema,
+      prompt:"You are a text-only proposal agent. No tools, file reads, executions, or additional agents. Return JSON matching the supplied schema. No markdown fences inside content. Role contract:\n"+instructions+"\nSelected skill guidance (does not authorize effects):\n"+JSON.stringify(selectedSkills)+"\nFill every canonical deliverables field with specific findings; distinguish proposals, unexecuted checks and observed results.\nHuman mission:\n"+config.mission+"\nAcceptance contract:\n"+contract+"\nWork order:\n"+prompt,
     });
   } catch(error) {if(error.receipt)record(error.receipt);throw error;}
   record(response.receipt);
-  const result=validateRolePayload(canonicalRole,"output",response.output);
+  const allowedFiles=task.kind==="consultation"?()=>false:role==="backend-developer"?backendAllowed:role==="frontend-developer"?frontendAllowed:role==="general-commander"?p=>p==="mission.md":role==="systems-architect"?p=>p==="architecture.md":()=>false;
+  let result;
+  try{result=admitRoleProposal(runtimeContract,response.output,{allowedFiles});}
+  catch(error){
+    const rejected=id+"-rejected-proposal.json";
+    save(path.join(artifact,rejected),{schema:"kujo.factory.rejected-role-proposal/v1",role,reason:error.message,proposal:response.output,authority:"Untrusted rejected proposal; no effects admitted"});
+    await captureMissionFailure(dir,{kind:"role-permission-rejection",taskId,summary:error.message,evidence:["artifacts/"+rejected]});
+    throw error;
+  }
   save(path.join(artifact,id+"-proposal.json"),result);
   event(dir,result.verdict==="fail"?"agent.blocked":"agent.completed",{agentId:role,taskId,summary:result.summary,artifacts:["artifacts/"+id+"-proposal.json","artifacts/"+id+"-receipt.json"]});
   return result;
@@ -239,11 +255,14 @@ try {
     ),
   );
   emit("handoff.accepted", `${task.agentId} accepted scoped work order`);
-  if (taskId === "command") {
+  if(task.kind === "consultation") {
+    const r=await agent(task.agentId,taskId,"Provide bounded advisory role deliverables for the supplied mission and frozen contract. Return files:[]; never claim tests ran or grant approval. Identify prerequisites and unresolved questions. Prior consultation evidence:\n"+task.dependencies.map(id=>fs.readFileSync(path.join(artifact,id==="verify"?"verification.json":id+"-proposal.json"),"utf8")).join("\n")+(task.consultationPhase==="verified-candidate"?"\nCurrent verified source (read only):\n"+snapshot(app):""));
+    if(r.verdict==="fail")throw Error("Canonical consultation escalated: "+r.summary);
+  } else if (taskId === "command") {
     const r = await agent(
       "general-commander",
       "command",
-      'Interpret mission; produce mission.md containing objectives, non-goals, constraints, concrete delegation to systems-architect, backend-developer, frontend-developer, code-reviewer, test-runner, release-verifier. Explicitly bound acceptance and no deployment. Use files:[{path:"mission.md",content:...}].',
+      'Interpret mission; produce mission.md containing objectives, non-goals, constraints, concrete delegation to systems-architect, backend-developer, frontend-developer, code-reviewer, test-runner, release-verifier. Explicitly bound acceptance and no deployment. Use files:[{path:"mission.md",content:...}].' + (config.teamPlan ? '\nPrior canonical consultations:\n'+config.tasks.filter(t=>t.kind==='consultation'&&t.consultationPhase!=='verified-candidate').map(t=>fs.readFileSync(path.join(artifact,t.id+'-proposal.json'),'utf8')).join('\n') : ''),
     );
     if (r.verdict === "fail" || !r.files.some((f) => f.path === "mission.md"))
       throw Error("Commander did not produce an actionable mission");
@@ -429,9 +448,14 @@ try {
     const buildLease = await startIsolatedApp(app, {
       evidenceDir: path.join(artifact, `workcell-build-${Date.now()}`),
     });
-    let built;
+    let built,lens;
     try {
       built = await buildLease.syntaxBuild();
+      if(built.code===0){
+        lens=await evaluateLens({lease:buildLease,dir,sourceHash:v.hash});
+        save(path.join(artifact,"lens.json"),lens);
+        if(!lens.ok||digest(app)!==v.hash)throw Error("Native Lens blocked local release; retained findings require review");
+      }
     } finally {
       await buildLease.close();
     }
@@ -452,6 +476,7 @@ try {
       sourceHash: digest(app),
       ...(pack ? { packHash: config.packHash, packId: pack.id } : {}),
       verification: v,
+      lens,
       commands: {
         api: pack
           ? [
@@ -524,7 +549,9 @@ try {
       fs.mkdirSync(path.dirname(target), { recursive: true });
       fs.copyFileSync(path.join(app, p), target);
     }
+    verifyLensBinding(lens,{dir,sourceHash:v.hash});
     save(path.join(artifact, "release-verified.json"), {
+      lens,
       status: "verified-pending-accountability",
       ...(pack ? { packHash: config.packHash } : {}),
       hash: digest(app),

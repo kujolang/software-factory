@@ -106,8 +106,32 @@ function namedArtifact(dir, names, name, label) {
   const bytes = readPlain(path.join(dir, name));
   return {value: JSON.parse(bytes), bytes, path: name};
 }
+function lensConsistency(dir,names,run,release,verified){
+  requireRecord(run.lensRequired===true && release.gateVersion==='kujo.factory.release-gates/v3', 'Lens gate version/requirement inconsistent');
+  const lens=release.lens;
+  requireRecord(object(lens)&&lens.schema==='kujo.factory.lens-evaluation/v1'&&lens.ok===true&&lens.sourceHash===release.hash&&commit(lens.sourceCommit)&&typeof lens.version==='string'&&same(lens,verified.lens), 'Lens release identity inconsistent');
+  requireRecord(typeof lens.evidenceDirectory==='string'&&/^artifacts\/lens\/attempt-[a-zA-Z0-9_-]+$/.test(lens.evidenceDirectory), 'Unsafe Lens evidence directory');
+  const binding=namedArtifact(dir,names,lens.evidenceDirectory+'/binding.json','Lens binding');
+  requireRecord(same(lens,binding.value),'Lens retained binding inconsistent');
+  requireRecord(typeof lens.workcellEvidence==='string'&&/^artifacts\/workcell-build-[a-zA-Z0-9_-]+$/.test(lens.workcellEvidence)&&object(lens.workcellRecords),'Unsafe or missing Lens Workcell provenance');
+  const workcellNames=['preflight.json','definition.json','effective.json','browser-lens-command.json'];
+  requireRecord(same(Object.keys(lens.workcellRecords).sort(),[...workcellNames].sort()),'Lens Workcell inventory incomplete');
+  const wc=Object.fromEntries(workcellNames.map(name=>[name,artifactReference(dir,names,{path:lens.workcellEvidence+'/'+name,sha256:lens.workcellRecords[name]},'Lens Workcell').value]));
+  const preflight=wc['preflight.json'],definition=wc['definition.json'],effective=wc['effective.json'],command=wc['browser-lens-command.json'];
+  requireRecord(/^sha256:[a-f0-9]{64}$/.test(lens.imageId)&&preflight.imageId===lens.imageId&&definition.runtime?.image_digest===lens.imageId&&definition.runtime?.require_digest===true&&definition.network?.mode==='none'&&definition.filesystem?.read_only_root===true&&Array.isArray(preflight.securityOptions)&&preflight.securityOptions.some(x=>typeof x==='string'&&x.includes('rootless'))&&preflight.securityOptions.some(x=>typeof x==='string'&&x.includes('seccomp'))&&command.code===0&&!command.reason&&effective.memory==='1073741824'&&effective.pids==='256'&&effective.cpu==='100000 100000'&&/^CapEff:\s+0000000000000000$/m.test(effective.status)&&/^NoNewPrivs:\s+1$/m.test(effective.status)&&/^Seccomp:\s+2$/m.test(effective.status)&&effective.privateParent?.uid===0&&effective.privateParent?.mode===448&&effective.source?.uid===0&&effective.source?.mode===292,'Lens Workcell observations inconsistent');
+  const expected=['lens-execution.json','lens-report.json','lens-console.json','lens-network.json','lens-dom.json','lens-accessibility.json','lens-desktop.png','lens-mobile.png'];
+  requireRecord(object(lens.files)&&same(Object.keys(lens.files).sort(),expected.sort()),'Lens evidence inventory missing');
+  for(const name of expected){const file=lens.evidenceDirectory+'/'+name;requireRecord(names.has(file)&&hex(lens.files[name])&&sha(readPlain(path.join(dir,file)))===lens.files[name],'Lens artifact missing or changed');}
+  const report=json(dir,lens.evidenceDirectory+'/lens-report.json'),execution=json(dir,lens.evidenceDirectory+'/lens-execution.json');
+  requireRecord(report.schema_version==='1'&&report.metadata?.tool==='lens'&&report.metadata.version===lens.version&&report.metadata.allow_external===false&&report.url==='http://127.0.0.1:4381'&&['http://127.0.0.1:4381','http://127.0.0.1:4381/'].includes(report.final_url)&&report.status==='PASS'&&report.exit_code===0&&execution.code===0&&!execution.error&&!execution.signal&&report.fail_threshold==='error'&&same(report.viewports,['desktop','mobile']), 'Native Lens execution did not pass');
+  const required=['page_load','evidence_limits','console_errors','network_failures','blank_page','horizontal_overflow','screenshots','accessibility'];
+  requireRecord(Array.isArray(report.findings)&&Array.isArray(report.checks)&&new Set(report.checks.map(c=>c.id)).size===report.checks.length&&report.checks.every(c=>object(c)&&typeof c.id==='string'&&['pass','fail','skipped'].includes(c.status)&&Array.isArray(c.findings)&&c.finding_count===c.findings.length),'Native Lens checks malformed or duplicated');
+  const counts={critical:0,error:0,warning:0,info:0};for(const finding of report.findings){requireRecord(object(finding)&&Object.hasOwn(counts,finding.severity),'Native Lens finding severity invalid');counts[finding.severity]++;}
+  requireRecord(counts.error===0&&counts.critical===0&&Object.entries(counts).every(([severity,count])=>report.summary?.[severity+'_count']===count)&&report.summary?.total_findings===report.findings.length&&report.summary?.checks_run===report.checks.filter(c=>c.status!=='skipped').length&&report.summary?.checks_skipped===report.checks.filter(c=>c.status==='skipped').length&&same(report.checks.flatMap(c=>c.findings),report.findings),'Native Lens findings/check summary inconsistent');
+  requireRecord(Array.isArray(report.checks)&&required.every(id=>report.checks.some(c=>c.id===id&&['pass','fail'].includes(c.status)))&&report.accessibility?.enabled===true&&report.accessibility?.engine?.available===true&&report.accessibility.scan_count===2&&same(lens.findings,report.findings),'Native Lens checks incomplete');
+}
 function nativeGateConsistency(dir, names, run, release, verification, review) {
-  requireRecord(run.status === 'completed' && release.gateVersion === 'kujo.factory.release-gates/v2', 'accountability gate version/state missing');
+  requireRecord(run.status === 'completed' && ['kujo.factory.release-gates/v2','kujo.factory.release-gates/v3'].includes(release.gateVersion), 'accountability gate version/state missing');
   const account = artifactReference(dir, names, release.accountability, 'accounting', 'artifacts/mission-accountability.json').value;
   const observations = namedArtifact(dir, names, 'artifacts/mission-observations.json', 'observations');
   requireRecord(account.schema === 'kujo.factory.mission-accountability/v1' && account.ok === true && account.status === 'pass' && account.runId === run.id && account.candidateHash === release.hash && account.deploymentAuthorized === false && account.observationsSha256 === sha(observations.bytes), 'accounting missing or inconsistent');
@@ -115,6 +139,7 @@ function nativeGateConsistency(dir, names, run, release, verification, review) {
   requireRecord(object(account.gates) && same(Object.keys(account.gates).sort(), gateNames) && same(account.gates, observations.value.gates), 'accounting gate inventory missing');
   for (const name of gateNames) requireRecord(hex(account.gates[name]) && sha(namedArtifact(dir, names, 'artifacts/' + name, 'accounted gate').bytes) === account.gates[name], 'gate changed after accounting');
   const verified = namedArtifact(dir, names, 'artifacts/release-verified.json', 'verified candidate').value;
+  if(release.gateVersion==='kujo.factory.release-gates/v3'||run.lensRequired!==undefined||release.lens!==undefined||verified.lens!==undefined||names.has('artifacts/lens.json')||[...names].some(name=>/^artifacts\/lens\/attempt-[^/]+\/binding\.json$/.test(name)))lensConsistency(dir,names,run,release,verified);
   requireRecord(verified.status === 'verified-pending-accountability' && verified.hash === release.hash && verified.buildHash === release.buildHash && verified.reviewHash === release.reviewHash && verified.deploymentAuthorized === false && same(verified.checks, release.checks) && verified.packHash === release.packHash, 'promoted release differs from accounted candidate');
   requireRecord(typeof account.ledgerId === 'string' && /^[a-zA-Z0-9_-]{1,300}$/.test(account.ledgerId), 'ledger identity invalid');
   const ledger = artifactReference(dir, names, account.ledgerRecord, 'RunLedger record');

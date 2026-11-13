@@ -313,3 +313,36 @@ test('controller observations must agree with ledger intent; entirely unknown us
   else assert.throws(()=>verifyRunReleaseRecords(f.run),/ledger (test history|usage intent)/);
  }
 });
+
+// Synthetic Lens records establish consistency tests only, not browser execution.
+function lensFixture(t){
+ const f=accountedFixture(t),load=name=>JSON.parse(fs.readFileSync(path.join(f.run,name)));
+ const directory='artifacts/lens/attempt-fixture',report={schema_version:'1',metadata:{tool:'lens',version:'1.1.1',allow_external:false},url:'http://127.0.0.1:4381',final_url:'http://127.0.0.1:4381/',fail_threshold:'error',viewports:['desktop','mobile'],exit_code:0,status:'PASS',checks:['page_load','evidence_limits','console_errors','network_failures','blank_page','horizontal_overflow','screenshots','accessibility'].map(id=>({id,status:'pass',findings:[],finding_count:0})),summary:{critical_count:0,error_count:0,warning_count:0,info_count:0,total_findings:0,checks_run:8,checks_skipped:0},findings:[],accessibility:{enabled:true,engine:{available:true},scan_count:2}};
+ const artifacts={'lens-report.json':report,'lens-execution.json':{code:0,error:null,signal:null},'lens-console.json':[],'lens-network.json':[],'lens-dom.json':{},'lens-accessibility.json':{},'lens-desktop.png':'synthetic screenshot','lens-mobile.png':'synthetic screenshot'};
+ const files=Object.fromEntries(Object.entries(artifacts).map(([name,value])=>[name,f.write(directory+'/'+name,value).sha256]));
+ const workcellEvidence='artifacts/workcell-build-fixture',imageId='sha256:'+'b'.repeat(64),records={'preflight.json':{imageId,securityOptions:['rootless','seccomp']},'definition.json':{runtime:{image_digest:imageId,require_digest:true},network:{mode:'none'},filesystem:{read_only_root:true}},'effective.json':{memory:'1073741824',pids:'256',cpu:'100000 100000',status:'CapEff: 0000000000000000\nNoNewPrivs: 1\nSeccomp: 2',privateParent:{uid:0,mode:448},source:{uid:0,mode:292}},'browser-lens-command.json':{code:0,reason:''}};
+ const workcellRecords=Object.fromEntries(Object.entries(records).map(([name,value])=>[name,f.write(workcellEvidence+'/'+name,value).sha256]));
+ const lens={workcellEvidence,workcellRecords,imageId,schema:'kujo.factory.lens-evaluation/v1',ok:true,sourceHash:f.release.hash,sourceCommit:'a'.repeat(40),version:'1.1.1',evidenceDirectory:directory,files,findings:[]};f.write(directory+'/binding.json',lens);
+ const verified=load('artifacts/release-verified.json');verified.lens=lens;const verifiedRef=f.write('artifacts/release-verified.json',verified);
+ const observations=load('artifacts/mission-observations.json');observations.gates['release-verified.json']=verifiedRef.sha256;const obsRef=f.write('artifacts/mission-observations.json',observations);
+ const intent=load(f.ledgerDir+'/finish-intent.json');intent.summary.evidence='artifacts/mission-observations.json sha256:'+obsRef.sha256;f.write(f.ledgerDir+'/finish-intent.json',intent);
+ const binding=load(f.ledgerDir+'/binding.json');binding.finishIdentity='sha256:'+f.h(f.canonical(intent));f.completion.ledgerBinding=f.write(f.ledgerDir+'/binding.json',binding);
+ f.completion.gates=observations.gates;f.completion.observationsSha256=obsRef.sha256;f.release.accountability=f.write('artifacts/mission-accountability.json',f.completion);
+ f.release.lens=lens;f.release.gateVersion='kujo.factory.release-gates/v3';f.write('artifacts/release.json',f.release);
+ const run=load('run.json');run.lensRequired=true;f.write('run.json',run);return {...f,directory,runRecord:run};
+}
+test('v3 Lens release records bind reports/screenshots and reject gate downgrade',t=>{
+ const good=lensFixture(t);assert.equal(verifyRunReleaseRecords(good.run).ok,true);assert.equal(exportEvidence(good.run,good.bundle).ok,true);
+ for(const kind of ['marker','version','screenshot','report','binding','missing','stripped','workcell']){
+  const f=lensFixture(t);
+  if(kind==='marker'){delete f.runRecord.lensRequired;f.write('run.json',f.runRecord);}
+  if(kind==='version'){f.release.gateVersion='kujo.factory.release-gates/v2';f.write('artifacts/release.json',f.release);}
+  if(kind==='screenshot')fs.appendFileSync(path.join(f.run,f.directory,'lens-desktop.png'),'changed');
+  if(kind==='report')fs.appendFileSync(path.join(f.run,f.directory,'lens-report.json'),' ');
+  if(kind==='binding')fs.appendFileSync(path.join(f.run,f.directory,'binding.json'),'broken');
+  if(kind==='stripped'){delete f.runRecord.lensRequired;f.write('run.json',f.runRecord);delete f.release.lens;f.release.gateVersion='kujo.factory.release-gates/v2';f.write('artifacts/release.json',f.release);const verified=JSON.parse(fs.readFileSync(path.join(f.run,'artifacts/release-verified.json')));delete verified.lens;f.write('artifacts/release-verified.json',verified);}
+  if(kind==='workcell')fs.appendFileSync(path.join(f.run,'artifacts/workcell-build-fixture/effective.json'),' ');
+  if(kind==='missing')fs.unlinkSync(path.join(f.run,f.directory,'lens-report.json'));
+  assert.throws(()=>verifyRunReleaseRecords(f.run));
+ }
+});

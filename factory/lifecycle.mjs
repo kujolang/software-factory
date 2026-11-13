@@ -1,3 +1,4 @@
+import {verifyLensBinding} from './lens.mjs';
 // Controller-owned lifecycle accounting. No candidate commands or provider prompts
 // are interpreted here; canonical tools receive bounded observed records only.
 import fs from 'node:fs';
@@ -25,7 +26,7 @@ function readRecord(dir,relative,max=2_000_000){
 }
 export async function startMissionAccounting(dir,config,provenance,{provider,model}){
  if(fs.existsSync(bindingPath(dir)))throw Error('Mission already has an accounting attempt; reconcile instead of restarting');
- const binding=await beginRunAccounting({missionId:config.id,provider,model:model||'unreported',evidence:'artifacts/controller-provenance.json',sourceProvenance:{source:provenance.source,controllerHashes:provenance.files,sourceRun:config.sourceRun||null,packHash:config.packHash||null}},{parent:path.join(dir,'artifacts/runledger')});
+ const binding=await beginRunAccounting({missionId:config.id,provider,model:model||'unreported',evidence:'artifacts/controller-provenance.json',sourceProvenance:{source:provenance.source,controllerHashes:provenance.files,sourceRun:config.sourceRun||null,repositorySource:config.repositorySource?{...config.repositorySource,sha256:readRecord(dir,'artifacts/repository-source.json').sha256}:null,packHash:config.packHash||null}},{parent:path.join(dir,'artifacts/runledger')});
  save(bindingPath(dir),binding);
  event(dir,'accountability.started',{summary:'Canonical RunLedger attempt started before implementation',artifacts:['artifacts/accounting-start.json'],data:{ledgerId:binding.id}});
  return binding;
@@ -98,6 +99,7 @@ export async function finishMissionAccounting(dir,config,{passed,reason}){
    const probe=collectMissionObservationsForBuild(build);
    if(release.status!=='verified-pending-accountability'||release.hash!==observations.candidate?.hash||release.hash!==probe||release.buildHash!==probe||release.reviewHash!==probe||verification.ok!==true||verification.hash!==probe||release.deploymentAuthorized!==false||policy.passed!==true||policy.sourceHash!==probe||policy.approvalGranted!==false||policy.deploymentAuthorized!==false)throw Error('Mission accounting requires unchanged independently verified release bytes');
  }
+ if(passed&&config.lensRequired){const lens=readRecord(dir,'artifacts/release-verified.json').value.lens;if(lens?.ok!==true)throw Error('Native Lens did not pass');verifyLensBinding(lens,{dir,sourceHash:observations.candidate.hash});}
  observations.gates=passed?Object.fromEntries(['release-verified.json','verification.json','release-policy-final.json','evaluation.json'].map(name=>[name,readRecord(dir,'artifacts/'+name).sha256])):{};
  save(path.join(dir,'artifacts/mission-observations.json'),observations);
  const start=readRecord(dir,'artifacts/accounting-start.json').value;
@@ -123,7 +125,8 @@ export function promoteAccountedRelease(dir,config){
  if(fs.existsSync(path.join(dir,'build'))||fs.existsSync(path.join(dir,'artifacts/release.json')))throw Error('Release promotion already attempted; reconcile instead of overwriting');
  const evalDir=path.relative(dir,evaluation.executionEvidence);
  if(!evalDir.startsWith('artifacts/eval/'))throw Error('Evaluation evidence outside mission');
- const release={...verified,status:'approved-local-candidate',gateVersion:'kujo.factory.release-gates/v2',accountability:artifactIdentity(dir,'artifacts/mission-accountability.json'),policy:artifactIdentity(dir,'artifacts/release-policy-final.json'),evaluation:artifactIdentity(dir,'artifacts/evaluation.json'),evaluationArtifacts:{input:artifactIdentity(dir,evalDir+'/evidence.json'),suite:artifactIdentity(dir,evalDir+'/suite.json'),result:artifactIdentity(dir,evalDir+'/results/evaluation-result.json'),binding:artifactIdentity(dir,evalDir+'/binding.json')},deploymentAuthorized:false};
+ if(config.lensRequired){if(verified.lens?.ok!==true)throw Error('Native Lens did not pass');verifyLensBinding(verified.lens,{dir,sourceHash:appHash});}
+ const release={...verified,status:'approved-local-candidate',gateVersion:config.lensRequired?'kujo.factory.release-gates/v3':'kujo.factory.release-gates/v2',accountability:artifactIdentity(dir,'artifacts/mission-accountability.json'),policy:artifactIdentity(dir,'artifacts/release-policy-final.json'),evaluation:artifactIdentity(dir,'artifacts/evaluation.json'),evaluationArtifacts:{input:artifactIdentity(dir,evalDir+'/evidence.json'),suite:artifactIdentity(dir,evalDir+'/suite.json'),result:artifactIdentity(dir,evalDir+'/results/evaluation-result.json'),binding:artifactIdentity(dir,evalDir+'/binding.json')},deploymentAuthorized:false};
  fs.renameSync(stage,path.join(dir,'build'));
  save(path.join(dir,'artifacts/release.json'),release);
  event(dir,'release.approved',{summary:'Verified and accounted local release candidate; no deployment',artifacts:['artifacts/release.json'],data:{hash:release.hash}});
