@@ -103,7 +103,7 @@
       ],
       "versionPrefix": "go version go1.27.4 ",
       "nativeCompiled": true,
-      "qualifiedImage": "sha256:6535831b94cd8d317b51b306ce5c057a61fe27100e26e3c9aa75c6c8f22101ee"
+      "qualifiedImage": "sha256:13a334b023ea9304bdaecc31d3a4954d53e68170b372b1df59632f2be6403338"
     },
     "rust-cli": {
       "version": "1.100.0",
@@ -128,7 +128,7 @@
       ],
       "versionPrefix": "rustc 1.100.0 ",
       "nativeCompiled": true,
-      "qualifiedImage": "sha256:6a5c8acb308500d7d0837a23882e763d9f8dfefae36b2db62f092f7b6436a0c5"
+      "qualifiedImage": "sha256:e53cfae50d0430337eaecd02e188a9d9220d604af38360003ba9fd4ddd7e88bc"
     }
   },
   "constraints": {
