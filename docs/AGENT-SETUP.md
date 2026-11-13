@@ -11,13 +11,15 @@ This guide is for an agent setting up the standalone Software Factory for a loca
 5. Save the endpoint with `npm run configure -- --docker-host unix:///...` or `npm run engine:connect -- PROFILE`. Run `npm run image:build`.
 6. Run `npm run doctor`, `npm run verify`, and `npm run smoke`. Preserve stdout/exit status and pointers to `.runtime/smoke/`. A missing/failed check is a blocker, not permission to skip it. `doctor --offline` is useful diagnostics but is not full readiness.
 7. Start `npm start`. Confirm GET `http://127.0.0.1:4380/api/runs` returns JSON and the viewer loads. Change the port through `configure` if occupied.
-8. Hand off the repository commit, viewer URL, setup/check results, private run-directory location, current template scope and any unresolved blockers. Do not claim a fresh build mission ran if only smoke tests ran.
+8. Hand off the repository commit, viewer URL, setup/check results, private run-directory location, supported runtime and selected pack and any unresolved blockers. Do not claim a fresh build mission ran if only smoke tests ran.
 
 ## First authorized mission
 
-Copy `factory/mission.txt` into a new text file and adjust goals within [the acceptance contract](../factory/contract.md). Run `npm run factory -- run PATH_TO_MISSION`. This makes paid/provider-backed calls. The wrapper requires preflight before execution. Monitor the ordered journal; use only the final verified `build/` artifact as a locally approved candidate. Use [retry/recheck](USAGE.md) rather than changing failure statuses or fabricating receipts.
+For the default issue tracker, copy `factory/mission.txt` and keep its required behavior. For another software idea, follow [the pack guide](PACKS.md): write requirements and tests, review expected results, validate, and seal the pack before constructing the app.
 
-For a different product type, follow [adaptation](ADAPT.md). The fixed issue-tracker acceptance contract will not validate an arbitrary XYZ app. Explain that constraint before promising customization. Changes to trusted contracts/harnesses require tests and review; never let candidate workers edit their own gates.
+Run `npm run factory -- run IDEA_FILE --pack PACK_FILE` for a pack, or omit `--pack` for the issue tracker. This uses the provider account. The wrapper checks prerequisites first. Follow the event journal and report the final release result. Only `build/` from an approved run is a locally approved candidate.
+
+Use [retry/recheck](USAGE.md) to recover or repeat checks. Never change failure statuses or invent receipts. Retries keep the original frozen pack. Unsupported languages, dependencies or services need a [runtime extension](ADAPT.md); explain that limit before promising customization.
 
 ## Completion criteria
 

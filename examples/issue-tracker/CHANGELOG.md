@@ -2,4 +2,4 @@
 
 ## 0.1.0 — local candidate
 
-Initial issue-tracker application with project/task management, Kanban, SQLite, REST, validation and activity. Independent verification and correction history live in the factory run evidence. No deployment.
+Initial issue tracker with projects, tasks, Kanban, SQLite, REST, validation and activity. The factory run evidence records independent checks and corrections. This candidate was not deployed.

@@ -7,8 +7,8 @@ Factory commit and OS/architecture:
 
 Expected behavior:
 
-Observed behavior and minimal reproduction:
+What happened and the smallest steps to reproduce it:
 
-Redacted doctor/check output:
+Doctor or test output, with private data removed:
 
 Do not include credentials, private mission data or authentication files. Security reports belong in a private channel; see SECURITY.md.

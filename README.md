@@ -1,12 +1,15 @@
 # Kujo Software Factory
 
-[![Verification](https://github.com/kujolang/software-factory/actions/workflows/verify.yml/badge.svg)](https://github.com/kujolang/software-factory/actions/workflows/verify.yml)
+[![Version](https://img.shields.io/badge/version-0.1.0-black)](package.json)
+[![License](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
+[![built with Kujo](https://img.shields.io/badge/built%20with-Kujo-white.svg)](https://github.com/kujolang/kujo)
+[![Verification](https://img.shields.io/github/actions/workflow/status/kujolang/software-factory/verify.yml?branch=main&label=verification&color=black)](https://github.com/kujolang/software-factory/actions/workflows/verify.yml)
 
 Give a team of agents a software mission. Inspect what they built, what reviewers rejected, and which tests actually passed.
 
 Software Factory coordinates scoped proposals through Kujo Dispatch, runs generated code inside rootless Workcell containers, and approves a local candidate only after independent checks. The Factory Floor lets you follow and replay the evidence.
 
-**Standalone, local-first, early release.** Agent City is not required. This version ships a working **issue-tracker software template**: a Node/SQLite API and browser interface. It is reusable for missions within that contract and a documented starting point for other software contracts. It does not turn an arbitrary prompt into arbitrary verified software, deploy applications, or include VideoOps/publishing factories.
+**Standalone, local, early release.** Give your agent an idea and the [software-pack guide](docs/PACKS.md). It can define the product contract and tests without rewriting the controller. Packs support Node APIs, SQLite when needed, and static browser interfaces. The issue tracker remains the default; converter and notes packs show other products. Agent City is not required.
 
 ## Start here
 
@@ -44,9 +47,19 @@ Already signed in to Codex? `npm run login -- --reuse-existing` imports only the
 
 Give your agent this instruction and the repository URL:
 
-> Clone kujolang/software-factory and follow docs/AGENT-SETUP.md. Install its pinned dependencies, help me select a supported rootless engine, run doctor and the no-model smoke test, then report the local viewer URL and any blockers. Keep generated code inside Workcell. Ask me to complete account sign-in when needed. Do not start a paid mission or publish an application until I request it.
+> Clone kujolang/software-factory and follow docs/AGENT-SETUP.md. Set up the pinned tools and rootless engine, then turn my software idea into a reviewed contract and tests using docs/PACKS.md. Validate and seal the pack before construction. Keep generated code inside Workcell. Help me complete sign-in when needed, and report any unsupported requirements. Run paid missions only when I authorize them.
 
 The [agent guide](docs/AGENT-SETUP.md) includes exact steps, success criteria and failure handling. The [installation guide](docs/INSTALL.md) explains supported environments and prerequisites.
+
+## Build a different product
+
+Your agent fills a pack from your idea, reviews its expected results and seals it. Run the idea against that pack:
+
+```sh
+npm run factory -- run idea.txt --pack packs/my-app.json
+```
+
+See the [pack guide](docs/PACKS.md) for the full workflow. Test the shipped converter and notes fixtures with `npm run test:packs`; this makes no model calls. Packs define tests as data. They cannot change the sandbox, run shell commands or approve their own output.
 
 ## What happens in a run
 
@@ -62,7 +75,8 @@ Workers propose text and files; they cannot run commands. Generated applications
 
 - [Run, retry, inspect and export](docs/USAGE.md)
 - [Configuration and dependency upgrades](docs/CONFIGURATION.md)
-- [Adapt the software contract](docs/ADAPT.md)
+- [Create a software pack](docs/PACKS.md)
+- [Extend the runtime](docs/ADAPT.md)
 - [Architecture and authority](docs/ARCHITECTURE.md)
 - [Execution isolation](factory/WORKCELL.md)
 - [Troubleshooting and recovery](docs/TROUBLESHOOTING.md)
@@ -72,6 +86,6 @@ Workers propose text and files; they cannot run commands. Generated applications
 
 ## Scope
 
-This is a local, single-operator factory. Rootless containers have bounded network, filesystem, process, memory and runtime access; they are not proof against kernel or runtime exploits. Hosted multi-tenant service, unattended crash recovery and public application deployment are not qualified. Windows users need Linux/WSL2; native Windows is unsupported. Platform qualification is recorded separately from intended compatibility.
+This is a local, single-operator factory. Workcell limits network, filesystem, process, memory and runtime access. These controls do not prove protection against kernel or runtime exploits. Hosted multi-tenant service, unattended crash recovery and public application deployment are not qualified. Windows users need Linux/WSL2; native Windows is unsupported. Platform qualification is recorded separately from intended compatibility.
 
 MIT licensed. Kujo dependencies retain their own licenses. The included Departure Mono font retains its license.

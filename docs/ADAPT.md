@@ -1,22 +1,11 @@
 # Adapt the software workflow
 
-The first release makes the tested factory portable. It does not yet provide interchangeable factory packs or automatic acceptance-test generation for arbitrary products.
+Use a [software pack](PACKS.md) to change the product contract and tests without editing the controller. Give the agent your idea and the pack guide. It prepares requirements, expected API results and browser steps before construction.
 
-## Changes that need no controller edit
+The shared runtime currently supports Node HTTP APIs, optional SQLite storage and static browser interfaces. The converter and notes examples use the same worker roles and release gates. Existing issue-tracker missions still work without a pack.
 
-Write another mission within `factory/contract.md`: choose wording, product presentation, visual treatment and priorities that preserve the required Node/SQLite API and browser behavior. Save it outside runtime code and run it through the normal command. The contract wins if a mission asks to bypass review, add network access or change mandatory endpoints.
+Review and seal each pack before running it. Candidate workers cannot change it. If a requirement or expected result was wrong, preserve the failed run, revise the pack and start a new mission. Do not weaken a test merely to pass a generated app.
 
-## A different software contract
+A new language, dependency model, external service or deployment target needs a trusted runtime extension. Update the image and isolation policy, add independent checks, run hostile-code probes and qualify the new path. A pack cannot grant those capabilities.
 
-Work in a branch or fork. Treat these as trusted maintainer changes:
-
-1. Define the product contract and independent acceptance criteria before generation. Edit `factory/contract.md`; include negative cases and required outputs.
-2. Update role/task definitions in `factory/cli.mjs`, worker prompts and file allowlists in `factory/worker.mjs`, and deterministic package documentation in `factory/product-docs.mjs`.
-3. Update controller-owned API acceptance and image-owned browser/build checks. Keep checks outside candidate ownership. Do not accept candidate-authored pass/fail reports as authority.
-4. If adding dependencies or languages, install them in the trusted image, rebuild, and requalify. Do not enable runtime package installation or outside network access just to satisfy a generated app.
-5. Update fixtures, run deterministic tests, native Dispatch tests, the smoke workflow, hostile isolation tests and a real mission. Verify source hashes, release bindings, native receipts and cleanup.
-6. Document the new scope and remaining limits. Obtain fresh evidence; the issue-tracker's checks do not prove your new product works.
-
-Keep the shared control/verification boundary intact. A model should not design its own acceptance criteria during the same untrusted run and then approve itself. Deployment and paid/external tool access require separate designs and authorization; they are not hidden setup toggles.
-
-VideoOps, WebOps and publishing packs are deliberately outside this extraction. Generalizing the contract interface is a future change after the standalone software workflow is stable.
+VideoOps, WebOps and publishing workflows remain outside this software-runtime change.

@@ -4,6 +4,8 @@ Run commands from the checkout. Start the read-only Factory Floor with `npm star
 
 ```sh
 npm run factory -- run factory/mission.txt
+# A different product, using a reviewed and sealed pack:
+npm run factory -- run idea.txt --pack packs/my-app.json
 # Deliberately adversarial mission for a qualified local engine:
 npm run factory -- run factory/mission-untrusted.txt
 ```
@@ -20,7 +22,7 @@ node factory/audit.mjs /absolute/run/directory
 node factory/export.mjs /absolute/run/directory /new/export/directory
 ```
 
-Retry creates a new run with fresh review and checks of the failed candidate. Recheck revalidates an approved candidate without pretending to build it again. Neither inherits approval. Export refuses to represent an invalid approved run as valid. Keep source and receipts together; absolute paths in receipts describe the machine where they were produced and are not installation instructions.
+Retry creates a new run with fresh review and checks of the failed candidate. Recheck revalidates an approved candidate without pretending to build it again. Neither inherits approval. Pack runs retain the source run’s frozen contract and tests. To change those tests, review and seal a new pack and start a new mission. Export refuses to represent an invalid approved run as valid. Keep source and receipts together; absolute paths in receipts describe the machine where they were produced and are not installation instructions.
 
 To replay exports, configure `--runs /absolute/export-parent` and start the viewer. The viewer cannot authorize release, run commands, or deploy anything.
 

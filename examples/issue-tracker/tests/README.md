@@ -1,1 +1,3 @@
-This is an untrusted representative fixture. Use npm run smoke from the Software Factory root. Historical candidate tests are not release authority.
+# Fixture tests
+
+Treat this application as untrusted. Run `npm run smoke` from the Software Factory root. Historical candidate tests cannot approve a release.

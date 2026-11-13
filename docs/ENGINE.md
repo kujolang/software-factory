@@ -56,7 +56,7 @@ npm run configure -- --docker-context my-rootless-context
 npm run configure -- --docker-host unix:///absolute/path/docker.sock
 ```
 
-Explicit `DOCKER_HOST` or `DOCKER_CONTEXT` overrides saved selection. Never set both. To separate public image-build credentials from your ordinary Docker configuration, create a directory with an empty `config.json` and set it with `--docker-config PATH`; the factory does not overwrite your normal configuration.
+`DOCKER_HOST` or `DOCKER_CONTEXT` overrides the saved engine. Never set both. To separate public image-build credentials from your ordinary Docker configuration, create a directory with an empty `config.json` and set it with `--docker-config PATH`; the factory does not overwrite your normal configuration.
 
 ## Qualification
 
@@ -66,4 +66,4 @@ npm run test:isolation
 npm run test:controller-death
 ```
 
-The last command deliberately kills its own test controller, observes the image watchdog stopping the workload, then performs scoped recovery. It does not kill unrelated containers. Keep outputs in `.runtime/`; inspect the evidence before claiming the engine is ready for your workload.
+The last command deliberately kills its own test controller, observes the image watchdog stopping the workload, then removes only the test’s own resources. It does not kill unrelated containers. Keep outputs in `.runtime/` and inspect them before calling the engine ready.

@@ -15,11 +15,12 @@ Start with `npm run doctor -- --json`. It reports failures without printing prov
 | Registry pulls fail | Check the VM's actual DNS/gateway and Docker credentials; do not copy a gateway IP from another machine. |
 | Receipt write fails / disk full | Free disk and verify retained run evidence. Treat missing receipts as failed verification; retry only in a new run. |
 | Observer port occupied | `npm run configure -- --port 4389`; restart the observer. |
+| Pack changed after review | Review the changed contract and tests, then seal again. Existing runs keep their frozen pack. |
 | Model failed or timed out | Inspect the failed run's artifacts; use `retry` if appropriate. No automatic paid re-dispatch after uncertain outcomes. |
 
 ## Abrupt controller death
 
-The image watchdog stops workload processes at the bounded deadline even if the whole host controller tree is killed. Host receipt finalization cannot run after SIGKILL, so stopped container metadata and disposable workspaces may remain. This is not automatic crash recovery or resumable mission execution.
+The image watchdog stops workload processes at the bounded deadline even if the whole host controller tree is killed. Host receipt finalization cannot run after SIGKILL, so stopped container metadata and disposable workspaces may remain. The factory does not automatically recover or resume that mission.
 
 Inspect Docker containers filtered by label `dev.kujo.workcell.project`, then inspect the candidate's retained `container.json` and its exact ID. Verify it belongs to this failed run and that no live controller owns it before removing that stopped container. Never run broad prune commands. Use Workcell's own receipt/cleanup commands where evidence exists; preserve incomplete evidence as incomplete.
 
