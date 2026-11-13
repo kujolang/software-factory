@@ -1,3 +1,4 @@
+import {ensureSecretArtifactGate} from './secret-artifact-gate.mjs';
 import {performanceContract,evaluatePerformancePair,verifyPerformanceGate,performanceEvidenceReferences} from './performance.mjs';
 import {repositoryContext} from './repository-mission.mjs';
 import {assertMissionOperationsBudget} from './operations-policy.mjs';
@@ -440,6 +441,7 @@ try {
     if (!v.ok || v.hash !== digest(app))
       throw Error("Missing/stale verification");
     verifyEvaluationBinding(json(path.join(artifact,"evaluation.json")),{sourceHash:v.hash,packHash:config.packHash||null,dir});
+    ensureSecretArtifactGate(dir,config,app,v.hash);
     const testContract = json(path.join(app, "tests/contract.json"));
     const trustedHarnesses = pack
       ? [
@@ -577,7 +579,9 @@ try {
     }
     if(benchmarkPolicy)verifyPerformanceGate(dir,config,pack,v.hash);
     verifyLensBinding(lens,{dir,sourceHash:v.hash});
+    const secretScan=ensureSecretArtifactGate(dir,config,app,v.hash);
     save(path.join(artifact, "release-verified.json"), {
+      ...(secretScan?{secretScan}:{}),
       ...(benchmarkPolicy?{performance:performanceEvidenceReferences(dir)}:{}),
       lens,
       status: "verified-pending-accountability",

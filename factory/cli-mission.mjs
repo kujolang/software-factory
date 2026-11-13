@@ -1,3 +1,4 @@
+import {ensureSecretArtifactGate} from './secret-artifact-gate.mjs';
 import {hashMissionArtifacts} from './mission-bindings.mjs';
 import {acquireMissionAdmission} from './operations-policy.mjs';
 // Native Dispatch construction over a closed, independently reviewed CLI contract.
@@ -35,7 +36,7 @@ export function verifyCLIMission(dir){
   const result=record(dir,step);if(!result.ok||result.sourceHash!==sourceHash||result.sourceLockSha256!==config.runtimeSourceLockSha256||result.profile!==input.profile||result.casesHash!==specHash(JSON.stringify(input.cases))||result.qualification!=='qualified-cli-fixtures-linux-amd64'||result.results.length!==input.cases.length)throw Error('CLI real acceptance missing or changed');
   for(const [i,item] of result.results.entries())if(item.index!==i||!item.ok||item.observed.reason||item.observed.code!==input.cases[i].exitCode||item.observed.out!==input.cases[i].stdout||item.imageId!==cliProfiles.profiles[input.profile].qualifiedImage)throw Error('CLI acceptance observation invalid');
  }
- return {schema:'kujo.factory.cli-candidate/v1',sourceHash,inputSha256:config.inputSha256,profile:input.profile,fixture:config.fixture,softwareReleaseApproval:!config.fixture,scope:'Single-file standard-library CLI with exact reviewed finite cases',humanApproval:false,deploymentAuthorized:false};
+ const secretScan=ensureSecretArtifactGate(dir,config,path.join(dir,'application'),sourceHash);return {schema:'kujo.factory.cli-candidate/v1',...(secretScan?{secretScan}:{}),sourceHash,inputSha256:config.inputSha256,profile:input.profile,fixture:config.fixture,softwareReleaseApproval:!config.fixture,scope:'Single-file standard-library CLI with exact reviewed finite cases',humanApproval:false,deploymentAuthorized:false};
 }
 /** Explicit provider fixture seam is never exposed through CLI and never approves a release. */
 export async function runCLIMission({input,provider=defaultProvider,model=defaultModel,parent=path.join(root,'.runtime/cli-missions'),fixtureOutputs}={}){
@@ -44,7 +45,7 @@ export async function runCLIMission({input,provider=defaultProvider,model=defaul
  let existing=path.resolve(parent);while(!fs.existsSync(existing))existing=path.dirname(existing);specPlain(existing);fs.mkdirSync(parent,{recursive:true,mode:0o700});specPlain(parent);
  const dir=fs.mkdtempSync(path.join(parent,'cli-')),id=path.basename(dir);for(const name of ['artifacts','application'])fs.mkdirSync(path.join(dir,name),{mode:0o700});
  const runtimeSourceBytes=fs.readFileSync(path.join(root,'config/cli-runtime-sources.lock.json'));
- const config={schema:'kujo.factory.cli-mission/v1',evidenceContract:'kujo.factory.cli-evidence/v1',runtimeSourceLockSha256:specHash(runtimeSourceBytes),id,kind:'cli-construction',mission:input.mission,profile:input.profile,runtimeProfileSha256:specHash(JSON.stringify(cliProfiles.profiles[input.profile])),inputSha256:specHash(JSON.stringify(input)),provider,model:model??null,fixture:fixtureOutputs!==undefined,status:'running',startedAt:new Date().toISOString(),tasks:cliMissionSteps.map(s=>({id:s.id,agentId:s.role||'controller',dependencies:s.dependsOn})),deploymentAuthorized:false};
+ const config={schema:'kujo.factory.cli-mission/v1',evidenceContract:'kujo.factory.cli-evidence/v1',runtimeSourceLockSha256:specHash(runtimeSourceBytes),id,kind:'cli-construction',mission:input.mission,profile:input.profile,runtimeProfileSha256:specHash(JSON.stringify(cliProfiles.profiles[input.profile])),inputSha256:specHash(JSON.stringify(input)),provider,model:model??null,secretScanRequired:true,fixture:fixtureOutputs!==undefined,status:'running',startedAt:new Date().toISOString(),tasks:cliMissionSteps.map(s=>({id:s.id,agentId:s.role||'controller',dependencies:s.dependsOn})),deploymentAuthorized:false};
  const admission=acquireMissionAdmission(path.resolve(parent),dir,{runId:id,...(config.fixture?{poolDirectory:path.join(path.resolve(parent),'.fixture-admission')}:{})});config.operationsAdmission=admission.record;
  try {
  writeSpecRecord(dir,'run.json',config);writeSpecRecord(dir,'artifacts/mission-evidence-contract.json',{schema:config.evidenceContract});writeSpecRecord(dir,'input.json',input);writeSpecRecord(dir,'artifacts/runtime-profile.json',cliProfiles.profiles[input.profile]);fs.writeFileSync(path.join(dir,'artifacts/runtime-source-lock.json'),runtimeSourceBytes,{flag:'wx',mode:0o600});writeSpecRecord(dir,'artifacts/controller-provenance.json',controllerProvenance());if(config.fixture)writeSpecRecord(dir,'fixture-outputs.json',fixtureOutputs);

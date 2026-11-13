@@ -1,3 +1,4 @@
+import {ensureSecretArtifactGate} from './secret-artifact-gate.mjs';
 import {verifyPerformanceGate,performanceEvidenceReferences} from './performance.mjs';
 import {verifyLensBinding} from './lens.mjs';
 // Controller-owned lifecycle accounting. No candidate commands or provider prompts
@@ -120,6 +121,7 @@ export function promoteAccountedRelease(dir,config){
  const ledger=readRecord(dir,account.ledgerRecord?.path).value;
  const app=path.join(dir,'application'),stage=path.join(dir,'artifacts/verified-build');
  const appHash=collectMissionObservationsForBuild(app),buildHash=collectMissionObservationsForBuild(stage);
+ const secretScan=ensureSecretArtifactGate(dir,config,app,appHash);if(secretScan&&JSON.stringify(secretScan)!==JSON.stringify(verified.secretScan))throw Error('Release secret source binding changed');
  if(account.ok!==true||account.status!=='pass'||account.runId!==config.id||account.candidateHash!==appHash||verified.status!=='verified-pending-accountability'||verified.hash!==appHash||verified.buildHash!==buildHash||appHash!==buildHash||policy.passed!==true||policy.sourceHash!==appHash||policy.approvalGranted!==false||policy.deploymentAuthorized!==false||verified.deploymentAuthorized!==false||verified.reviewHash!==appHash||evaluation.ok!==true||evaluation.sourceHash!==appHash||ledger.status!=='pass'||ledger.id!==account.ledgerId||ledger.task_name!==config.id)throw Error('Local release cannot promote incomplete or changed evidence');
  if(!account.gates||Object.keys(account.gates).length!==4||Object.entries(account.gates).some(([name,hash])=>!['release-verified.json','verification.json','release-policy-final.json','evaluation.json'].includes(name)||readRecord(dir,'artifacts/'+name).sha256!==hash))throw Error('Verification gates changed after accounting');
  if(readRecord(dir,account.ledgerRecord.path).sha256!==account.ledgerRecord.sha256||readRecord(dir,account.ledgerBinding.path).sha256!==account.ledgerBinding.sha256||readRecord(dir,'artifacts/mission-observations.json').sha256!==account.observationsSha256)throw Error('Accounting evidence changed before promotion');

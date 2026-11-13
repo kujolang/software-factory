@@ -146,6 +146,7 @@ async function executeAdmittedRun(dir, config, admission, recovery) {
   if(!recovery){
   config.accountabilityRequired=true;
   config.lensRequired=true;
+  config.secretScanRequired=true;
   config.executionProvider={provider,model:model||null};
   save(path.join(dir,"run.json"),config);
   const provenance=controllerProvenance();
