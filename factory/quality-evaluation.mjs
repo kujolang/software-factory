@@ -44,7 +44,7 @@ export function assessProviderComparison(samples){
  const checks={samePrompt:rows.every(r=>r.promptSha256===rows[0].promptSha256),sameOutputContract:rows.every(r=>r.contractSha256===rows[0].contractSha256),sameAssessmentKind:rows.every(r=>r.assessment.kind===rows[0].assessment.kind),modelIdentitiesKnown:rows.every(r=>typeof r.model==='string'&&r.model.trim().length>0),fixtureStatusConsistent:rows.every(r=>r.fixture===rows[0].fixture)};
  return {schema:'kujo.factory.provider-comparison/v1',checks,comparable:Object.values(checks).every(Boolean),samples:rows,costRanking:null,scope:'Paired archival task/contract/assessment observations. Model judgments remain model judgments, duration is call latency not application performance, unknown costs remain unknown. No provider conformance or execution-authenticity certification.'};
 }
-async function nativeAssessment(kind,assessment,{parent=path.join(root,'.runtime/quality-evaluation')}={}){
+export async function nativeAssessment(kind,assessment,{parent=path.join(root,'.runtime/quality-evaluation')}={}){
  const dependency=verifyEvalDependency();let ancestor=path.resolve(parent);while(!fs.existsSync(ancestor))ancestor=path.dirname(ancestor);specPlain(ancestor);fs.mkdirSync(parent,{recursive:true,mode:0o700});specPlain(parent);
  const directory=fs.mkdtempSync(path.join(parent,'evaluation-'));fs.mkdirSync(path.join(directory,'.home'));fs.mkdirSync(path.join(directory,'.tmp'));const write=(name,v)=>fs.writeFileSync(path.join(directory,name),JSON.stringify(v,null,2)+'\n',{flag:'wx',mode:0o600});
  write('assessment.json',assessment);
