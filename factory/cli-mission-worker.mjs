@@ -45,7 +45,12 @@ try{
  }
  if(taskId==='release'){
   const verification=read('verify');if(!verification.ok||verification.sourceHash!==source().sourceHash)throw Error('No exact passing CLI acceptance');
-  await proposal('Independently decide local CLI candidate readiness using source, frozen contract, independent review and ACTUAL Workcell cases. No deployment/human approval. Reject missing/contradictory evidence, failed tests or out-of-scope claims. Return files:[] and pass only when acceptable.\nContract review:'+JSON.stringify(read('review-contract-proposal'))+'\nSource review:'+JSON.stringify(read('review-proposal'))+'\nActual trusted acceptance:'+JSON.stringify(verification),{sourceBound:true});
+  const evidenceRoot=path.join(dir,'artifacts/verify-workcell'),runs=fs.readdirSync(evidenceRoot).filter(name=>/^cli-runtime-[A-Za-z0-9]+$/.test(name));
+  if(runs.length!==1)throw Error('Ambiguous CLI acceptance evidence');
+  const evidencePath='artifacts/verify-workcell/'+runs[0],retained=readSpecRecord(dir,evidencePath+'/result.json');
+  if(JSON.stringify(retained)!==JSON.stringify(verification))throw Error('Retained CLI acceptance changed');
+  const references={missionDirectory:dir,source:'application/'+profile.entrypoint,frozenInput:'input.json',runtimeProfile:'artifacts/runtime-profile.json',verification:'artifacts/verify.json',rawResult:evidencePath+'/result.json',cases:verification.results.map(row=>({index:row.index,observation:evidencePath+'/case-'+row.index+'.json',workcell:evidencePath+'/'+row.evidence,executionWorkcell:row.executionEvidence?evidencePath+'/'+row.executionEvidence:null,commands:row.commands??null})),meaning:'Controller-retained local paths; no agent tool access. Exact argument vectors are inside-container commands executed by the trusted host launcher.'};
+  await proposal('Independently decide local CLI candidate readiness using source, frozen contract, independent review and ACTUAL Workcell cases. No deployment/human approval. Reject missing/contradictory evidence, failed tests or out-of-scope claims. Return files:[] and pass only when acceptable.\nContract review:'+JSON.stringify(read('review-contract-proposal'))+'\nSource review:'+JSON.stringify(read('review-proposal'))+'\nRetained evidence references:'+JSON.stringify(references)+'\nActual trusted acceptance:'+JSON.stringify(verification),{sourceBound:true});
  }
  if(specHash(JSON.stringify(readSpecRecord(dir,'input.json')))!==config.inputSha256)throw Error('Frozen CLI input changed during stage');
  emit('task.completed','CLI construction stage complete: '+taskId);console.log(JSON.stringify({ok:true,data:{taskId,deploymentAuthorized:false}}));
