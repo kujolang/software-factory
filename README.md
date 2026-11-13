@@ -7,9 +7,7 @@
 
 Give a team of agents a software mission. Inspect what they built, what reviewers rejected, and which tests actually passed.
 
-[![Watch the Software Factory demo](docs/media/software-factory-demo.png)](docs/media/software-factory-demo.mp4)
-
-[Watch the narrated demo — 49 seconds](docs/media/software-factory-demo.mp4)
+https://github.com/user-attachments/assets/1b85bfd6-5fb6-4d32-a421-22546934389f
 
 Software Factory coordinates scoped proposals through Kujo Dispatch, runs generated code inside rootless Workcell containers, and approves a local candidate only after independent checks. The Factory Floor lets you follow and replay the evidence.
 

@@ -12,4 +12,6 @@ The extracted runtime includes the controller, observer, native Dispatch adapter
 
 Canonical role contracts, Dispatch and Workcell are fetched at the public commits in `sources.lock.json`; the factory does not maintain copies of those engines. Kujo and Codex runtime versions are locked npm dependencies. The observer font retains its license in `factory/web/assets/`.
 
-The README preview links to `docs/media/software-factory-demo.mp4`, an unchanged copy of the final narrated demo with the Kujo bumper. Its SHA-256 is `4046393dc1e7c836ee8b944a6006ab81c8ea28aeae1c9a8a387581104ff0288e`. The preview image is the existing one-second frame from that video. This historical issue-tracker demonstration predates software packs.
+The README plays the final narrated demo with the Kujo bumper through a GitHub video attachment. `docs/media/software-factory-demo.mp4` retains the unchanged source copy. Its SHA-256 is `4046393dc1e7c836ee8b944a6006ab81c8ea28aeae1c9a8a387581104ff0288e`. The retained preview image is the existing one-second frame from that video. This historical issue-tracker demonstration predates software packs.
+
+Inline video attachment: https://github.com/user-attachments/assets/1b85bfd6-5fb6-4d32-a421-22546934389f. Uploaded directly to this repository through GitHub’s media upload endpoint; no YouTube account or issue/comment was needed.
