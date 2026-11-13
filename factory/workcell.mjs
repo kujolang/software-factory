@@ -67,6 +67,15 @@ function copyCandidate(source, target) {
   return { files: count, bytes };
 }
 export async function workcellPreflight() {
+  if (process.env.DOCKER_HOST && process.env.DOCKER_CONTEXT)
+    throw Error('Set only one Docker endpoint selector');
+  let endpoint = process.env.DOCKER_HOST;
+  if (!endpoint) {
+    const context = process.env.DOCKER_CONTEXT || (await docker(['context', 'show'])).out.trim();
+    endpoint = JSON.parse((await docker(['context', 'inspect', context])).out)[0]?.Endpoints?.docker?.Host;
+  }
+  if (typeof endpoint !== 'string' || !endpoint.startsWith('unix:///'))
+    throw Error('Factory requires a local Unix Docker socket; remote engines are unsupported');
   const info = JSON.parse(
     (await docker(["info", "--format", "{{json .SecurityOptions}}"])).out,
   );

@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import { startIsolatedApp } from "./workcell.mjs";
 const evidence = path.resolve(
-  process.argv[2] || "evidence/factory/workcell-adversarial",
+  process.argv[2] || ".runtime/qualification/workcell-adversarial",
 );
 fs.mkdirSync(evidence, { recursive: true });
 const scratch = fs.mkdtempSync(path.join(os.tmpdir(), "factory-host-canary-"));

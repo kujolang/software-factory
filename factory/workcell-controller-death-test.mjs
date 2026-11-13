@@ -5,7 +5,7 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 import { command, root, save } from "./core.mjs";
 const evidence = path.resolve(
-  process.argv[2] || "evidence/factory/workcell-controller-death",
+  process.argv[2] || ".runtime/qualification/controller-death",
 );
 fs.mkdirSync(evidence, { recursive: true });
 const app = path.join(evidence, "fixture");
