@@ -278,6 +278,9 @@ function cliMissionConsistency(dir,names,run,rows){
   const cases=missionArtifact(dir,names,base+'/reviewed-cases.json');requireRecord(sha(cases.bytes)===record.casesFileSha256&&same(cases.value,input.cases)&&sha(missionArtifact(dir,names,base+'/runtime-source-lock.json').bytes)===record.sourceLockSha256&&(!fresh||record.sourceLockSha256===run.runtimeSourceLockSha256),'CLI frozen test/runtime bytes mismatch');
   for(const [i,item] of record.results.entries()){
    requireRecord(item.index===i&&item.ok===true&&same(item.expected,input.cases[i])&&!item.observed?.reason&&item.observed?.code===input.cases[i].exitCode&&item.observed?.out===input.cases[i].stdout&&/^sha256:[a-f0-9]{64}$/.test(item.imageId)&&(!profile||item.imageId===profile.qualifiedImage)&&same(missionArtifact(dir,names,base+'/case-'+i+'.json').value,item),'CLI actual case observation mismatch');
+   if(item.commands!==undefined){
+    requireRecord(profile&&Array.isArray(profile.versionCommand)&&Array.isArray(profile.command)&&same(item.commands,{version:profile.versionCommand,build:profile.buildCommand||null,execute:[...profile.command,...input.cases[i].args],executionBoundary:'docker exec as uid/gid 65534 in the recorded Workcell lease; no host candidate execution'}),'CLI recorded command vectors differ from frozen runtime/cases');
+   }
    cliWorkcell(dir,names,base,item,profile?profile.nativeCompiled===true:item.staged!=null);
   }
  }
