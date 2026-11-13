@@ -7,3 +7,11 @@ test('CLI source bounds reject hardlinks and oversized sparse files',()=>{const 
 
 test('public runtime returns catalog and rejects candidate-owned expected cases',async()=>{assert.equal((await cliRuntimeCommand(['list'])).schema,'kujo.factory.cli-runtime-profiles/v1');const base=fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(),'factory-cli-')));try{const candidate=path.join(base,'source');fs.mkdirSync(candidate);const cases=path.join(candidate,'cases.json');fs.writeFileSync(cases,'[]');await assert.rejects(cliRuntimeCommand(['verify','python-cli',candidate,cases,path.join(base,'evidence')]),/outside candidate/);}finally{fs.rmSync(base,{recursive:true,force:true});}});
 test('unqualified native compiled lease is blocked before engine access',async()=>{const {startIsolatedApp}=await import('../factory/workcell.mjs');await assert.rejects(startIsolatedApp('/does-not-exist',{evidenceDir:'/does-not-exist',executionProfile:'native-compiled-cli/v1'}),/disabled.*write protection/);});
+
+test('readonly native execution requires a controller-owned bounded artifact before engine access',async()=>{
+ const {startIsolatedApp}=await import('../factory/workcell.mjs');
+ await assert.rejects(startIsolatedApp('/missing',{executionProfile:'native-compiled-cli/v2'}),/Trusted compiled artifact required/);
+ await assert.rejects(startIsolatedApp('/missing',{compiledArtifact:{bytes:Buffer.alloc(64)}}),/requires readonly execution profile/);
+});
+
+test("Docker reserved exit codes cannot become successful candidate expectations",()=>{for(const exitCode of [125,126,127])assert.throws(()=>validateCLICases("python-cli",[{args:[],stdout:"",exitCode}]),/Invalid trusted/);assert.doesNotThrow(()=>validateCLICases("python-cli",[{args:[],stdout:"",exitCode:1}]));});

@@ -74,7 +74,7 @@
       "version": "1.27.4",
       "entrypoint": "main.go",
       "image": "kujolang/factory-native-go:local",
-      "qualification": "blocked-workspace-write-boundary",
+      "qualification": "qualified-cli-fixtures-linux-amd64",
       "dependencies": "standard library only; CGO disabled; no modules/network/toolchain download",
       "sourceLock": "config/cli-runtime-sources.lock.json",
       "buildCommand": [
@@ -102,13 +102,14 @@
         "version"
       ],
       "versionPrefix": "go version go1.27.4 ",
-      "nativeCompiled": true
+      "nativeCompiled": true,
+      "qualifiedImage": "sha256:6535831b94cd8d317b51b306ce5c057a61fe27100e26e3c9aa75c6c8f22101ee"
     },
     "rust-cli": {
       "version": "1.100.0",
       "entrypoint": "main.rs",
       "image": "kujolang/factory-native-rust:local",
-      "qualification": "blocked-workspace-write-boundary",
+      "qualification": "qualified-cli-fixtures-linux-amd64",
       "dependencies": "standard library only; direct rustc; no Cargo/build.rs/network",
       "sourceLock": "config/cli-runtime-sources.lock.json",
       "buildCommand": [
@@ -126,7 +127,8 @@
         "--version"
       ],
       "versionPrefix": "rustc 1.100.0 ",
-      "nativeCompiled": true
+      "nativeCompiled": true,
+      "qualifiedImage": "sha256:6a5c8acb308500d7d0837a23882e763d9f8dfefae36b2db62f092f7b6436a0c5"
     }
   },
   "constraints": {

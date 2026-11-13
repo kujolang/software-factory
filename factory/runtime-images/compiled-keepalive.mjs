@@ -6,7 +6,9 @@ setTimeout(()=>process.exit(124),lifetime);
 const mount='/workspace/compiled-input';
 function immutableInput(dir){const stat=fs.lstatSync(dir);if(!stat.isDirectory()||stat.uid!==0||(stat.mode&0o022))throw Error('Untrusted compiled workspace owner/mode');for(const entry of fs.readdirSync(dir)){const p=dir+'/'+entry,s=fs.lstatSync(p);if(s.isSymbolicLink()||s.uid!==0||(s.mode&0o022))throw Error('Untrusted compiled input');if(s.isDirectory())immutableInput(p);else if(!s.isFile()||s.nlink!==1)throw Error('Compiled input type/link');}}
 immutableInput(mount);
-fs.mkdirSync(mount+'/.factory-executable',{mode:0o755});
+// The controller stages one executable before the native read-only mount is created.
+const artifact=fs.lstatSync(mount+'/.factory-executable/program');
+if(!artifact.isFile()||artifact.isSymbolicLink()||artifact.nlink!==1||![365,493].includes(artifact.mode&511))throw Error('Invalid controller-staged executable');
 fs.cpSync(mount+'/candidate','/tmp/factory-source',{recursive:true});
 function protect(dir){for(const entry of fs.readdirSync(dir,{withFileTypes:true})){const p=dir+'/'+entry.name;if(entry.isDirectory())protect(p);else fs.chmodSync(p,0o444);}fs.chmodSync(dir,0o555);}protect('/tmp/factory-source');
 const privateParent=fs.statSync('/workspace/private');if(privateParent.uid!==0||(privateParent.mode&511)!==448)process.exit(125);

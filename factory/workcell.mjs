@@ -5,6 +5,8 @@ import crypto from "node:crypto";
 import http from "node:http";
 import { spawn } from "node:child_process";
 import { command, save, root } from "./core.mjs";
+import {decodeCompiledExport} from "./compiled-export.mjs";
+import {writeCompiledArtifact} from "./runtime-images/compiled-artifact-contract.mjs";
 const workspace = path.dirname(root);
 const executable = workcellBinary;
 const kujo = process.env.FACTORY_WORKCELL_KUJO || kujoBinary();
@@ -113,11 +115,15 @@ export async function workcellPreflight() {
 }
 export async function startIsolatedApp(
   appDir,
-  { evidenceDir, timeoutMs = 300000, executionProfile = "default" } = {},
+  { evidenceDir, timeoutMs = 300000, executionProfile = "default", compiledArtifact } = {},
 ) {
-  if (!["default", "native-compiled-cli/v1"].includes(executionProfile)) throw Error("Unsupported trusted Workcell execution profile");
-  const compiledCLI = executionProfile === "native-compiled-cli/v1";
-  if(compiledCLI)throw Error("Native compiled profile disabled: candidate write protection on shared workspace bind failed qualification");
+  if (!["default", "native-compiled-cli/v1", "native-compiled-cli/v2"].includes(executionProfile)) throw Error("Unsupported trusted Workcell execution profile");
+  const compiledCLI = executionProfile === "native-compiled-cli/v2";
+  if(executionProfile === "native-compiled-cli/v1")throw Error("Native compiled profile disabled: candidate write protection on shared workspace bind failed qualification");
+  if(compiledCLI){
+    if(!compiledArtifact||!Buffer.isBuffer(compiledArtifact.bytes))throw Error("Trusted compiled artifact required");
+    compiledArtifact=decodeCompiledExport(JSON.stringify({...compiledArtifact.record,base64:compiledArtifact.bytes.toString("base64")}));
+  }else if(compiledArtifact)throw Error("Compiled artifact requires readonly execution profile");
   const inputMount = compiledCLI ? "/workspace/compiled-input" : "/workspace/private/input";
   if (
     !Number.isSafeInteger(timeoutMs) ||
@@ -141,6 +147,11 @@ export async function startIsolatedApp(
       path.resolve(appDir),
       path.join(source, "candidate"),
     );
+  if(compiledCLI){
+    const staging=path.join(source,".factory-executable");fs.mkdirSync(staging,{mode:0o755});
+    writeCompiledArtifact(path.join(staging,"program"),compiledArtifact.bytes);
+    save(path.join(evidenceDir,"compiled-artifact.json"),compiledArtifact.record);
+  }
   } catch (e) {
     fs.rmSync(scratch, { recursive: true, force: true });
     throw e;
@@ -159,7 +170,8 @@ export async function startIsolatedApp(
       strategy: "isolated-clone",
       mount_path: inputMount,
       run_as: "rootless",
-      scan: { max_files: 500, max_bytes: 20000000, max_depth: 16 },
+      ...(compiledCLI?{read_only:true}:{}),
+      scan: { max_files: 500, max_bytes: compiledCLI?30000000:20000000, max_depth: 16 },
     },
     command: ["node", compiledCLI ? "/opt/factory/compiled-keepalive.mjs" : "/opt/factory/keepalive.mjs", String(timeoutMs)],
     environment: { allow: [], set: {} },
@@ -450,7 +462,7 @@ export async function startIsolatedApp(
       inspection.Mounts.filter((m) => m.Type === "bind").length !== 1 ||
       inspection.Mounts.some(
         (m) =>
-          m.Type === "bind" && m.Destination !== inputMount,
+          m.Type === "bind" && (m.Destination !== inputMount || (compiledCLI && m.RW !== false)),
       ) ||
       !["noexec","nosuid","nodev"].every(flag=>(inspection.HostConfig.Tmpfs?.["/tmp"]||"").split(",").includes(flag)) ||
       ![image, preflight.imageId].includes(inspection.Config.Image)
@@ -650,14 +662,12 @@ export async function startIsolatedApp(
       evidenceDir,
       container,
       request,
-      async stageCompiledArtifact() {
-        if(!compiledCLI)throw Error("Compiled staging not authorized by lease profile");
-        const result=await command("docker",["exec","--workdir","/tmp","--user","0:0",container,"node","/opt/factory/stage-compiled.mjs"],{timeout:10000,maxBytes:65536});
-        save(path.join(evidenceDir,"compiled-staging-command.json"),result);
-        if(result.code!==0||result.reason)throw Error("Compiled artifact staging rejected");
-        const record=JSON.parse(result.out);
-        if(record.schema!=="kujo.factory.compiled-artifact/v1"||record.path!=="/workspace/compiled-input/.factory-executable/program"||record.uid!==0||record.mode!==365||!Number.isSafeInteger(record.bytes)||record.bytes<64||record.bytes>16777216||! /^[a-f0-9]{64}$/.test(record.sha256))throw Error("Invalid compiled artifact staging receipt");
-        save(path.join(evidenceDir,"compiled-artifact.json"),record);return record;
+      async exportCompiledArtifact() {
+        if(compiledCLI)throw Error("Cannot export from execution-only lease");
+        const result=await command("docker",["exec","--workdir","/tmp","--user","0:0",container,"node","/opt/factory/export-compiled.mjs"],{timeout:10000,maxBytes:22371000});
+        save(path.join(evidenceDir,"compiled-export-command.json"),{code:result.code,reason:result.reason,err:result.err,outputBytes:Buffer.byteLength(result.out),outputSha256:crypto.createHash("sha256").update(result.out).digest("hex")});
+        if(result.code!==0||result.reason)throw Error("Compiled artifact export rejected");
+        const exported=decodeCompiledExport(result.out);save(path.join(evidenceDir,"compiled-artifact.json"),exported.record);return exported;
       },
       runLens: (target) => browserOperation("lens", target),
       runBrowserCheck: (target) => browserOperation("check", target),

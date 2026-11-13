@@ -18,7 +18,7 @@ export function validateCLISource(candidate){
 export function validateCLICases(profile,cases){
  if(!Object.hasOwn(cliProfiles.profiles,profile))throw Error('Unsupported CLI runtime profile');
  if(!Array.isArray(cases)||cases.length<1||cases.length>4)throw Error('CLI cases must contain 1..4 trusted cases');
- for(const item of cases)if(!item||typeof item!=='object'||!Array.isArray(item.args)||item.args.length>16||item.args.some(x=>typeof x!=='string'||x.length>1024||x.includes('\0'))||typeof item.stdout!=='string'||Buffer.byteLength(item.stdout)>65536||!Number.isInteger(item.exitCode)||item.exitCode<0||item.exitCode>255||Object.keys(item).some(k=>!['args','stdout','exitCode'].includes(k)))throw Error('Invalid trusted CLI case');
+ for(const item of cases)if(!item||typeof item!=='object'||!Array.isArray(item.args)||item.args.length>16||item.args.some(x=>typeof x!=='string'||x.length>1024||x.includes('\0'))||typeof item.stdout!=='string'||Buffer.byteLength(item.stdout)>65536||!Number.isInteger(item.exitCode)||item.exitCode<0||item.exitCode>255||[125,126,127].includes(item.exitCode)||Object.keys(item).some(k=>!['args','stdout','exitCode'].includes(k)))throw Error('Invalid trusted CLI case');
  return cliProfiles.profiles[profile];
 }
 // cases must come from the controller's reviewed specification, never candidate files/output.
@@ -28,7 +28,7 @@ export async function evaluateCLI({profile,candidate,dir,cases,casesSourceBytes}
  const sourceHash=validateCLISource(candidate);const reviewedCases=casesSourceBytes??Buffer.from(JSON.stringify(cases));if(reviewedCases.length>300000||JSON.stringify(JSON.parse(reviewedCases))!==JSON.stringify(cases))throw Error('Reviewed case snapshot mismatch');const casesFileSha256=createHash('sha256').update(reviewedCases).digest('hex');
  const sourceLock=fs.readFileSync(path.join(root,'config/cli-runtime-sources.lock.json'));const sourceLockSha256=createHash('sha256').update(sourceLock).digest('hex');const request={profile,candidate,dir,cases,sourceHash,casesFileSha256,sourceLockSha256};
  const run=fs.mkdtempSync(path.join(dir,'cli-runtime-'));fs.writeFileSync(path.join(run,'reviewed-cases.json'),reviewedCases,{mode:0o600,flag:'wx'});fs.writeFileSync(path.join(run,'runtime-source-lock.json'),sourceLock,{mode:0o600,flag:'wx'});const file=path.join(run,'request.json');fs.writeFileSync(file,JSON.stringify({...request,dir:run}),{mode:0o600,flag:'wx'});
- const env={};for(const key of ['PATH','HOME','DOCKER_HOST','DOCKER_CONTEXT','DOCKER_CONFIG','FACTORY_CONFIG','FACTORY_WORKCELL_KUJO'])if(process.env[key])env[key]=process.env[key];env.FACTORY_WORKCELL_IMAGE=selected.image;
+ const env={};for(const key of ['PATH','HOME','DOCKER_HOST','DOCKER_CONTEXT','DOCKER_CONFIG','FACTORY_CONFIG','FACTORY_WORKCELL_KUJO','FACTORY_WORKCELL_BIN'])if(process.env[key])env[key]=process.env[key];env.FACTORY_WORKCELL_IMAGE=selected.image;
  const child=spawn(process.execPath,[path.join(root,'factory/cli-runtime-worker.mjs'),file],{cwd:root,env,stdio:['ignore','pipe','pipe']});let output='',bytes=0;let stopped=false;
  const timer=setTimeout(()=>{stopped=true;child.kill('SIGKILL');},300000);
  for(const stream of [child.stdout,child.stderr])stream.on('data',b=>{bytes+=b.length;if(bytes>100000){stopped=true;child.kill('SIGKILL');}else output+=b;});

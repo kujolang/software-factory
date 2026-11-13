@@ -205,7 +205,7 @@
     },
     "go-cli": {
       "version": "1.27.4",
-      "qualification": "blocked-workspace-write-boundary",
+      "qualification": "qualified-cli-fixtures-linux-amd64",
       "lastExecution": {
         "scope": "default noexec profile",
         "compileExitCode": 0,
@@ -283,11 +283,142 @@
           "sha256": "d633d8c105bd299877e57180f8bbe660053e62d6536a95d2fc43e7034902b2d5"
         }
       },
-      "securityQualificationPassed": false
+      "securityQualificationPassed": true,
+      "readonlyV2Qualification": {
+        "functionalPassed": true,
+        "securityPassed": true,
+        "integrationStatus": "installed-pinned-source-verified",
+        "upstreamNativeCommit": "099d1b6d17b38c8c247e8c6617649d8ea21ba157",
+        "evidence": ".runtime/go-cli-qualification-GGzbD1",
+        "outcomes": [
+          {
+            "name": "positive",
+            "ok": true,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "wrong",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "timeout",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": null,
+                "reason": "timeout"
+              }
+            ]
+          },
+          {
+            "name": "compileFailure",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 1,
+                "code": 1,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "protected",
+            "ok": true,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          }
+        ],
+        "log": {
+          "path": ".runtime/ecosystem-phase-b/go-cli-readonly-qualification.log",
+          "sha256": "19432a4c10555a1b1183cc3027312fd3f49da89438013f64a57c238513539ec0"
+        },
+        "imageId": "sha256:6535831b94cd8d317b51b306ce5c057a61fe27100e26e3c9aa75c6c8f22101ee"
+      },
+      "imageId": "sha256:6535831b94cd8d317b51b306ce5c057a61fe27100e26e3c9aa75c6c8f22101ee",
+      "platform": "linux/amd64",
+      "log": ".runtime/ecosystem-phase-b/go-cli-readonly-qualification.log",
+      "logSha256": "19432a4c10555a1b1183cc3027312fd3f49da89438013f64a57c238513539ec0",
+      "evidence": ".runtime/go-cli-qualification-GGzbD1",
+      "outcomes": [
+        {
+          "name": "positive",
+          "ok": true,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "wrong",
+          "ok": false,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "timeout",
+          "ok": false,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": null,
+              "reason": "timeout"
+            }
+          ]
+        },
+        {
+          "name": "compileFailure",
+          "ok": false,
+          "observed": [
+            {
+              "buildCode": 1,
+              "code": 1,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "protected",
+          "ok": true,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        }
+      ]
     },
     "rust-cli": {
       "version": "1.100.0",
-      "qualification": "blocked-workspace-write-boundary",
+      "qualification": "qualified-cli-fixtures-linux-amd64",
       "imageBuild": {
         "base": "sha256:c62fa7844cd38dd67d18421162af5016b2973a48d6db0a119982b2bf4b661383",
         "exitCode": 0,
@@ -360,7 +491,138 @@
           "sha256": "8b320ef44bb30afa171e9780b2bf416e501f0ced4abeb8691d4e7f81d06d5d01"
         }
       },
-      "securityQualificationPassed": false
+      "securityQualificationPassed": true,
+      "readonlyV2Qualification": {
+        "functionalPassed": true,
+        "securityPassed": true,
+        "integrationStatus": "installed-pinned-source-verified",
+        "upstreamNativeCommit": "099d1b6d17b38c8c247e8c6617649d8ea21ba157",
+        "evidence": ".runtime/rust-cli-qualification-wnPt7N",
+        "outcomes": [
+          {
+            "name": "positive",
+            "ok": true,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "wrong",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "timeout",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": null,
+                "reason": "timeout"
+              }
+            ]
+          },
+          {
+            "name": "compileFailure",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 1,
+                "code": 1,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "protected",
+            "ok": true,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          }
+        ],
+        "log": {
+          "path": ".runtime/ecosystem-phase-b/rust-cli-readonly-qualification.log",
+          "sha256": "0e9d71efa6de284d55fc86314f07dcfad58776b629b183a73e09ee9857b45642"
+        },
+        "imageId": "sha256:6a5c8acb308500d7d0837a23882e763d9f8dfefae36b2db62f092f7b6436a0c5"
+      },
+      "imageId": "sha256:6a5c8acb308500d7d0837a23882e763d9f8dfefae36b2db62f092f7b6436a0c5",
+      "platform": "linux/amd64",
+      "log": ".runtime/ecosystem-phase-b/rust-cli-readonly-qualification.log",
+      "logSha256": "0e9d71efa6de284d55fc86314f07dcfad58776b629b183a73e09ee9857b45642",
+      "evidence": ".runtime/rust-cli-qualification-wnPt7N",
+      "outcomes": [
+        {
+          "name": "positive",
+          "ok": true,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "wrong",
+          "ok": false,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "timeout",
+          "ok": false,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": null,
+              "reason": "timeout"
+            }
+          ]
+        },
+        {
+          "name": "compileFailure",
+          "ok": false,
+          "observed": [
+            {
+              "buildCode": 1,
+              "code": 1,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "protected",
+          "ok": true,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        }
+      ]
     }
   },
   "nativeProfileBlocker": {
@@ -375,20 +637,128 @@
     "failClosedTest": {
       "path": ".runtime/ecosystem-phase-b/cli-runtime-failclosed.log",
       "sha256": "558b9c018f500c7e89b9d0fdf827d8b3c425dd7f929ec4aac7beeefdbc92ceec"
-    }
+    },
+    "scope": "Historical native-compiled-cli/v1 failure; v1 stays disabled. V2 uses independently observed kernel read-only mount."
   },
   "deterministicVerification": {
-    "command": "node --test tests/cli-runtime.test.mjs tests/lens.test.mjs tests/compiled-artifact.test.mjs",
-    "passed": 18,
+    "command": "node --test tests/cli-runtime.test.mjs tests/lens.test.mjs tests/compiled-artifact.test.mjs tests/compiled-export.test.mjs",
+    "passed": 24,
     "failed": 0,
-    "scope": "Trusted input/record/synthetic byte fixture tests; no candidate host execution or substitute for runtime qualification",
+    "scope": "Trusted byte/record fixtures; no host candidate execution",
     "log": {
-      "path": ".runtime/ecosystem-phase-b/runtime-stable-unit.log",
-      "sha256": "b2a8cb1ee8cadab01e558044e309c1acd5274e301ab0f35c2c5f3064520d62c6"
+      "path": ".runtime/ecosystem-phase-b/runtime-installed-final-unit.log",
+      "sha256": "109c7b389aa13f49139cc273ac1355b6a00c20a3cdd887c25ea511bb3331dd1d"
     }
   },
   "sourceLock": {
     "path": "config/cli-runtime-sources.lock.json",
-    "sha256": "b8f822e3f034fa5113c517a2177fa3a8be4a8b68579f7eae9cee830631a69084"
+    "sha256": "de693fdd2945f9b9fdf968ada03c72d1d8ea99b1845ab24dad968ea14d8776e9"
+  },
+  "readonlyV2Security": {
+    "ok": true,
+    "checks": [
+      "symlink rejected",
+      "hardlink rejected",
+      "oversize rejected",
+      "observed readonly workspace mount",
+      "bounded immutable artifact executed only in Workcell",
+      "UID, immutable bind/source/image, credentials and socket boundaries",
+      "egress denied"
+    ],
+    "evidence": ".runtime/native-staging-qualification-lV0wjT",
+    "log": {
+      "path": ".runtime/ecosystem-phase-b/native-readonly-staging-qualification.log",
+      "sha256": "ea8ed787ff860355e5fc16aa4b6e3c4cfa7a9bb1f6d41249372016bad539e7e4"
+    }
+  },
+  "installedPublicCLI": {
+    "ok": true,
+    "evidence": ".runtime/native-installed-qualification-Z0VI97",
+    "records": [
+      {
+        "profile": "go-cli",
+        "elapsedMs": 29466,
+        "sourceHash": "502d64a669a2d45e804d35d7f892e53063cd232861006621db3713b3ca52b542",
+        "workcellSource": {
+          "commit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+          "clean": true,
+          "expectedCommit": "144ab49da88a17fd0d786d01d98030d7ec7798cb"
+        },
+        "imageId": "sha256:6535831b94cd8d317b51b306ce5c057a61fe27100e26e3c9aa75c6c8f22101ee",
+        "stdoutSha256": "43949b962132d19216148ca5eb340305c9c1caf860af123c31fd9e3412ce0eea",
+        "evidence": "go-cli/evidence"
+      },
+      {
+        "profile": "rust-cli",
+        "elapsedMs": 11087,
+        "sourceHash": "028997150d8b5dba2d363b566189380229ab8400eca8c49676c3b9c9347ccec9",
+        "workcellSource": {
+          "commit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+          "clean": true,
+          "expectedCommit": "144ab49da88a17fd0d786d01d98030d7ec7798cb"
+        },
+        "imageId": "sha256:6a5c8acb308500d7d0837a23882e763d9f8dfefae36b2db62f092f7b6436a0c5",
+        "stdoutSha256": "f258b09868c81c77f32f6cde3e20cdb725e222a3cbc14eb6564f47a6339b7d86",
+        "evidence": "rust-cli/evidence"
+      }
+    ],
+    "command": "node scripts/qualify-installed-native-cli.mjs",
+    "log": {
+      "path": ".runtime/ecosystem-phase-b/native-installed-public-qualification.log",
+      "sha256": "1c090960de26a88511b9e7415c7cc171c99029564c191730f500cda5435d9a7b"
+    }
+  },
+  "upstreamWorkcell": {
+    "url": "https://github.com/kujolang/workcell.git",
+    "branch": "codex/workcell-readonly-workspace",
+    "commit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+    "clean": true,
+    "pushed": true,
+    "testedKujo": "1.9.0",
+    "nativeUnitPassed": 223,
+    "portableUnitPassed": 23,
+    "adapterTestsPassed": 30,
+    "releaseReportPassed": 257,
+    "auditVulnerabilities": 0,
+    "fullSuiteExitCode": 0,
+    "remoteLiveQualified": false,
+    "logs": [
+      {
+        "path": ".runtime/ecosystem-phase-b/workcell-readonly-all-final.log",
+        "sha256": "ad599f0a98e4a4acc297d1c12ed04760609c7a55629d4a4340352ed129f03fb4"
+      },
+      {
+        "path": ".runtime/ecosystem-phase-b/workcell-readonly-unsupported.log",
+        "sha256": "44d51ee313be7d5f44004b5dcac792d8f409c82f383bb4803b0dca653a1dab6b"
+      },
+      {
+        "path": ".runtime/ecosystem-phase-b/workcell-adapter-security-tests.log",
+        "sha256": "f317a8f85d8b9f114c1db8b3e07148dc710f99f00799b3b02b227ef468987d37"
+      },
+      {
+        "path": ".runtime/ecosystem-phase-b/workcell-adapter-security-audit-final.json",
+        "sha256": "d413743c70bf782d3b8dfb55b486bbf4cddeb34f87f48ac947673bc3d3e2ed4b"
+      },
+      {
+        "path": ".runtime/ecosystem-phase-b/workcell-readonly-pinned-setup.log",
+        "sha256": "82e4ccbf291219824b519cb8b2621dd6f53a1b237ffc2b36d8b8a4473bf81598"
+      },
+      {
+        "path": ".runtime/ecosystem-phase-b/workcell-readonly-installed-live.log",
+        "sha256": "9878fab541d2d2c259d407ffddd075566d3714311e7bfdb882f009136f59829b"
+      }
+    ]
+  },
+  "controllerSourceBytes": {
+    "factory/cli-runtime.mjs": "98e08123e27907fc32be6ce3932a0f9f0feccc50525d9bbe9153e2fbc44d637d",
+    "factory/cli-runtime-worker.mjs": "88b60fab37af88adfb1e764e5821b731b0caae6ea4f68e553eeb29eecd41f90b",
+    "factory/workcell.mjs": "968834b8f26c16c2682bfeff568fb6f31f2e7a88473d6e77b52212523c0f9a1e",
+    "factory/compiled-export.mjs": "8e3f0154d27104cbae7c2a554228f1b35cd79e3364d4a3810684bb275c621fec",
+    "factory/runtime-images/compiled-artifact-contract.mjs": "9f56670deb98907a4125cc1257d812dee4af8afdacea152402dc8d43497c18a2",
+    "factory/runtime-images/compiled-keepalive.mjs": "c545e206ea402ebb5a2ceadbc5b52df3fee67bd8e075f153c50019224c28a72f",
+    "factory/runtime-images/export-compiled.mjs": "a54636bce4523c8eb43545441088f023a01e3dd3750d8b8c812406e97224e3ad",
+    "config/cli-runtime-profiles.json": "967859f74cd53eebd22213ff2c90de49488f8fe8d719a4d1ad0dac1ddf829254",
+    "config/cli-runtime-sources.lock.json": "de693fdd2945f9b9fdf968ada03c72d1d8ea99b1845ab24dad968ea14d8776e9",
+    "sources.lock.json": "67407995783d72ab15328c7eb1d18a98fb75d140e98091dbcfea05fab07efca4"
   }
 }
