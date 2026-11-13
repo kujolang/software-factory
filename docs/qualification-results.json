@@ -744,6 +744,56 @@
         }
       ],
       "scope": "Fresh published checkout with isolated HOME/cache and no copied dependencies/settings/authentication, on the existing host. No clean-machine, provider, engine, or mission execution claim."
+    },
+    "finalLiveRevalidation": {
+      "runId": "factory-recheck-2026-11-13T19-50-22-471Z",
+      "controllerSource": {
+        "commit": "cdf86862fa99d1564a35c7c48da12b530b7b2b89",
+        "tree": "e1586a9a96b706734afa8c4b9588a9307d4c85c3",
+        "dirty": false,
+        "identityScope": "Git HEAD; dirty working-tree bytes are separately hashed below"
+      },
+      "status": "completed",
+      "elapsedMs": 94324,
+      "providerCalls": 2,
+      "usage": {
+        "input_tokens": 33533,
+        "cached_input_tokens": 11776,
+        "output_tokens": 2220
+      },
+      "cost": null,
+      "telemetryRecords": 25,
+      "exportFiles": 233,
+      "bundleId": "sha256:813dea97e10b9a24766a27165c6e99315ee1f6274a91e6a48f6e023de8dc900f",
+      "authentication": "unsigned",
+      "deploymentAuthorized": false,
+      "evidence": [
+        {
+          "path": ".runtime/ledger-completion/final-codex-recheck.log",
+          "sha256": "7d8bc1c575e48a4943ae0fb5ee0eeca92557b6aca1b9b5813eabd072e27542cf"
+        },
+        {
+          "path": ".runtime/ledger-completion/final-recheck-audit.json",
+          "sha256": "c02ebb724bede3d22db86060bc6bdfecc33e98424c09fa1900b15ab13a9b58db"
+        },
+        {
+          "path": ".runtime/ledger-completion/final-recheck-export.json",
+          "sha256": "59208e3dbb56952a1add3e9ec1dd53ecf6fd4a587e0a29c13897496337b938f5"
+        },
+        {
+          "path": ".runtime/ledger-completion/final-recheck-verify.json",
+          "sha256": "06a8cd60280fe3f1737db32d9a852028d2f4d1496388d1f6016a9d670878df20"
+        },
+        {
+          "path": ".runtime/ledger-live/factory-recheck-2026-11-13T19-50-22-471Z/artifacts/controller-provenance.json",
+          "sha256": "ef5b65e4d00fe46b6299ff4b3e00887cada3e245c6cafea6e2e3326b112c5851"
+        },
+        {
+          "path": ".runtime/ledger-live/factory-recheck-2026-11-13T19-50-22-471Z/artifacts/telemetry.json",
+          "sha256": "15f1c3ca7c21ff7f19f632f460e5c235991a0c52dcbd6be21a46003a0a134db4"
+        }
+      ],
+      "scope": "Actual current-source Codex approved-candidate revalidation and terminal native Watchdog; no construction, all-role consultation or deployment claim."
     }
   }
 }
