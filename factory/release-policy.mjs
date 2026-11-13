@@ -114,7 +114,10 @@ export async function prepareReleasePolicy({dir,app,packet}){
   requireCheck(validate(readiness.report),'Invalid canonical ShipCheck report');
   requireCheck(readiness.report.summary.total_checks===readiness.report.checks.length&&new Set(readiness.report.checks.map(c=>c.name)).size===readiness.report.checks.length,'Inconsistent ShipCheck check inventory');
   const reportFile=path.relative(dir,path.join(readiness.executionEvidence,'binding.json')).split(path.sep).join('/');
-  receipt.shipcheck={sourceCommit:readiness.sourceCommit,bindingPath:reportFile,bindingSha256:sha(read(evidence(dir,reportFile))),upstreamGatePassed:readiness.report.summary.gate_passed===1,requiredChecks:approved.value.requiredShipcheckChecks};
+  receipt.shipcheck={sourceCommit:readiness.sourceCommit,bindingPath:reportFile,bindingSha256:sha(read(evidence(dir,reportFile))),upstreamGatePassed:readiness.report.summary.gate_passed===1,requiredChecks:approved.value.requiredShipcheckChecks,
+   requiredCheckResults:readiness.report.checks.filter(check=>approved.value.requiredShipcheckChecks.includes(check.name)),
+   advisoryCheckResults:readiness.report.checks.filter(check=>!approved.value.requiredShipcheckChecks.includes(check.name)),
+   scope:'ShipCheck scans isolated candidate metadata only. The pinned local policy requires the listed metadata checks. Other scan findings and the full upstream aggregate remain advisory; they do not describe the separately executed controller acceptance, build, or independent reviews.'};
   requireCheck(approved.value.requiredShipcheckChecks.every(name=>readiness.report.checks.some(c=>c.name===name&&c.passed===1)),'Required metadata readiness checks failed');
   const after=context({dir,app,packet});requireCheck(after.source.hash===state.source.hash&&identity(after.harnesses)===identity(state.harnesses)&&policy().sha256===approved.sha256,'Source, harness or policy changed during readiness inspection');
   receipt.passed=true;

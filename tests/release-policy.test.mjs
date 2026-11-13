@@ -30,6 +30,12 @@ function fixture(pack=null){
 // synthetic and do not qualify actual acceptance or authorize a real release.
 test('real ShipCheck metadata observations strengthen but never replace independent gates',async()=>{
  const f=fixture(),gate=await prepareReleasePolicy(f);assert.equal(gate.passed,true,JSON.stringify(gate));assert.equal(gate.approvalGranted,false);assert.equal(gate.shipcheck.upstreamGatePassed,false,'staging has no Git/tests; those scan findings remain advisory');
+ assert.deepEqual(gate.shipcheck.requiredCheckResults.map(c=>c.name).sort(),[...gate.shipcheck.requiredChecks].sort());
+ assert.ok(gate.shipcheck.requiredCheckResults.every(c=>c.passed===1));
+ assert.ok(gate.shipcheck.advisoryCheckResults.some(c=>c.passed!==1));
+ assert.ok(gate.shipcheck.advisoryCheckResults.every(c=>!gate.shipcheck.requiredChecks.includes(c.name)));
+ const native=JSON.parse(fs.readFileSync(path.join(f.dir,gate.shipcheck.bindingPath)));
+ assert.deepEqual([...gate.shipcheck.requiredCheckResults,...gate.shipcheck.advisoryCheckResults].sort((a,b)=>a.name.localeCompare(b.name)),native.report.checks.sort((a,b)=>a.name.localeCompare(b.name)));
  assertReleasePolicy(gate);assert.match(gate.policySha256,/^[a-f0-9]{64}$/);assert.equal(gate.sourceHash,digest(f.app));
  const final=finalizeReleasePolicy(f);assert.equal(final.passed,true,JSON.stringify(final));assert.equal(final.deploymentAuthorized,false);assert.equal(fs.existsSync(path.join(f.dir,'artifacts/release.json')),false);
  assert.throws(()=>finalizeReleasePolicy(f),/EEXIST/,'a final decision cannot overwrite prior evidence');

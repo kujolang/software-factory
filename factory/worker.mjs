@@ -504,7 +504,7 @@ try {
     const r = await agent(
       "release-verifier",
       "release",
-      "Assess this complete evidence packet for the bounded LOCAL release candidate only. No deployment is requested. Return files:[], verdict pass/fail with concrete blockers grounded in evidence. Build and broad equivalent acceptance checks were actually executed; do not require optional branded tools merely for their names. Evidence:\n" +
+      "Assess this complete evidence packet for the bounded LOCAL release candidate only. No deployment is requested. Return files:[], verdict pass/fail with concrete blockers grounded in evidence. Build and broad equivalent acceptance checks were actually executed; do not require optional branded tools merely for their names. Assess requiredCheckResults and advisoryCheckResults under the pinned local release policy; the full upstream ShipCheck aggregate covers metadata-only staging, while actual acceptance and build evidence are separate. Retain independent judgment and reject concrete blockers. Evidence:\n" +
         JSON.stringify({...packet,releasePolicy}),
     );
     if (r.verdict !== "pass")
