@@ -1,8 +1,10 @@
 import {prepareRepositoryMission} from './repository-mission.mjs';
-import {bindMissionRecovery} from './operations.mjs';
+import {bindMissionRecovery,prepareMissionResume,reclaimMissionAdmissionForResume} from './operations.mjs';
+import {acquireMissionAdmission} from './operations-policy.mjs';
 import {observeMissionTelemetry} from './telemetry.mjs';
 import {readOperatorModel} from './operator-model.mjs';
-import {applicationTeam,validateProviderRouting} from './role-runtime.mjs';
+import {listMissions,readMission} from './mission-observer.mjs';
+import {applicationTeam,repositoryTeam,validateProviderRouting} from './role-runtime.mjs';
 import {verifyRunReleaseRecords} from './evidence.mjs';
 import {startMissionAccounting,finishMissionAccounting,captureMissionFailure,blockUnaccountedRelease,promoteAccountedRelease} from './lifecycle.mjs';
 import {validatePackWithSpec,annotateRunAccounting} from './accountability.mjs';
@@ -130,31 +132,51 @@ function requirePlainTree(dir) {
       throw Error("Candidate contains a non-file entry");
   }
 }
-async function executeRun(dir, config) {
+async function executeRun(dir, config, recovery=null) {
+  const admission=recovery ? reclaimMissionAdmissionForResume(dir,recovery.prepared,{authorized:true,operator:recovery.operator})||acquireMissionAdmission(path.dirname(dir),dir,{runId:config.id,deadline:Date.parse(config.startedAt)+7200000}) : acquireMissionAdmission(path.dirname(dir),dir,{runId:config.id});
+  let reconciled=!recovery;
+  try {
+    if(!recovery)config.operationsAdmission=admission.record;
+    reconciled=await executeAdmittedRun(dir,config,admission,recovery);
+  }finally{if(reconciled)admission.close();}
+}
+async function executeAdmittedRun(dir, config, admission, recovery) {
+  if(!recovery){
   config.accountabilityRequired=true;
   config.lensRequired=true;
   config.executionProvider={provider,model:model||null};
   save(path.join(dir,"run.json"),config);
   const provenance=controllerProvenance();
   save(path.join(dir,"artifacts/controller-provenance.json"),provenance);
-  console.log(JSON.stringify({runId:config.id,directory:dir,kind:config.kind||"build"}));
+  }
+  console.log(JSON.stringify({runId:config.id,directory:dir,kind:config.kind||"build",recovery:recovery?.prepared.attemptDirectory??null}));
   let dispatchResult=null,passed=false,reason="Mission did not reach independent release";
   try {
+    if(!recovery){
     bindMissionRecovery(dir);
-    await startMissionAccounting(dir,config,provenance,{provider,model});
+    await startMissionAccounting(dir,config,json(path.join(dir,"artifacts/controller-provenance.json")),{provider,model});
     if(config.packHash){
       const binding=await validatePackWithSpec(runPack(dir,config),{parent:path.join(dir,"artifacts/spec")});
       save(path.join(dir,"artifacts/spec-binding.json"),binding);
     }
+    }
     dispatchResult=await command(kujoBinary(),["run",path.join(root,"factory/dispatch.kujo")],{
-      cwd:dispatchRoot,timeout:7200000,
-      env:{FACTORY_RUN_DIR:dir,FACTORY_ROOT:root,FACTORY_WORKFLOW_KIND:"application",NODE_BIN:process.execPath,DISPATCH_ALLOW_ANY_OUTPUT_ROOT:"true"},
+      cwd:dispatchRoot,timeout:Math.min(7200000,admission.check().remainingMs),
+      env:{FACTORY_RUN_DIR:dir,FACTORY_ROOT:root,FACTORY_WORKFLOW_KIND:"application",NODE_BIN:process.execPath,DISPATCH_ALLOW_ANY_OUTPUT_ROOT:"true",...(recovery?.prepared.env||{})},
     });
-    save(path.join(dir,"dispatch-process.json"),dispatchResult);
+    save(path.join(recovery?.prepared.attemptDirectory||dir,"dispatch-process.json"),dispatchResult);
+    if(recovery){
+      const summaryFile=path.join(recovery.prepared.attemptDirectory,"dispatch-result.json");
+      const summary=fs.existsSync(summaryFile)?json(summaryFile):null;
+      if(!summary||!['completed','failed','cancelled'].includes(summary.status)||!fs.existsSync(path.join(recovery.prepared.attemptDirectory,'admission.json'))){
+        save(path.join(recovery.prepared.attemptDirectory,'controller-reconciliation.json'),{ok:false,preservedOriginalMission:true,reason:'Native recovery did not reach an admitted terminal state; explicit reconciliation required'});process.exitCode=1;return false;
+      }
+    }
     passed=dispatchResult.code===0&&!dispatchResult.reason&&events(dir).some(e=>e.type==="release.verified")&&!events(dir).some(e=>e.type==="accountability.failed");
     reason=passed?"Independent local release gates passed; no deployment authorized":"Mission stopped before all independent release gates passed";
-    if(!passed)await captureMissionFailure(dir,{kind:"mission-failure",summary:reason+"; Dispatch exit "+dispatchResult.code,evidence:["dispatch-process.json"]});
+    if(!passed)await captureMissionFailure(dir,{kind:"mission-failure",summary:reason+"; Dispatch exit "+dispatchResult.code,evidence:[path.relative(dir,path.join(recovery?.prepared.attemptDirectory||dir,"dispatch-process.json"))]});
   } catch(error) {
+    if(recovery){save(path.join(recovery.prepared.attemptDirectory,'controller-reconciliation.json'),{ok:false,preservedOriginalMission:true,reason:error.message});process.exitCode=1;return false;}
     passed=false;reason=error.message;
     event(dir,"mission.failed",{summary:"Mission stopped: "+reason});
     try{await captureMissionFailure(dir,{kind:"controller-failure",summary:reason.slice(0,16000)});}catch(captureError){reason+="; failure capture unavailable: "+captureError.message;}
@@ -176,9 +198,14 @@ async function executeRun(dir, config) {
   try{const observation=observeMissionTelemetry(dir,{parent:path.join(dir,"artifacts/telemetry")});save(path.join(dir,"artifacts/telemetry.json"),observation);if(observation.ok)telemetryStatus="recorded";}catch{/* Optional observation cannot change terminal release authority. */}
   console.log(JSON.stringify({runId:config.id,status:config.status,dispatchCode:dispatchResult?.code??null,telemetry:telemetryStatus}));
   process.exitCode=passed?0:1;
+  return true;
 }
 
-if (verb === "run") {
+if(verb === "resume"){
+ if(process.argv.length!==6||process.argv[4]!=="--operator")throw Error('Usage: resume RUN_ID --operator LOCAL_OPERATOR');
+ const dir=runPath(process.argv[3]),config=json(path.join(dir,'run.json')),operator=process.argv[5];
+ const prepared=prepareMissionResume(dir,{authorized:true,operator});await executeRun(dir,config,{prepared,operator});
+} else if (verb === "run") {
   const file = process.argv[3];
   if (!file) throw Error("Usage: node factory/cli.mjs run mission.txt");
   const extra = process.argv.slice(4);
@@ -186,10 +213,10 @@ if (verb === "run") {
   for(let i=0;i<extra.length;i+=2){if(!['--pack','--team','--routing','--source'].includes(extra[i])||!extra[i+1]||Object.hasOwn(options,extra[i]))throw Error('Usage: run mission.txt [--pack FILE] [--team FILE] [--routing FILE] [--source REPOSITORY]');options[extra[i]]=extra[i+1];}
   const readOption=file=>{if(fs.lstatSync(file).isSymbolicLink()||!fs.statSync(file).isFile()||fs.statSync(file).size>65536)throw Error('Unsafe mission policy input');return json(file);};
   const pack = options['--pack'] ? readSealedPack(path.resolve(options['--pack'])) : null;
-  const team=options['--team']?applicationTeam(readOption(options['--team']),tasks):null;
+  const team=options['--team']?(options['--source']?repositoryTeam:applicationTeam)(readOption(options['--team']),tasks):null;
   const providerRouting=validateProviderRouting(options['--routing']?readOption(options['--routing']):{});
-  if(options['--source']&&(!pack||team))throw Error('Existing repository repair requires --pack and cannot use a new-application --team plan');
-  const runTasks=options['--source']?tasks.filter(t=>['verify','release'].includes(t.id)).map(t=>({...t,dependencies:t.id==='verify'?[]:['verify'],handoffFrom:t.id==='verify'?'human':'code-reviewer'})):team?.tasks||tasks;
+  if(options['--source']&&!pack)throw Error('Existing repository development requires --pack');
+  const runTasks=options['--source']&&!team?tasks.filter(t=>['verify','release'].includes(t.id)).map(t=>({...t,dependencies:t.id==='verify'?[]:['verify'],handoffFrom:t.id==='verify'?'human':'code-reviewer'})):team?.tasks||tasks;
   const runRoles=[...roles,...(team?.plan.roles||[]).filter(r=>!roles.some(x=>'chain.'+x.id===r.id)).map(r=>({id:r.id.slice(6),name:r.id.slice(6),layer:r.layer,parent:null}))];
   const mission = fs.readFileSync(path.resolve(file), "utf8");
   if (!mission.trim() || mission.length > 12000)
@@ -522,6 +549,9 @@ if (verb === "run") {
       return send(403, { error: "Loopback Host required" });
     try {
       const pathname = new URL(req.url, "http://127.0.0.1").pathname;
+      if(pathname==='/api/missions')return send(200,listMissions());
+      const missionMatch=pathname.match(/^\/api\/missions\/(application|specification|documentation|cli)\/([A-Za-z0-9_-]+)$/);
+      if(missionMatch)return send(200,readMission(missionMatch[1],missionMatch[2]));
       if (pathname === "/api/runs") {
         const list = fs.existsSync(runsRoot)
           ? fs
