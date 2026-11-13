@@ -1,0 +1,18 @@
+from telemetry_native_adapter import watchdog_native_batch_normalize
+from telemetry_repository import watchdog_telemetry_repository_insert, watchdog_telemetry_repository_validate
+from watchdog_shared import watchdog_ensure_schema
+input := parse_json(read_file(args()[0]))
+db := db_connect("sqlite", args()[1])
+watchdog_ensure_schema(db)
+batches := []
+for item in input {
+ normalized := watchdog_native_batch_normalize("kujo-software-factory", "1", item["id"], item["events"])
+ assert(normalized["ok"], "native normalization rejected")
+ batch := normalized["batch"]
+ valid := watchdog_telemetry_repository_validate(batch)
+ assert(valid["ok"], to_json(valid))
+ inserted := watchdog_telemetry_repository_insert(db, batch)
+ assert(inserted["ok"], to_json(inserted))
+ batches = push(batches, batch)
+}
+print(to_json({"ok": true, "batches": batches, "records": db_query(db, "SELECT canonical_json, canonical_sha256 FROM telemetry_records_v2 ORDER BY id", [])}))

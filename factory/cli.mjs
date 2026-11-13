@@ -1,5 +1,6 @@
 import {prepareRepositoryMission} from './repository-mission.mjs';
 import {bindMissionRecovery} from './operations.mjs';
+import {observeMissionTelemetry} from './telemetry.mjs';
 import {readOperatorModel} from './operator-model.mjs';
 import {applicationTeam,validateProviderRouting} from './role-runtime.mjs';
 import {verifyRunReleaseRecords} from './evidence.mjs';
@@ -171,7 +172,9 @@ async function executeRun(dir, config) {
   config.status=passed?"completed":"failed";config.finishedAt=new Date().toISOString();
   save(path.join(dir,"run.json"),config);
   event(dir,passed?"mission.completed":"mission.failed",{summary:reason});
-  console.log(JSON.stringify({runId:config.id,status:config.status,dispatchCode:dispatchResult?.code??null}));
+  let telemetryStatus="unavailable";
+  try{const observation=observeMissionTelemetry(dir,{parent:path.join(dir,"artifacts/telemetry")});save(path.join(dir,"artifacts/telemetry.json"),observation);if(observation.ok)telemetryStatus="recorded";}catch{/* Optional observation cannot change terminal release authority. */}
+  console.log(JSON.stringify({runId:config.id,status:config.status,dispatchCode:dispatchResult?.code??null,telemetry:telemetryStatus}));
   process.exitCode=passed?0:1;
 }
 

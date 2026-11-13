@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {spawn} from 'node:child_process';
 import {root} from './settings.mjs';
-const lockPaths=['sources.lock.json','config/catalog.lock.json','config/accountability.lock.json','config/change-tools.lock.json','config/context.lock.json','config/eval-source.lock.json','config/lens-source.lock.json'];
+const lockPaths=['sources.lock.json','config/catalog.lock.json','config/accountability.lock.json','config/change-tools.lock.json','config/context.lock.json','config/telemetry.lock.json','config/eval-source.lock.json','config/lens-source.lock.json'];
 export function collectSourcePins(locks=lockPaths.map(file=>({file,value:JSON.parse(fs.readFileSync(path.join(root,file)))}))){
  const result=new Map();
  for(const {file,value} of locks){const pins=value.repositories?Object.values(value.repositories):[value];for(const pin of pins){if(!/^https:\/\/github\.com\/kujolang\/[a-z0-9-]+\.git$/.test(pin.url)||!/^[a-f0-9]{40}$/.test(pin.commit))throw Error('Invalid reviewed source pin');const prior=result.get(pin.url);if(prior&&prior.commit!==pin.commit)throw Error('Conflicting reviewed source pins: '+pin.url);if(prior)prior.locks.push(file);else result.set(pin.url,{url:pin.url,commit:pin.commit,locks:[file]});}}
