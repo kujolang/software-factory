@@ -28,5 +28,6 @@ test('MCP lifecycle discovery and status remain bounded without execution author
  assert.equal(callReadTool('factory_list_mission_workflows').workflows.length,20);
  const admission=callReadTool('factory_validate_workflow',{mission:{schema:'kujo.factory.mission-input/v1',type:'idea-to-specification',mission:'A proposed idea'}});assert.equal(admission.ok,true);assert.equal(admission.executionAuthorized,false);
  for(const args of [{family:'cli',id:'../private'},{family:'../../',id:'run'},{family:'application',id:'/tmp/run'},{family:'cli',id:'run',path:'/etc/passwd'}])assert.throws(()=>callReadTool('factory_read_mission',args));
- const blocked=callReadTool('factory_validate_workflow',{mission:{schema:'kujo.factory.mission-input/v1',type:'database-migration'}});assert.equal(blocked.ok,false);
+ assert.throws(()=>callReadTool('factory_validate_workflow',{mission:{schema:'kujo.factory.mission-input/v1',type:'database-migration'}}),/Missing required mission input/);
+ const rejected=handleMcp({jsonrpc:'2.0',id:3,method:'tools/call',params:{name:'factory_validate_workflow',arguments:{mission:{schema:'kujo.factory.mission-input/v1',type:'database-migration'}}}});assert.equal(rejected.result.isError,true);
 });
