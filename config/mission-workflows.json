@@ -924,16 +924,36 @@
     },
     {
       "id": "performance",
-      "route": "blocked",
-      "output": "none",
-      "runtime": null,
+      "route": "repository",
+      "output": "independently-reviewed-performance-change",
+      "runtime": "node-http",
       "skills": [
         "kujo-eval-workflows"
       ],
-      "roles": [],
-      "effects": [],
+      "roles": [
+        "planner",
+        "research-analyst",
+        "core-developer",
+        "general-commander",
+        "systems-architect",
+        "backend-developer",
+        "frontend-developer",
+        "test-runner",
+        "code-reviewer",
+        "release-verifier"
+      ],
+      "effects": [
+        "private-committed-source-copy",
+        "restricted-provider-proposals",
+        "rootless-workcell-execution",
+        "private-local-artifacts"
+      ],
       "verification": [
-        "bounded-read-or-copy"
+        "frozen-benchmark-review",
+        "trusted-acceptance",
+        "workcell-baseline-candidate-comparison",
+        "independent-release",
+        "accounting"
       ],
       "approval": {
         "humanRequiredBeforePublication": true,
@@ -942,7 +962,7 @@
       },
       "recovery": {
         "automaticResume": false,
-        "retry": "new mission after failure evidence review; existing recheck creates fresh verification"
+        "retry": "New source-bound performance mission with original reviewed policy and baseline; generic retry/recheck rejects benchmark downgrade"
       },
       "upstream": {
         "id": "loop-engineering",
@@ -951,20 +971,34 @@
         "entrypoint": "`(cd loop-engineering && bash scripts/run-workflow.sh --demo)`",
         "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
       },
-      "blockedReason": "No qualified benchmark resource isolation, baseline/comparison or performance acceptance gate.",
       "input": {
         "schema": "kujo.factory.mission-input/v1",
-        "required": [],
+        "required": [
+          "mission",
+          "pack",
+          "source",
+          "performance"
+        ],
         "unknownFields": "reject",
         "pack": "Reviewed seal mandatory for application/repository routes; identity does not establish correctness",
         "source": "Explicit local source directory; repository execution imports committed source only"
       },
-      "dependencies": [],
+      "dependencies": [
+        "spec",
+        "dispatch",
+        "workcell",
+        "eval",
+        "shipcheck",
+        "runledger",
+        "casefile",
+        "lens"
+      ],
       "failure": {
         "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
         "promotion": "Blocked on nonzero child status or required gate failure",
         "externalEffects": "No push, merge, publication or deployment"
-      }
+      },
+      "qualification": "Actual source-bound converter latency repair with7samples2warmups, functional/browser acceptance, independent release and standalone evidence verification; one fixed GET workload only"
     },
     {
       "id": "release-candidate",
