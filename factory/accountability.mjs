@@ -82,6 +82,16 @@ export function projectPackToSpec(pack) {
   validatePack(pack);
   return {name:pack.title,goal:pack.contract,version:'1.0.0',priority:'medium',status:'review',acceptance_criteria:pack.requirements.map(r=>`${r.id}: ${r.description}`),non_goals:['No deployment or external writes authorized'],review_expectations:['Independent acceptance review is required; a pack hash proves identity, not correctness.'],metadata:{factoryPackId:pack.id,factoryPackHash:hashPack(pack),traceability:pack.requirements.map(r=>({requirement:r.id,tests:[...pack.api,...pack.browser].filter(t=>t.covers.includes(r.id)).map(t=>t.id)}))}};
 }
+/** Validate a controller-owned non-HTTP mission contract through native Spec. */
+export async function validateNativeSpecContract(spec,{parent}={}) {
+  if(!spec||typeof spec!=="object"||Array.isArray(spec)||Buffer.byteLength(JSON.stringify(spec))>200000)throw Error('Native Spec contract exceeds bound');
+  const dir=workspace(parent);write(dir,'mission.spec.json',spec);
+  const receipt=await execute('spec',['validate','mission.spec.json','--strict','--json'],dir);
+  const validation=JSON.parse(receipt.stdout);if(validation.valid!==true)throw Error('Spec rejected mission contract');
+  await execute('spec',['export','mission.spec.json','--format','envelope','--payload-format','dispatch','--output','spec-envelope.json'],dir);
+  const envelope=boundedJson(path.join(dir,'spec-envelope.json'));if(!envelope.metadata||!envelope.payload)throw Error('Spec export contract mismatch');
+  const result={schema:'kujo.factory.native-spec-binding/v1',specSha256:hash(fs.readFileSync(path.join(dir,'mission.spec.json'))),envelopeSha256:hash(fs.readFileSync(path.join(dir,'spec-envelope.json'))),validation,sourceCommit:lock.repositories.spec.commit,semanticAcceptanceReviewed:false,executionEvidence:dir};write(dir,'binding.json',result);return result;
+}
 export async function validatePackWithSpec(pack,{parent}={}) {
   const spec=projectPackToSpec(pack),dir=workspace(parent);write(dir,'mission.spec.json',spec);write(dir,'pack.json',pack);
   const receipt=await execute('spec',['validate','mission.spec.json','--strict','--json'],dir);
