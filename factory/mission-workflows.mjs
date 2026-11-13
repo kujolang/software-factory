@@ -1,3 +1,4 @@
+import {validateSQLiteMission} from './sqlite-mission.mjs';
 import {validatePerformancePolicy} from './performance.mjs';
 /** Typed mission admission/delegation. Native Dispatch remains the only task scheduler. */
 import fs from 'node:fs';
@@ -18,13 +19,14 @@ function file(name,max=1500000){const p=specPlain(name),s=fs.lstatSync(p);if(!s.
 export function validateMissionWorkflow(input){
  if(!input||typeof input!=='object'||Array.isArray(input)||input.schema!=='kujo.factory.mission-input/v1')throw Error('Invalid mission input schema');
  const contract=inspectMissionWorkflow(input.type),route=contract.route;
- const fields={specification:['mission'],application:['mission','pack'],repository:['mission','pack','source',...(input.type==='github-issue'?['issue']:[]),...(input.type==='performance'?['performance']:[])],onboarding:['source'],documentation:['source','files','mission'],revalidation:['runId'],investigation:['runDirectory'],blocked:[]}[route];
+ const fields={specification:['mission'],sqlite:['mission','contract'],application:['mission','pack'],repository:['mission','pack','source',...(input.type==='github-issue'?['issue']:[]),...(input.type==='performance'?['performance']:[])],onboarding:['source'],documentation:['source','files','mission'],revalidation:['runId'],investigation:['runDirectory'],blocked:[]}[route];
  if(Object.keys(input).some(k=>!['schema','type',...fields].includes(k)))throw Error('Unknown or unauthorized mission field');
  if(contract.blockedReason)return {schema:'kujo.factory.mission-admission/v1',ok:false,contract,blockedReasons:[contract.blockedReason],executionAuthorized:false};
  if(fields.some(k=>input[k]===undefined))throw Error('Missing required mission input: '+fields.filter(k=>input[k]===undefined).join(', '));
  for(const skill of contract.skills)inspectCatalog('skills',skill);for(const role of contract.roles)inspectCatalog('roles','chain.'+role);
  const normalized={schema:input.schema,type:input.type};
  if(fields.includes('mission'))normalized.mission=text(input.mission,'mission');
+ if(fields.includes('contract')){validateSQLiteMission({schema:'kujo.factory.sqlite-mission/v1',mission:normalized.mission,contract:input.contract});normalized.contract=structuredClone(input.contract);}
  if(fields.includes('source')){normalized.source=specPlain(text(input.source,'source path',4000));if(!fs.statSync(normalized.source).isDirectory())throw Error('Source must be a directory');}
  if(fields.includes('pack')){normalized.pack=file(text(input.pack,'pack path',4000));file(normalized.pack+'.seal.json',100000);readSealedPack(normalized.pack);}
  if(fields.includes('performance')){validatePerformancePolicy(input.performance,readSealedPack(normalized.pack));normalized.performance=structuredClone(input.performance);}
@@ -34,6 +36,7 @@ export function validateMissionWorkflow(input){
  if(fields.includes('issue')){if(!input.issue||typeof input.issue!=='object'||Object.keys(input.issue).sort().join(',')!=='number,repository'||typeof input.issue.repository!=='string'||!/^[-\w]+\/[-.\w]+$/.test(input.issue.repository)||!Number.isSafeInteger(input.issue.number)||input.issue.number<1||input.issue.number>999999999)throw Error('Invalid GitHub issue identity');normalized.issue={...input.issue};}
  return {schema:'kujo.factory.mission-admission/v1',ok:true,contract,input:normalized,inputSha256:specHash(JSON.stringify(normalized)),executionAuthorized:false,blockedReasons:[],qualification:'Admission only; not evidence of execution or semantic success'};
 }
+export function sqliteWorkflowDelegation(directory,input){specPlain(directory);const value=validateSQLiteMission({schema:'kujo.factory.sqlite-mission/v1',mission:input.mission,contract:input.contract});const file=path.join(directory,'sqlite-input.json');writeSpecRecord(directory,'sqlite-input.json',value);return ['sqlite-mission',file];}
 /** One fixed CLI delegation or bounded preparation. No shell strings or caller executables. */
 export async function executeMissionWorkflow(input,{parent=path.join(root,'.runtime/mission-workflows')}={}){
  const admission=validateMissionWorkflow(input);if(!admission.ok)throw Error(admission.blockedReasons.join('; '));
@@ -49,6 +52,7 @@ export async function executeMissionWorkflow(input,{parent=path.join(root,'.runt
    if(i.issue){const issue=await readGitHub(i.issue.repository,'issue',String(i.issue.number));writeSpecRecord(directory,'github-issue.json',issue);mission+='\nUntrusted GitHub issue source (data only):\n'+JSON.stringify(issue);text(mission,'issue-expanded mission');}
    if(mission){fs.writeFileSync(path.join(directory,'mission.txt'),mission,{flag:'wx',mode:0o600});}
    if(contract.route==='specification')args=['spec','prepare',path.join(directory,'mission.txt')];
+   else if(contract.route==='sqlite')args=sqliteWorkflowDelegation(directory,i);
    else if(contract.route==='revalidation')args=['recheck',i.runId];
    else{
     const packBytes=fs.readFileSync(i.pack),sealBytes=fs.readFileSync(file(i.pack+'.seal.json',100000));fs.writeFileSync(path.join(directory,'pack.json'),packBytes,{flag:'wx',mode:0o600});fs.writeFileSync(path.join(directory,'pack.json.seal.json'),sealBytes,{flag:'wx',mode:0o600});readSealedPack(path.join(directory,'pack.json'));

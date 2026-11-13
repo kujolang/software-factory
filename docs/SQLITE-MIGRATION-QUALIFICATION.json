@@ -23,7 +23,30 @@
     "scope": "Pinned tracked Git blob bytes and executable modes; ignored files and generated caches are not authenticated"
   },
   "scope": "Finite disposable SQLite SQL migration, exact columns and rows, reopen/restart, rollback on SQL error; no production/deployment or reverse migration",
-  "realModelPipeline": "pending",
+  "realModelPipeline": {
+    "ok": true,
+    "runDirectory": ".runtime/sqlite-missions/sqlite-8fUBdG",
+    "provider": "codex",
+    "startedAt": "2026-11-13T21:39:14.199Z",
+    "finishedAt": "2026-11-13T21:40:26.363Z",
+    "sourceHash": "9c42a8c46fa4cc97aa0b51bc8d1c1b2dda781c4c9d618977d765682533978d57",
+    "promotionSha256": "abdf85a7825579076e34873a970b59f7880209b904e920e663d44a55fc572e76",
+    "accountingSha256": "aee4566112660266f386181dbe7af313a75563b7060a345ac87821a5c15912d5",
+    "controllerProvenanceSha256": "41b3143374e9a6e8dcee21ca239eb33dccb3da5d7e9325d64072711be20c1080",
+    "log": ".runtime/ledger-completion/sqlite-mission-rollback-live.log",
+    "logSha256": "c2de43ca60b409e568a98bed02fc7ed257d9d2720045bfd60cb5853222f90cef",
+    "offlineVerification": {
+      "ok": true,
+      "record": ".runtime/ledger-completion/sqlite-live-offline-verify.json",
+      "exportRecord": ".runtime/ledger-completion/sqlite-live-export.json",
+      "scope": "Standalone copied built-in verifier; exact five-call command/request/stdout/schema/rollback/source/ledger and promotion binding consistency, not authentication"
+    },
+    "usage": {
+      "input_tokens": 45894,
+      "output_tokens": 1981,
+      "cost": null
+    }
+  },
   "failedEvidence": [
     ".runtime/sqlite-migration-qualification/qualification-sWByvp",
     ".runtime/sqlite-missions/sqlite-BLVN2X",

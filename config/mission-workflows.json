@@ -663,16 +663,35 @@
     },
     {
       "id": "database-migration",
-      "route": "blocked",
-      "output": "none",
-      "runtime": null,
+      "route": "sqlite",
+      "output": "reviewed-sqlite-migration-artifact",
+      "runtime": "sqlite-sql-v1",
       "skills": [
-        "kujo-workcell-workflows"
+        "kujo-spec-workflows",
+        "kujo-workcell-workflows",
+        "kujo-security-hardening"
       ],
-      "roles": [],
-      "effects": [],
+      "roles": [
+        "code-reviewer",
+        "backend-developer",
+        "security-reviewer",
+        "release-verifier"
+      ],
+      "effects": [
+        "private-local-artifacts",
+        "bounded-sql-in-disposable-rootless-workcell"
+      ],
       "verification": [
-        "bounded-read-or-copy"
+        "native-spec",
+        "independent-contract-review",
+        "independent-security-review",
+        "exact-old-and-new-schema-and-rows",
+        "candidate-specific-forced-transaction-rollback",
+        "forward-reopen-restart-integrity",
+        "independent-release-review",
+        "fresh-repeated-acceptance",
+        "native-runledger",
+        "offline-evidence-consistency"
       ],
       "approval": {
         "humanRequiredBeforePublication": true,
@@ -690,19 +709,33 @@
         "entrypoint": "`bash workcell-execution-gate/scripts/run.sh`",
         "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
       },
-      "blockedReason": "No independently qualified existing-data migration and rollback gate. SQLite application creation does not qualify migration.",
       "input": {
         "schema": "kujo.factory.mission-input/v1",
-        "required": [],
+        "required": [
+          "mission",
+          "contract"
+        ],
         "unknownFields": "reject",
-        "pack": "Reviewed seal mandatory for application/repository routes; identity does not establish correctness",
-        "source": "Explicit local source directory; repository execution imports committed source only"
+        "contract": "Sealed kujo.factory.sqlite-migration/v1; independently reviewed before SQL generation; seal establishes identity only"
       },
-      "dependencies": [],
+      "dependencies": [
+        "Spec",
+        "Dispatch",
+        "Workcell",
+        "RunLedger",
+        "CaseFile",
+        "qualified-node26-sqlite-image"
+      ],
       "failure": {
         "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
         "promotion": "Blocked on nonzero child status or required gate failure",
         "externalEffects": "No push, merge, publication or deployment"
+      },
+      "qualification": {
+        "scope": "Disposable SQLite SQL forward migration with finite reviewed old-data/schema assertions; transaction failure rollback, not reverse migration or production database authorization",
+        "runtimeCases": 9,
+        "actualMission": "sqlite-8fUBdG",
+        "offlineEvidence": "passed; standalone verifier and exact five-call receipt agreement"
       }
     },
     {
