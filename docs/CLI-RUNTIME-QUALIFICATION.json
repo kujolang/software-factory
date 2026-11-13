@@ -1,0 +1,258 @@
+{
+  "schema": "kujo.factory.cli-runtime-qualification/v1",
+  "scope": "Local Linux amd64 rootless Workcell CLI fixtures; no service/framework or cross-platform qualification",
+  "runtimes": {
+    "python-cli": {
+      "version": "3.13.9",
+      "qualification": "qualified-cli-fixtures-linux-amd64",
+      "imageId": "sha256:0c858030a48881dd918554ea0420070659c282d21703630ff7df23657618e0f8",
+      "platform": "linux/amd64",
+      "command": "node scripts/qualify-python-cli.mjs",
+      "log": ".runtime/ecosystem-phase-b/python-cli-qualified.log",
+      "logSha256": "5d9c769ff1d1104a76639c09969e842eb882cfcded8227d55e511692d85fe2d4",
+      "evidence": ".runtime/python-cli-qualification-WckP9H",
+      "outcomes": [
+        {
+          "name": "positive",
+          "ok": true,
+          "observed": [
+            {
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "wrong-answer",
+          "ok": false,
+          "observed": [
+            {
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "timeout",
+          "ok": false,
+          "observed": [
+            {
+              "code": null,
+              "reason": "timeout"
+            }
+          ]
+        },
+        {
+          "name": "forged-output",
+          "ok": false,
+          "observed": [
+            {
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "diagnostic-flood",
+          "ok": false,
+          "observed": [
+            {
+              "code": null,
+              "reason": "output_limit"
+            }
+          ]
+        },
+        {
+          "name": "isolation",
+          "ok": true,
+          "observed": [
+            {
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        }
+      ]
+    },
+    "kujo-cli": {
+      "version": "1.9.0",
+      "qualification": "qualified-cli-fixtures-linux-amd64",
+      "imageId": "sha256:c62fa7844cd38dd67d18421162af5016b2973a48d6db0a119982b2bf4b661383",
+      "platform": "linux/amd64",
+      "command": "node scripts/qualify-kujo-cli.mjs",
+      "log": ".runtime/ecosystem-phase-b/kujo-cli-qualified.log",
+      "logSha256": "58a655ba9c776ca46f9ea3cbd2d1d1c3c91862be01cef366c6acf96f18381129",
+      "evidence": ".runtime/kujo-cli-qualification-BVvwT4",
+      "outcomes": [
+        {
+          "name": "positive",
+          "ok": true,
+          "observed": [
+            {
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "wrong-answer",
+          "ok": false,
+          "observed": [
+            {
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "timeout",
+          "ok": false,
+          "observed": [
+            {
+              "code": null,
+              "reason": "timeout"
+            }
+          ]
+        },
+        {
+          "name": "forged-output",
+          "ok": false,
+          "observed": [
+            {
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "protected-write",
+          "ok": false,
+          "observed": [
+            {
+              "code": 4,
+              "reason": ""
+            }
+          ]
+        }
+      ]
+    },
+    "typescript-cli": {
+      "version": "7.0.2",
+      "qualification": "qualified-cli-fixtures-linux-amd64",
+      "imageId": "sha256:0952d2a6f776fa396bd4a7a3fed61615db9685501c1227e0170c484bfb683fc1",
+      "platform": "linux/amd64",
+      "command": "node scripts/qualify-compiled-cli.mjs typescript-cli",
+      "log": ".runtime/ecosystem-phase-b/typescript-cli-qualification.log",
+      "logSha256": "4b3937430f0df3d0e06728f9752b2e25b83710571320e083898833c263fc1d27",
+      "evidence": ".runtime/typescript-cli-qualification-LESJIN",
+      "outcomes": [
+        {
+          "name": "positive",
+          "ok": true,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "wrong",
+          "ok": false,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "timeout",
+          "ok": false,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": null,
+              "reason": "timeout"
+            }
+          ]
+        },
+        {
+          "name": "compileFailure",
+          "ok": false,
+          "observed": [
+            {
+              "buildCode": 2,
+              "code": 2,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "protected",
+          "ok": true,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        }
+      ]
+    },
+    "go-cli": {
+      "version": "1.27.4",
+      "qualification": "unqualified-native-artifact-profile",
+      "lastExecution": {
+        "scope": "default noexec profile",
+        "compileExitCode": 0,
+        "executionExitCode": 126,
+        "result": "Correctly denied native execution from /tmp",
+        "evidence": ".runtime/go-cli-qualification-mR9v64",
+        "log": {
+          "path": ".runtime/ecosystem-phase-b/go-cli-qualification.log",
+          "sha256": "e240be1be553aaa9ab6150fd152dae892431e80d31ad7c54b0ff8fbc4a90edd8"
+        }
+      },
+      "pending": "Optional immutable executable artifact staging requires new helper image and fresh positive/adversarial qualification"
+    },
+    "rust-cli": {
+      "version": "1.100.0",
+      "qualification": "unqualified-native-artifact-profile",
+      "imageBuild": {
+        "base": "sha256:c62fa7844cd38dd67d18421162af5016b2973a48d6db0a119982b2bf4b661383",
+        "exitCode": 0,
+        "imageId": "sha256:ff5420e6093b3c1d0e86fa3cd554657072a7a93886e8ca3a18a1c9bb4b55b952"
+      },
+      "executionQualification": "not performed",
+      "pending": "Optional immutable executable artifact staging requires new helper image and fresh positive/adversarial qualification"
+    }
+  },
+  "nativeProfileBlocker": {
+    "availableGiBObserved": 2.2,
+    "requiredHelperBuildGiB": 3,
+    "buildStarted": false,
+    "reason": "Explicit local helper-image disk guard rejected; no guard bypass or main-image rebuild",
+    "log": {
+      "path": ".runtime/ecosystem-phase-b/native-go-helper-build.log",
+      "sha256": "47af62292108a907a6f2a2782eee96907a543f5fae2cb3e9d671f94802c54f23"
+    }
+  },
+  "deterministicVerification": {
+    "command": "node --test tests/cli-runtime.test.mjs tests/lens.test.mjs tests/compiled-artifact.test.mjs",
+    "passed": 18,
+    "failed": 0,
+    "scope": "Trusted input/record/synthetic byte fixture tests; no candidate host execution or substitute for runtime qualification",
+    "log": {
+      "path": ".runtime/ecosystem-phase-b/runtime-stable-unit.log",
+      "sha256": "b2a8cb1ee8cadab01e558044e309c1acd5274e301ab0f35c2c5f3064520d62c6"
+    }
+  },
+  "sourceLock": {
+    "path": "config/cli-runtime-sources.lock.json",
+    "sha256": "b8f822e3f034fa5113c517a2177fa3a8be4a8b68579f7eae9cee830631a69084"
+  }
+}

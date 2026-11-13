@@ -1,0 +1,3 @@
+ARG FACTORY_RUNTIME=kujolang/factory-compiled:local
+FROM ${FACTORY_RUNTIME}
+COPY --chmod=444 compiled-keepalive.mjs stage-compiled.mjs compiled-artifact-contract.mjs /opt/factory/

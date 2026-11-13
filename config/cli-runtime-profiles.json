@@ -1,0 +1,154 @@
+{
+  "schema": "kujo.factory.cli-runtime-profiles/v1",
+  "profiles": {
+    "python-cli": {
+      "version": "3.13.9",
+      "entrypoint": "main.py",
+      "command": [
+        "/opt/python/bin/python3",
+        "-I",
+        "-B",
+        "/tmp/factory-source/source/main.py"
+      ],
+      "image": "kujolang/factory-cli:local",
+      "qualification": "qualified-cli-fixtures-linux-amd64",
+      "dependencies": "standard library only; no installation",
+      "sourceImage": "python:3.13.9-slim-bookworm@sha256:b685a4fa58bb19d1814d78a1ec0f0208f351452724f78b20212c984d6e124a34",
+      "qualifiedImage": "sha256:0c858030a48881dd918554ea0420070659c282d21703630ff7df23657618e0f8",
+      "versionCommand": [
+        "/opt/python/bin/python3",
+        "--version"
+      ],
+      "versionPrefix": "Python 3.13.9"
+    },
+    "kujo-cli": {
+      "version": "1.9.0",
+      "entrypoint": "main.kujo",
+      "command": [
+        "/opt/lens-runtime/node_modules/.bin/kujo",
+        "run",
+        "/tmp/factory-source/source/main.kujo",
+        "--"
+      ],
+      "image": "kujolang/factory-node:local",
+      "qualification": "qualified-cli-fixtures-linux-amd64",
+      "dependencies": "bundled standard library only; no installation",
+      "sourceLock": "config/lens-runtime-package-lock.json",
+      "qualifiedImage": "sha256:c62fa7844cd38dd67d18421162af5016b2973a48d6db0a119982b2bf4b661383",
+      "versionCommand": [
+        "/opt/lens-runtime/node_modules/.bin/kujo",
+        "--version"
+      ],
+      "versionPrefix": "kujo 1.9.0"
+    },
+    "typescript-cli": {
+      "version": "7.0.2",
+      "entrypoint": "main.ts",
+      "image": "kujolang/factory-compiled:local",
+      "qualification": "qualified-cli-fixtures-linux-amd64",
+      "dependencies": "standard language libraries only; no packages",
+      "sourceLock": "config/typescript-runtime-package-lock.json",
+      "buildCommand": [
+        "/opt/typescript/node_modules/.bin/tsc",
+        "--target",
+        "ES2022",
+        "--module",
+        "commonjs",
+        "--strict",
+        "--outDir",
+        "/tmp/factory-data/out",
+        "/tmp/factory-source/source/main.ts"
+      ],
+      "command": [
+        "node",
+        "/tmp/factory-data/out/main.js"
+      ],
+      "versionCommand": [
+        "/opt/typescript/node_modules/.bin/tsc",
+        "--version"
+      ],
+      "versionPrefix": "Version 7.0.2",
+      "qualifiedImage": "sha256:0952d2a6f776fa396bd4a7a3fed61615db9685501c1227e0170c484bfb683fc1"
+    },
+    "go-cli": {
+      "version": "1.27.4",
+      "entrypoint": "main.go",
+      "image": "kujolang/factory-native-go:local",
+      "qualification": "unqualified-native-artifact-profile",
+      "dependencies": "standard library only; CGO disabled; no modules/network/toolchain download",
+      "sourceLock": "config/cli-runtime-sources.lock.json",
+      "buildCommand": [
+        "/opt/go/bin/go",
+        "build",
+        "-trimpath",
+        "-o",
+        "/tmp/factory-data/program",
+        "/tmp/factory-source/source/main.go"
+      ],
+      "buildEnv": {
+        "CGO_ENABLED": "0",
+        "GOTOOLCHAIN": "local",
+        "GOPROXY": "off",
+        "GOSUMDB": "off",
+        "GO111MODULE": "off",
+        "GOCACHE": "/tmp/factory-data/go-cache",
+        "GOMODCACHE": "/tmp/factory-data/go-mod"
+      },
+      "command": [
+        "/workspace/compiled-input/.factory-executable/program"
+      ],
+      "versionCommand": [
+        "/opt/go/bin/go",
+        "version"
+      ],
+      "versionPrefix": "go version go1.27.4 ",
+      "nativeCompiled": true
+    },
+    "rust-cli": {
+      "version": "1.100.0",
+      "entrypoint": "main.rs",
+      "image": "kujolang/factory-native-rust:local",
+      "qualification": "unqualified-native-artifact-profile",
+      "dependencies": "standard library only; direct rustc; no Cargo/build.rs/network",
+      "sourceLock": "config/cli-runtime-sources.lock.json",
+      "buildCommand": [
+        "/usr/local/cargo/bin/rustc",
+        "--edition=2024",
+        "/tmp/factory-source/source/main.rs",
+        "-o",
+        "/tmp/factory-data/program"
+      ],
+      "command": [
+        "/workspace/compiled-input/.factory-executable/program"
+      ],
+      "versionCommand": [
+        "/usr/local/cargo/bin/rustc",
+        "--version"
+      ],
+      "versionPrefix": "rustc 1.100.0 ",
+      "nativeCompiled": true
+    }
+  },
+  "constraints": {
+    "network": "none",
+    "user": "65534:65534",
+    "memory": "1g",
+    "cpus": 1,
+    "pids": 256,
+    "caseTimeoutMs": 10000,
+    "leaseTimeoutMs": 120000,
+    "maxOutputBytes": 65536,
+    "maxCases": 4,
+    "freshLeasePerCase": true,
+    "rootFilesystem": "read-only",
+    "providerCredentials": false,
+    "deploymentAuthorized": false,
+    "compileTimeoutMs": 45000
+  },
+  "unsupported": [
+    "dependency installation",
+    "services/frameworks",
+    "arbitrary build commands",
+    "unqualified profiles remain diagnostic-only"
+  ]
+}

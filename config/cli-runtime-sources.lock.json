@@ -1,0 +1,35 @@
+{
+  "schema": "kujo.factory.cli-runtime-sources/v1",
+  "python": {
+    "version": "3.13.9",
+    "image": "python:3.13.9-slim-bookworm@sha256:b685a4fa58bb19d1814d78a1ec0f0208f351452724f78b20212c984d6e124a34",
+    "source": "https://github.com/docker-library/python",
+    "sourceCommit": "3f2d7e4c339ab883455b81a873519f1d0f2cd80a"
+  },
+  "kujo": {
+    "version": "1.9.0",
+    "npmLock": "config/lens-runtime-package-lock.json",
+    "qualifiedImage": "sha256:c62fa7844cd38dd67d18421162af5016b2973a48d6db0a119982b2bf4b661383"
+  },
+  "go": {
+    "version": "1.27.4",
+    "image": "golang:bookworm@sha256:4fa7c968ba93f1635670522dbb01a2c78150443e1385746924566079f36570ea",
+    "source": "https://github.com/docker-library/golang",
+    "sourceCommit": "6aa5c5f09346fb65fdefa941a23eb3cb25ba7b1a",
+    "qualification": "not built"
+  },
+  "rust": {
+    "version": "1.100.0",
+    "image": "rust:slim-bookworm@sha256:7c7d4eb4d05b7781187a327809466cfddf29753f6defdc3d19a0e291951b7a37",
+    "source": "https://github.com/rust-lang/docker-rust",
+    "sourceCommit": "3f4c9cd699d3671ee657c75b5e592f6eb0b93824",
+    "qualification": "not built",
+    "sourcePath": "stable/bookworm/slim/Dockerfile"
+  },
+  "typescript": {
+    "version": "7.0.2",
+    "integrity": "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA==",
+    "qualification": "not built",
+    "npmLock": "config/typescript-runtime-package-lock.json"
+  }
+}

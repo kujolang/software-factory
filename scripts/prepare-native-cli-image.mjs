@@ -1,0 +1,10 @@
+// Tiny local-only layer over an already built/pinned compiler image; never pulls or rebuilds main.
+import '../factory/settings.mjs';import fs from 'node:fs';import path from 'node:path';import {execFileSync,spawnSync} from 'node:child_process';import {workcellPreflight} from '../factory/workcell.mjs';
+const kind=process.argv[2];if(!['go','rust'].includes(kind))throw Error('Usage: node scripts/prepare-native-cli-image.mjs go|rust');
+const disk=fs.statfsSync('.');if(Number(disk.bavail)*Number(disk.bsize)<3*1024**3)throw Error('Local helper layer requires3GiB free');await workcellPreflight();
+const base=kind==='go'?'compiled':'rust',tag='kujolang/factory-'+base+':local',record=JSON.parse(fs.readFileSync('.runtime/runtime-qualification/'+base+'-image-build.json'));
+const image=execFileSync('docker',['image','inspect',tag,'--format','{{.Id}}'],{encoding:'utf8'}).trim();if(record.exitCode!==0||record.imageId!==image)throw Error('Compiler image differs from successful build receipt');
+const alias='kujolang/factory-native-base:'+image.slice(7);execFileSync('docker',['tag',image,alias]);const stage=fs.mkdtempSync(path.resolve('.runtime/native-cli-image-'));let result;
+try{fs.copyFileSync('factory/runtime-images/Dockerfile.native-cli',path.join(stage,'Dockerfile'));for(const name of ['compiled-keepalive.mjs','stage-compiled.mjs','compiled-artifact-contract.mjs'])fs.copyFileSync('factory/runtime-images/'+name,path.join(stage,name));result=spawnSync('docker',['build','--pull=false','--build-arg','FACTORY_RUNTIME='+alias,'-t','kujolang/factory-native-'+kind+':local',stage],{stdio:'inherit',timeout:120000});}finally{fs.rmSync(stage,{recursive:true,force:true});}
+const imageId=result.status===0?execFileSync('docker',['image','inspect','kujolang/factory-native-'+kind+':local','--format','{{.Id}}'],{encoding:'utf8'}).trim():null;
+fs.writeFileSync('.runtime/runtime-qualification/native-'+kind+'-image-build.json',JSON.stringify({base:image,exitCode:result.status,imageId},null,2)+'\n');if(result.error)throw result.error;process.exitCode=result.status??1;
