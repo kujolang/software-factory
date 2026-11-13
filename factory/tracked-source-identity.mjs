@@ -12,6 +12,8 @@ export function verifyTrackedSourceIdentity(directory,expectedCommit){
  const root=plain(directory);if(!fs.lstatSync(root).isDirectory())throw Error('Tracked source root must be a directory');
  if(path.resolve(git(root,['rev-parse','--show-toplevel'],4096).trim())!==root)throw Error('Tracked source repository root mismatch');
  const commit=git(root,['rev-parse','--verify','HEAD'],1024).trim();if(commit!==expectedCommit)throw Error('Tracked source commit mismatch');
+ // Verify stored object contents, not just their paths/claimed object IDs.
+ git(root,['fsck','--strict','--no-reflogs','--no-dangling',expectedCommit]);
  const records=git(root,['ls-tree','-rz','--full-tree',expectedCommit]).split('\0').filter(Boolean);
  if(!records.length||records.length>MAX_FILES)throw Error('Tracked source inventory bound');
  let total=0;const inventory=createHash('sha256');

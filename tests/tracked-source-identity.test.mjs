@@ -1,3 +1,4 @@
+import {deflateSync} from 'node:zlib';
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import path from 'node:path';import os from 'node:os';import {execFileSync} from 'node:child_process';import {verifyTrackedSourceIdentity} from '../factory/tracked-source-identity.mjs';
 const git=(root,...args)=>execFileSync('git',['-C',root,...args],{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
 function fixture(fn){const root=fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(),'tracked-source-')));try{git(root,'init','-q');fs.writeFileSync(path.join(root,'native.kujo'),'print("fixture")\n');fs.writeFileSync(path.join(root,'.gitignore'),'cache/\n');git(root,'add','.');git(root,'-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-qm','fixture');return fn(root,git(root,'rev-parse','HEAD'));}finally{fs.rmSync(root,{recursive:true,force:true});}}
@@ -13,4 +14,14 @@ test('tracked executable mode mutation cannot be hidden by index flags',()=>fixt
 test('replacement commit graphs cannot redefine the pinned tracked source authority',()=>fixture((root,expected)=>{
  const file=path.join(root,'native.kujo');fs.writeFileSync(file,'print("substituted")\n');git(root,'add','.');git(root,'-c','user.name=Fixture','-c','user.email=fixture@example.invalid','commit','-qm','substitute');const substitute=git(root,'rev-parse','HEAD');git(root,'replace',expected,substitute);git(root,'reset','--hard',expected);
  assert.equal(git(root,'rev-parse','HEAD'),expected);assert.equal(git(root,'status','--porcelain'),'');assert.throws(()=>verifyTrackedSourceIdentity(root,expected),/byte mismatch/);
+}));
+
+test('corrupted loose commit contents cannot redefine the expected object hash',()=>fixture((root,expected)=>{
+ const commit=execFileSync('git',['-C',root,'cat-file','commit',expected]);const changed=Buffer.from(commit.toString().replace('fixture\n','corrupt\n'));assert.notDeepEqual(changed,commit);
+ const forged=Buffer.concat([Buffer.from('commit '+changed.length+'\0'),changed]);const object=path.join(root,'.git','objects',expected.slice(0,2),expected.slice(2));fs.chmodSync(object,0o644);fs.writeFileSync(object,deflateSync(forged));
+ assert.equal(git(root,'rev-parse','HEAD'),expected);assert.throws(()=>verifyTrackedSourceIdentity(root,expected),/Git identity unavailable/);
+}));
+
+test('valid dangling objects do not invalidate a clean pinned checkout',()=>fixture((root,expected)=>{
+ execFileSync('git',['-C',root,'hash-object','-w','--stdin'],{input:'discarded valid object\n'});assert.equal(verifyTrackedSourceIdentity(root,expected).clean,true);
 }));
