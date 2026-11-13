@@ -1,3 +1,5 @@
+import {hashMissionArtifacts} from './mission-bindings.mjs';
+import {acquireMissionAdmission} from './operations-policy.mjs';
 /** Inert documentation artifacts: native Dispatch sequences independent canonical roles. */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -28,26 +30,28 @@ export function verifyDocumentationArtifact(dir){
  if(typeof config.fixture!=='boolean'||config.kind!=='source-to-reviewed-documentation'||config.schema!=='kujo.factory.documentation-mission/v1'||!Array.isArray(source)||source.some(f=>specHash(f.content)!==f.sha256)||docs.schema!=='kujo.factory.documentation/v1'||docs.sourceSha256!==specHash(JSON.stringify(source))||binding.sourceSha256!==docs.sourceSha256||binding.documentationSha256!==specHash(JSON.stringify(docs))||review.verdict!=='pass'||review.files.length)throw Error('Documentation source or independent review binding mismatch');
  for(const step of documentationSteps.filter(s=>s.role)){
   const receipt=readSpecRecord(dir,'artifacts/'+step.id+'-receipt.json');
-  if(receipt.fixture!==config.fixture||receipt.role!==step.role||receipt.status!=='completed'||receipt.code!==0||receipt.observedToolCalls!==0||!['mock','codex','ollama'].includes(receipt.provider)||(!config.fixture&&receipt.provider==='mock'))throw Error('Documentation canonical receipt invalid');
+  if(receipt.fixture!==config.fixture||receipt.role!==step.role||receipt.status!=='completed'||receipt.code!==0||receipt.observedToolCalls!==0||!['mock','codex','ollama','openai','anthropic','gemini'].includes(receipt.provider)||(!config.fixture&&receipt.provider==='mock'))throw Error('Documentation canonical receipt invalid');
  }
  if(!Array.isArray(docs.files)||!docs.files.length||docs.files.length>10||new Set(docs.files.map(f=>f.path)).size!==docs.files.length||docs.files.some(f=>!/^docs\/[a-zA-Z0-9_-]+\.md$/.test(f.path)||typeof f.content!=='string'||f.content.length>100000))throw Error('Documentation output path or size invalid');
  return {schema:'kujo.factory.reviewed-documentation/v1',sourceSha256:docs.sourceSha256,documentationSha256:binding.documentationSha256,reviewSha256:specHash(fs.readFileSync(path.join(dir,'artifacts/review-docs-proposal.json'))),fixture:config.fixture,modelReview:!config.fixture,implementationTestsExecuted:false,humanApproval:false,softwareReleaseApproval:false,deploymentAuthorized:false};
 }
 export async function runDocumentationPipeline({source,files,mission,provider=configuredProvider,model=configuredModel,parent=path.join(root,'.runtime/documentation'),fixtureOutputs}={}){
- if(typeof mission!=='string'||!mission.trim()||mission.length>12000||mission.includes('\0')||!['codex','ollama'].includes(provider))throw Error('Invalid documentation mission/provider');
+ if(typeof mission!=='string'||!mission.trim()||mission.length>12000||mission.includes('\0')||!['codex','ollama','openai','anthropic','gemini'].includes(provider))throw Error('Invalid documentation mission/provider');
  if(fixtureOutputs!==undefined&&(!fixtureOutputs||typeof fixtureOutputs!=='object'||Array.isArray(fixtureOutputs)||JSON.stringify(fixtureOutputs).length>1000000))throw Error('Invalid explicit documentation fixture');
  const snapshot=snapshotDocumentationSource(source,files);
  let ancestor=path.resolve(parent);while(!fs.existsSync(ancestor))ancestor=path.dirname(ancestor);specPlain(ancestor);fs.mkdirSync(parent,{recursive:true,mode:0o700});specPlain(parent);
  const dir=fs.mkdtempSync(path.join(parent,'docs-')),id=path.basename(dir);fs.mkdirSync(path.join(dir,'artifacts'),{mode:0o700});
- const config={schema:'kujo.factory.documentation-mission/v1',id,kind:'source-to-reviewed-documentation',mission,provider,model:model??null,fixture:fixtureOutputs!==undefined,status:'running',startedAt:new Date().toISOString()};
- writeSpecRecord(dir,'run.json',config);writeSpecRecord(dir,'artifacts/source.json',snapshot);writeSpecRecord(dir,'artifacts/controller-provenance.json',controllerProvenance());
+ const config={evidenceContract:'kujo.factory.documentation-evidence/v1',schema:'kujo.factory.documentation-mission/v1',id,kind:'source-to-reviewed-documentation',mission,provider,model:model??null,fixture:fixtureOutputs!==undefined,status:'running',startedAt:new Date().toISOString()};
+ const admission=acquireMissionAdmission(path.resolve(parent),dir,{runId:id,...(config.fixture?{poolDirectory:path.join(path.resolve(parent),'.fixture-admission')}:{})});config.operationsAdmission=admission.record;
+ try {
+ writeSpecRecord(dir,'run.json',config);writeSpecRecord(dir,'artifacts/mission-evidence-contract.json',{schema:config.evidenceContract});writeSpecRecord(dir,'artifacts/source.json',snapshot);writeSpecRecord(dir,'artifacts/controller-provenance.json',controllerProvenance());
  if(config.fixture)writeSpecRecord(dir,'fixture-outputs.json',fixtureOutputs);
  writeSpecRecord(dir,'workflow.json',{id:'source-to-reviewed-documentation',name:'Source-bound documentation review; no software approval',tasks:documentationSteps.map(s=>({id:s.id,name:s.id,agentId:s.role??'controller',dependsOn:s.dependsOn,timeoutMs:600000,parallelSafe:false}))});
  event(dir,'mission.created',{summary:'Prepare inert documentation with independent model review'});
  let ledger,dispatch,errorMessage=null,frozen=null,terminal=null;
  try{
   ledger=await beginRunAccounting({missionId:id,provider:config.fixture?'mock-fixture':provider,model:config.fixture?'offline-fixture':model||'unreported',evidence:'artifacts/controller-provenance.json'},{parent:path.join(dir,'artifacts/runledger')});writeSpecRecord(dir,'artifacts/accounting-start.json',ledger);
-  dispatch=await command(kujoBinary(),['run',path.join(root,'factory/dispatch.kujo')],{cwd:dispatchRoot,timeout:1500000,maxBytes:1000000,env:{FACTORY_WORKFLOW_KIND:'documentation',FACTORY_ROOT:root,FACTORY_RUN_DIR:dir,NODE_BIN:process.execPath,DISPATCH_ALLOW_ANY_OUTPUT_ROOT:'true'}});writeSpecRecord(dir,'artifacts/dispatch-process.json',dispatch);
+  dispatch=await command(kujoBinary(),['run',path.join(root,'factory/dispatch.kujo')],{cwd:dispatchRoot,timeout:Math.min(1500000,admission.check().remainingMs),maxBytes:1000000,env:{FACTORY_WORKFLOW_KIND:'documentation',FACTORY_ROOT:root,FACTORY_RUN_DIR:dir,NODE_BIN:process.execPath,DISPATCH_ALLOW_ANY_OUTPUT_ROOT:'true'}});writeSpecRecord(dir,'artifacts/dispatch-process.json',dispatch);
   const native=readSpecRecord(dir,'dispatch-result.json');if(dispatch.code!==0||dispatch.reason||native.ok!==true||native.status!=='completed')throw Error('Native Dispatch documentation workflow failed; inspect retained task evidence');
   frozen=verifyDocumentationArtifact(dir);
  }catch(error){errorMessage=error.message;}
@@ -56,9 +60,10 @@ export async function runDocumentationPipeline({source,files,mission,provider=co
  try{
   if(!ledger)throw Error('Required RunLedger start unavailable');
   terminal=await finishRunAccounting(ledger,{status:errorMessage?'fail':'pass',verdict:errorMessage||'Source-bound documentation independently reviewed; no implementation tests or software approval',evidence:errorMessage?'artifacts/dispatch-process.json':'artifacts/documentation.json sha256:'+frozen.documentationSha256,tests:[],usage:Object.keys(usage).length?usage:null});writeSpecRecord(dir,'artifacts/accounting-terminal.json',terminal);
-  if(!errorMessage){const checked=verifyDocumentationArtifact(dir);if(JSON.stringify(checked)!==JSON.stringify(frozen))throw Error('Documentation identity changed during accounting');writeSpecRecord(dir,'reviewed-documentation.json',{...frozen,accountingId:terminal.id,accountingSha256:specHash(fs.readFileSync(path.join(dir,'artifacts/accounting-terminal.json')))});}
+  if(!errorMessage){const checked=verifyDocumentationArtifact(dir);if(JSON.stringify(checked)!==JSON.stringify(frozen))throw Error('Documentation identity changed during accounting');writeSpecRecord(dir,'reviewed-documentation.json',{...frozen,evidenceBindings:hashMissionArtifacts(dir),accountingId:terminal.id,accountingSha256:specHash(fs.readFileSync(path.join(dir,'artifacts/accounting-terminal.json')))});}
  }catch(error){errorMessage='Documentation accounting/promotion failed: '+error.message;if(terminal){try{await annotateRunAccounting(ledger,errorMessage);}catch{}}}
  if(errorMessage){try{writeSpecRecord(dir,'artifacts/casefile.json',await captureFailureLog(JSON.stringify({missionId:id,error:errorMessage,eventJournalSha256:specHash(fs.readFileSync(path.join(dir,'events.jsonl'))),reproduction:'Inspect retained role outputs and Dispatch events; start a new mission after review, never reuse approval'}),{name:'documentation-failure',parent:path.join(dir,'artifacts/casefile')}));}catch(error){errorMessage+='; CaseFile capture failed: '+error.message;}}
  config.status=errorMessage?'failed':'completed';config.finishedAt=new Date().toISOString();save(path.join(dir,'run.json'),config);event(dir,errorMessage?'mission.failed':'mission.completed',{summary:errorMessage||'Reviewed documentation recorded; publication requires separate authorization'});
  const result={ok:!errorMessage,id,directory:dir,status:config.status,error:errorMessage,artifact:errorMessage?null:path.join(dir,'reviewed-documentation.json'),fixture:config.fixture,softwareReleaseApproval:false,deploymentAuthorized:false};writeSpecRecord(dir,'result.json',result);return result;
+ }finally{admission.close();}
 }

@@ -1,3 +1,4 @@
+import {assertMissionOperationsBudget} from './operations-policy.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import {specSteps,specHash,readSpecRecord,writeSpecRecord,verifyFrozenSpec,specPlain} from './spec-pipeline.mjs';
@@ -24,6 +25,7 @@ async function proposal(prompt){
  const output=admitRoleProposal(contract,response.output,{allowedFiles:taskId==='write-spec'?p=>p==='pack.json':()=>false});writeSpecRecord(dir,artifact(taskId+'-proposal.json'),output);if(output.verdict==='fail'||(taskId==='review-spec'&&output.verdict!=='pass'))throw Error('Role '+task.role+' did not accept its bounded task: '+output.summary);return output;
 }
 try{
+ assertMissionOperationsBudget(dir);
  emit('task.started','Specification stage '+taskId);
  if(taskId==='plan')await proposal('Define requirements, risks, ambiguities, non-goals and independently reviewable acceptance criteria expressible in the closed pack data language for a dependency-free Node API/static-browser application. Return files:[], concrete planner deliverables. Reject ideas outside the qualified runtime rather than invent compatibility.');
  if(taskId==='write-spec'){
