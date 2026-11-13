@@ -20,6 +20,7 @@ const {verifyAccountabilityDependency}=await import('../factory/accountability.m
 const {verifyChangeDependency}=await import('../factory/change-tools.mjs');for(const name of ['fence','concord','changebucket','patchbrief','kennel'])check(name,()=>verifyChangeDependency(name).commit,'Run npm run setup.');
 const {verifyContextDependency}=await import('../factory/context.mjs');for(const name of ['scout','scent','redact'])check(name,()=>verifyContextDependency(name).commit,'Run npm run setup.');
 const {verifyLensDependency}=await import('../factory/lens.mjs');check('lens',()=>verifyLensDependency(),'Run npm run setup and npm run image:build.');
+const {verifyTelemetryDependency}=await import('../factory/telemetry.mjs');check('watchdog',()=>verifyTelemetryDependency().commit,'Run npm run setup.');
 const {verifyEvalDependency}=await import('../factory/evaluation.mjs');check('eval',()=>verifyEvalDependency(),'Run npm run setup.');
 const {validateReleasePolicy}=await import('../factory/release-policy.mjs');check('release-policy',()=>validateReleasePolicy(JSON.parse(fs.readFileSync(path.join(root,'config/release-policy.json')))).id,'Restore the reviewed controller release policy.');
 check('disk',()=>{const s=fs.statfsSync(root);const available=s.bavail*s.bsize;if(available<2*1024**3)throw Error('Less than 2 GiB free');return {availableGiB:Math.round(available/1024**3)};},'Free disk space before creating images or run receipts; initial image build should have at least 10 GiB available.');
