@@ -1,0 +1,21 @@
+from src.config import default_config
+from src.chunking import chunk_documents
+from src.embeddings import embed_chunks
+from src.retrieval import hybrid_search
+from src.common import term_frequency
+value := parse_json(read_file(args()[0]))
+cfg := default_config()
+cfg["embedding_provider"] = "hash"
+cfg["embedding_cache_enabled"] = false
+cfg["top_k"] = 5
+cfg["chunk_size"] = 900
+cfg["chunk_overlap"] = 100
+chunks := chunk_documents(value["documents"],cfg)
+assert(len(chunks)<=500,"chunk bound")
+embedded := embed_chunks(chunks,cfg)
+assert(embedded["provider"]=="hash" && embedded["error"]==null,"offline embedding failed")
+lexical := []
+for chunk in chunks { lexical = push(lexical,{"chunk_id":chunk["chunk_id"],"term_freq":term_frequency(chunk["tokens"])}) }
+index := {"chunks":chunks,"vectors":embedded["vectors"],"lexical":lexical}
+write_file("index.json",to_json(index))
+print(to_json({"provider":"hash","results":hybrid_search(index,value["query"],cfg),"chunks":len(chunks)}))

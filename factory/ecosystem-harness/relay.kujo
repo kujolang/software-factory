@@ -1,0 +1,3 @@
+from src.contracts import event_chain_integrity_valid, receipt_sequence_valid
+value := parse_json(read_file(args()[0]))
+print(to_json({"eventsValid":event_chain_integrity_valid(value["events"]),"receiptsValid":receipt_sequence_valid(value["receipts"])}))

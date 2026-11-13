@@ -1,0 +1,3 @@
+from src.contracts import validate_external_receipt
+value := parse_json(read_file(args()[0]))
+print(to_json(validate_external_receipt(os_getcwd(),value)))

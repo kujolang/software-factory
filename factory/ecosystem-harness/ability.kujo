@@ -1,0 +1,4 @@
+from src.contract import validate_ability_definition, ability_definition_digest
+value := parse_json(read_file(args()[0]))
+validation := validate_ability_definition(value)
+print(to_json({"validation": validation, "digest": ability_definition_digest(value)}))
