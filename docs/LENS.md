@@ -1,0 +1,9 @@
+# Native Lens browser evidence
+
+The factory pins Lens 1.1.1 at `91049646d70c11bf0c6071f39cf7dfac6b1ba70b`, including its complete source byte inventory. `node scripts/setup-lens.mjs` verifies the installation. The trusted image build installs locked Kujo 1.9.0 and Lens bridge dependencies using `npm ci --ignore-scripts`. Browser download occurs only in that explicit trusted build phase.
+
+`evaluateLens({lease, dir, sourceHash})` invokes the fixed `runLens` operation on an existing Workcell lease. Native Lens runs as protected browser UID 1000, separately from candidate UID 65534. The only URL is the isolated application at `http://127.0.0.1:4381`; external URLs, candidate configuration, authentication state, flows, crawling and arbitrary options are not accepted. Existing network isolation, read-only image, seccomp, resource limits and independent lease deadline remain mandatory.
+
+Desktop/mobile screenshots, console/network/DOM records and automated axe-core accessibility evidence are collected. Native Lens report and subprocess exit must agree. Required check presence and enabled accessibility are validated; artifacts are bounded and hashed against the controller-supplied candidate identity. A Lens PASS uses the explicit upstream `error` threshold; warnings remain visible and are not silently discarded. Automated accessibility does not establish WCAG compliance. Lens evidence is subordinate to independent acceptance and release policy; it grants no approval or deployment authority. Visual baseline comparison is not enabled by this adapter.
+
+`node scripts/qualify-lens.mjs` runs real fixture browser checks inside Workcell. `node --test tests/lens.test.mjs` checks fail-closed report handling and dependency identity; these unit cases do not constitute browser execution proof. Image changes require the existing smoke, isolation and controller-death regression suites.
