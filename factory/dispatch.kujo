@@ -24,12 +24,13 @@ func factory_worker(input, context) {
     # A fixed executable and argv boundary. Workers own validation, isolated
     # candidate writes, provider usage, corrections, and release policy.
     kind := env_or("FACTORY_WORKFLOW_KIND", "application")
-    assert(kind == "application" || kind == "specification" || kind == "documentation" || kind == "cli-construction" || kind == "sqlite-migration", "Unknown trusted factory workflow kind")
+    assert(kind == "application" || kind == "specification" || kind == "documentation" || kind == "cli-construction" || kind == "sqlite-migration" || kind == "node-package-upgrade", "Unknown trusted factory workflow kind")
     worker := "/factory/worker.mjs"
     if kind == "specification" { worker = "/factory/spec-pipeline-worker.mjs" }
     if kind == "documentation" { worker = "/factory/documentation-pipeline-worker.mjs" }
     if kind == "cli-construction" { worker = "/factory/cli-mission-worker.mjs" }
     if kind == "sqlite-migration" { worker = "/factory/sqlite-mission-worker.mjs" }
+    if kind == "node-package-upgrade" { worker = "/factory/node-package-mission-worker.mjs" }
     result := spawn_process([env_or("NODE_BIN", "node"), factory_root + worker, run_dir, context["step_id"]], {"cwd": factory_root, "inherit_env": true, "timeout_ms": timeout_ms, "max_output_bytes": 1048576})
     if result.success == false {
         return {"ok": false, "error": {"code": "factory_worker_failed", "message": "Worker failed or exceeded its bound; inspect the task evidence: " + context["step_id"], "retryable": false}}
@@ -112,6 +113,7 @@ if env_or("FACTORY_WORKFLOW_KIND", "application") == "specification" { release_a
 if env_or("FACTORY_WORKFLOW_KIND", "application") == "documentation" { release_authority = "none-documentation-review-only" }
 if env_or("FACTORY_WORKFLOW_KIND", "application") == "cli-construction" { release_authority = "independent-cli-candidate-gate" }
 if env_or("FACTORY_WORKFLOW_KIND", "application") == "sqlite-migration" { release_authority = "independent-sqlite-migration-gate" }
+if env_or("FACTORY_WORKFLOW_KIND", "application") == "node-package-upgrade" { release_authority = "independent-node-package-candidate-gate" }
 summary := {"schema": "kujo.factory.dispatch-result/v1", "ok": result["ok"], "status": result["run_state"]["status"], "runId": result["run_state"]["run_id"], "runDir": result["run_state"]["run_dir"], "releaseAuthority": release_authority}
 write_file(summary_path, to_json(summary))
 print(to_json(summary))
