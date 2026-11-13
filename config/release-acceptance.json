@@ -43,16 +43,23 @@
       "status": "partial",
       "implementation": [
         "factory/accountability.mjs",
-        "factory/cli.mjs"
+        "factory/lifecycle.mjs",
+        "factory/evaluation.mjs",
+        "factory/release-policy.mjs",
+        "factory/cli.mjs",
+        "factory/worker.mjs"
       ],
       "tests": [
         "tests/accountability.test.mjs",
+        "tests/lifecycle.test.mjs",
+        "tests/evaluation.test.mjs",
+        "tests/release-policy.test.mjs",
         "tests/packs.test.mjs"
       ],
       "evidence": [
         "docs/qualification-results.json"
       ],
-      "limits": "Four real adapters and pack Spec gate; remaining audited components and lifecycle hooks incomplete."
+      "limits": "Native accounting/failure/Eval/selected ShipCheck lifecycle gates implemented. Other audited components and broader policies remain incomplete."
     },
     {
       "id": "AC-04",
@@ -94,16 +101,20 @@
       "status": "partial",
       "implementation": [
         "factory/worker.mjs",
-        "factory/pack.mjs"
+        "factory/pack.mjs",
+        "factory/lifecycle.mjs",
+        "factory/release-policy.mjs"
       ],
       "tests": [
         "factory/tests.test.mjs",
-        "tests/packs.test.mjs"
+        "tests/packs.test.mjs",
+        "tests/lifecycle.test.mjs",
+        "tests/release-policy.test.mjs"
       ],
       "evidence": [
         "docs/qualification-results.json"
       ],
-      "limits": "Existing source-bound gates retained and tested; new full-mission provider paths still need qualification."
+      "limits": "No promotion before terminal accounting; current source and native gates rebound before approval. See full mission qualification separately; arbitrary teams/runtimes remain incomplete."
     },
     {
       "id": "AC-07",
@@ -119,7 +130,7 @@
       "evidence": [
         "docs/qualification-results.json"
       ],
-      "limits": "Codex and native local Ollama live schema checks pass; representative complete missions incomplete."
+      "limits": "Codex converter construction with a successful independent retry is recorded. Both providers pass live schema checks; complete Ollama mission and broader provider qualification remain incomplete."
     },
     {
       "id": "AC-08",
@@ -146,7 +157,7 @@
       "evidence": [
         "docs/qualification-results.json"
       ],
-      "limits": "Standalone offline export/import/verify/compare and optional trusted-key signatures tested; no execution-authenticity claim."
+      "limits": "Standalone offline verification requires actual native accounting/policy/Eval artifacts for new runs, with optional signatures. Integrity and internal provenance consistency are not execution authenticity."
     },
     {
       "id": "AC-10",
@@ -161,7 +172,7 @@
       "evidence": [
         "docs/qualification-results.json"
       ],
-      "limits": "Independent watchdog death cleanup passes; durable mission continuation/reconciliation incomplete."
+      "limits": "Watchdog death cleanup and unaccounted promotion rejection pass. Durable checkpoint continuation and external-effect reconciliation remain incomplete."
     },
     {
       "id": "AC-11",
@@ -216,7 +227,7 @@
       ],
       "tests": [],
       "evidence": [],
-      "limits": "Existing-machine install succeeds; fresh Linux/macOS/WSL and full mission matrix not run."
+      "limits": "Fresh public checkout on current macOS host installs and passes 118+8 checks without copied dependencies/settings/auth. Independent machines and Linux/WSL/full matrix not run."
     },
     {
       "id": "AC-15",

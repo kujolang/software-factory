@@ -118,8 +118,8 @@
     "offline install",
     "upgrade/rollback",
     "new runtime matrix",
-    "full provider missions",
-    "durable resume matrix"
+    "durable resume matrix",
+    "full Ollama mission and broader provider matrix"
   ],
   "preservedFailures": [
     ".runtime/ecosystem-qualification/first-attempt/",
@@ -139,5 +139,210 @@
   "doctor": {
     "command": "npm run doctor -- --offline --json",
     "exitCode": 0
+  },
+  "phaseB": {
+    "sourceCommit": "fc96648c15dd006f9a110f6a712d72a6662f5f63",
+    "deterministic": {
+      "command": "npm run verify",
+      "exitCode": 0,
+      "tests": 118,
+      "nativeDispatchTests": 8,
+      "failed": 0,
+      "skipped": 0,
+      "markdownFilesChecked": 43,
+      "log": ".runtime/ecosystem-phase-b/verify-prelive.log",
+      "logSha256": "b8e5f22a6306773e300d1eaab6cbe33774f43fec69b6b12738c79e35fe43e2b7"
+    },
+    "cleanCheckout": {
+      "scope": "new checkout on the existing macOS host; not a clean independent machine or Linux/WSL qualification",
+      "sourceCommit": "fc96648c15dd006f9a110f6a712d72a6662f5f63",
+      "ok": true,
+      "credentialsCopied": false,
+      "dependencyDirectoriesCopied": false,
+      "settingsCopied": false,
+      "modelsInvoked": false,
+      "engineTestsInvoked": false,
+      "commands": [
+        {
+          "command": "git clone public branch",
+          "exitCode": 0,
+          "durationSeconds": 1.98,
+          "log": ".runtime/ecosystem-phase-b/clean-install-logs-9ros2eco/clone.log",
+          "logSha256": "974fc05833030f39d569bb5b1010496a2f49232bf413aae5cb01bc3230a20a00"
+        },
+        {
+          "command": "npm ci",
+          "exitCode": 0,
+          "durationSeconds": 28.614,
+          "log": ".runtime/ecosystem-phase-b/clean-install-logs-9ros2eco/npm-ci.log",
+          "logSha256": "1d42af86c5796ab00af753b9f615b2f03eec513d2d48ed157ba3b6fe70f00279"
+        },
+        {
+          "command": "npm run setup",
+          "exitCode": 0,
+          "durationSeconds": 24.21,
+          "log": ".runtime/ecosystem-phase-b/clean-install-logs-9ros2eco/setup.log",
+          "logSha256": "30a7bfee4caa90381a56cec5f8155dec379b7d865b6b84dabf9692740c3fd3c5"
+        },
+        {
+          "command": "npm run doctor -- --offline --json",
+          "exitCode": 0,
+          "durationSeconds": 8.492,
+          "log": ".runtime/ecosystem-phase-b/clean-install-logs-9ros2eco/doctor-offline.log",
+          "logSha256": "e6cf36d2c8a3050e0d62672f0546e3a2b592c4c0765304ca54501c0a11a3979d"
+        },
+        {
+          "command": "npm run verify",
+          "exitCode": 0,
+          "durationSeconds": 33.627,
+          "log": ".runtime/ecosystem-phase-b/clean-install-logs-9ros2eco/verify.log",
+          "logSha256": "5f48660955f18e0a0fba095ca54aefcab006266067c393d42f0a10f591abaa1f"
+        }
+      ]
+    },
+    "liveMission": {
+      "command": "FACTORY_RUNS=.runtime/phase-b-live FACTORY_PROVIDER=codex npm run factory -- run packs/converter.idea.txt --pack packs/converter.json",
+      "exitCode": 1,
+      "startedAtEpoch": 1794588146.298305,
+      "durationSeconds": 277.999,
+      "log": ".runtime/ecosystem-phase-b/codex-mission.log",
+      "runId": "factory-2026-11-13T16-42-35-479Z",
+      "status": "failed",
+      "runDirectory": ".runtime/phase-b-live/factory-2026-11-13T16-42-35-479Z",
+      "sourceCommit": "fc96648c15dd006f9a110f6a712d72a6662f5f63",
+      "result": "failed-independent-release-review",
+      "apiBrowserPassed": true,
+      "nativeEvalPassed": true,
+      "releasePolicyPreflightPassed": true,
+      "ledgerStatus": "fail",
+      "casefileCaptures": 2,
+      "releaseApproved": false,
+      "buildPublished": false,
+      "usage": {
+        "input_tokens": 74741,
+        "output_tokens": 13757,
+        "cost": null
+      },
+      "evidenceVerification": ".runtime/ecosystem-phase-b/codex-evidence-verify.json",
+      "failure": "Reviewer misinterpreted upstream aggregate ShipCheck gate as configured required checks. Required readme/version-metadata/changelog checks actually passed; remaining optional checks made aggregate false."
+    },
+    "liveRetry": {
+      "command": "FACTORY_RUNS=.runtime/phase-b-live FACTORY_PROVIDER=codex npm run factory -- retry factory-2026-11-13T16-42-35-479Z",
+      "exitCode": 0,
+      "startedAtEpoch": 1794588631.397247,
+      "durationSeconds": 107.131,
+      "log": ".runtime/ecosystem-phase-b/codex-retry.log",
+      "runId": "factory-retry-2026-11-13T16-50-44-314Z",
+      "status": "completed",
+      "runDirectory": ".runtime/phase-b-live/factory-retry-2026-11-13T16-50-44-314Z",
+      "observedUsage": {
+        "inputTokens": 27029,
+        "outputTokens": 1180
+      },
+      "cost": null,
+      "originalExportFilesPreserved": true,
+      "originalExportFileCount": 220,
+      "qualificationSourceCommit": "5b5422cb2f66c0e6b8eb854e258c05ec8d24bd58",
+      "auditLog": ".runtime/ecosystem-phase-b/codex-retry-audit.json",
+      "exportVerifyLog": ".runtime/ecosystem-phase-b/codex-retry-evidence-verify.json"
+    },
+    "runtime": [
+      {
+        "command": "npm run smoke",
+        "exitCode": 0,
+        "durationSeconds": 45.93,
+        "log": ".runtime/ecosystem-phase-b/live-smoke.log",
+        "logSha256": "5a1ced8aa2545c1701e4026c3780b31bc1d2a0a9e265997dc5ff5a93ca924b53",
+        "sourceCommitObservedAfterSuites": "9a52045b1fd97404cc9c0bb84a0fc752a296817e",
+        "sourceCommitQualification": "Source changed concurrently in unrelated offline evidence verifier/docs; exact per-suite commit not captured at launch",
+        "scope": "Actual local rootless Workcell execution; fixture-only except adversarial/controller-death checks"
+      },
+      {
+        "command": "npm run test:isolation",
+        "exitCode": 0,
+        "durationSeconds": 37.454,
+        "log": ".runtime/ecosystem-phase-b/live-test-isolation.log",
+        "logSha256": "b085170d5a6de2f3d647bc03203e68f1763134d4fabcc834a8c82645d2520584",
+        "sourceCommitObservedAfterSuites": "9a52045b1fd97404cc9c0bb84a0fc752a296817e",
+        "sourceCommitQualification": "Source changed concurrently in unrelated offline evidence verifier/docs; exact per-suite commit not captured at launch",
+        "scope": "Actual local rootless Workcell execution; fixture-only except adversarial/controller-death checks"
+      },
+      {
+        "command": "npm run test:controller-death",
+        "exitCode": 0,
+        "durationSeconds": 19.212,
+        "log": ".runtime/ecosystem-phase-b/live-test-controller-death.log",
+        "logSha256": "29585ccaa59d38f8e7df2f247c1f76c48e99941f8c8260a95933e537c12260f4",
+        "sourceCommitObservedAfterSuites": "9a52045b1fd97404cc9c0bb84a0fc752a296817e",
+        "sourceCommitQualification": "Source changed concurrently in unrelated offline evidence verifier/docs; exact per-suite commit not captured at launch",
+        "scope": "Actual local rootless Workcell execution; fixture-only except adversarial/controller-death checks"
+      },
+      {
+        "command": "npm run test:packs",
+        "exitCode": 0,
+        "durationSeconds": 61.469,
+        "log": ".runtime/ecosystem-phase-b/live-test-packs.log",
+        "logSha256": "737317ff901dbae6b78ba178b5dda147973caf7edde608f604a250a0c7d0b3fc",
+        "sourceCommitObservedAfterSuites": "9a52045b1fd97404cc9c0bb84a0fc752a296817e",
+        "sourceCommitQualification": "Source changed concurrently in unrelated offline evidence verifier/docs; exact per-suite commit not captured at launch",
+        "scope": "Actual local rootless Workcell execution; fixture-only except adversarial/controller-death checks"
+      }
+    ],
+    "finalEvidenceVerification": [
+      {
+        "command": [
+          "node",
+          "factory/audit.mjs",
+          ".runtime/phase-b-live/factory-retry-2026-11-13T16-50-44-314Z"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 3.07,
+        "sourceCommit": "dce41c7f471fa3815102d4f8b63153c77c6d6be7",
+        "log": ".runtime/ecosystem-phase-b/final-codex-retry-audit.json",
+        "logSha256": "5d8664ab7ce586f83b91bf949cd227889023138e86ee1ce02bebcff0fa856804"
+      },
+      {
+        "command": [
+          "node",
+          "bin/software-factory.mjs",
+          "evidence",
+          "verify",
+          ".runtime/ecosystem-phase-b/exports/codex-failed-converter"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 1.16,
+        "sourceCommit": "dce41c7f471fa3815102d4f8b63153c77c6d6be7",
+        "log": ".runtime/ecosystem-phase-b/final-codex-failed-evidence-verify.json",
+        "logSha256": "2fb0cdad2c128122b89a555c5e5d753badd9e59503a41b47b19cafe21791f327"
+      },
+      {
+        "command": [
+          "node",
+          "bin/software-factory.mjs",
+          "evidence",
+          "verify",
+          ".runtime/ecosystem-phase-b/exports/codex-retry-converter"
+        ],
+        "exitCode": 0,
+        "durationSeconds": 1.361,
+        "sourceCommit": "dce41c7f471fa3815102d4f8b63153c77c6d6be7",
+        "log": ".runtime/ecosystem-phase-b/final-codex-retry-evidence-verify.json",
+        "logSha256": "9e73fe11f5ba0f02a50bf69a67b06f86e986def538afe6e59a20cb8146fadc69"
+      }
+    ],
+    "finalDeterministic": {
+      "command": "npm run verify",
+      "commit": "dce41c7f471fa3815102d4f8b63153c77c6d6be7",
+      "exitCode": 0,
+      "startedAt": "2026-11-13T16:56:13.001259+00:00",
+      "durationSeconds": 38.979,
+      "log": ".runtime/ecosystem-phase-b/verify-accounting-final.log",
+      "logSha256": "68ce8c7773f15f76b6fa8cfc5b2c8c255993f47e0c6dc5db22538e8a21e8db58",
+      "tests": 121,
+      "nativeDispatchTests": 8,
+      "failed": 0,
+      "skipped": 0,
+      "markdownFilesChecked": 44
+    }
   }
 }
