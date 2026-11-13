@@ -1,0 +1,145 @@
+{
+  "schema": "kujo.software-factory.qualification/v1",
+  "qualifiedAt": "2026-11-13",
+  "runtimeCommit": "2f0afb4",
+  "scope": "Local single-operator issue-tracker factory; no hosted or multi-tenant qualification",
+  "environment": {
+    "host": "macOS x64",
+    "engine": "Rootless Docker in Colima Ubuntu 24.04",
+    "node": "26.12.1",
+    "imageId": "sha256:4ab9764eab2e99a72cedd2231a32e45b4887cab5e7f50b5384fcee9ff32f281c"
+  },
+  "installation": {
+    "publicHttpsCloneOutsideOriginalSiblingLayout": true,
+    "pinnedSetupRepeated": true,
+    "isolatedProviderLogin": true,
+    "doctor": true,
+    "freshCloneFinalRuntimeCommit": "2f0afb4",
+    "freshCloneDeterministicAndSmokePassed": true
+  },
+  "deterministic": {
+    "unitTests": 35,
+    "nativeDispatchTests": 8,
+    "documentationChecks": true,
+    "productionNpmAuditVulnerabilities": 0
+  },
+  "smoke": {
+    "ok": true,
+    "apiChecks": 30,
+    "browserChecks": 16,
+    "modelCalls": 0,
+    "releaseApproval": false
+  },
+  "isolation": {
+    "ok": true,
+    "checks": [
+      "candidate UID65534",
+      "hostRead",
+      "hostWrite",
+      "hostEnvironment",
+      "controlWrite",
+      "browserWrite",
+      "imageWrite",
+      "privateBindWrite",
+      "procRootWrite",
+      "procCwdRead",
+      "procFdRead",
+      "protectedSourceWrite",
+      "signalControl",
+      "dockerSocket",
+      "rootReadOnly",
+      "egress",
+      "host canary unchanged",
+      "oversized response rejected by trusted bridge",
+      "receipt verified and owned container removed",
+      "symlink rejected before execution",
+      "hardlink rejected before execution",
+      "native deadline terminates lease and blocks success",
+      "candidate diagnostic flood kills lease and blocks success",
+      "unavailable engine fails closed"
+    ],
+    "scope": "Known hostile payloads under observed rootless Workcell policy; not a universal escape proof"
+  },
+  "unqualified": [
+    "Native Linux live rootless engine",
+    "ARM live engine",
+    "WSL2 live engine",
+    "Public multi-tenant service",
+    "Unattended crash recovery",
+    "Arbitrary software contracts"
+  ],
+  "controllerDeath": {
+    "ok": true,
+    "autonomousExitCode": 124,
+    "stoppedMetadataRequiredRecovery": true,
+    "recoveryRemovedContainer": true
+  },
+  "ci": {
+    "run": "https://github.com/kujolang/software-factory/actions/runs/43359154659",
+    "conclusion": "success",
+    "platforms": [
+      "ubuntu-24.04",
+      "macos-15"
+    ],
+    "scope": "Offline prerequisites and deterministic tests"
+  },
+  "modelBackedLineage": [
+    {
+      "id": "factory-2026-11-13T03-05-22-434Z",
+      "status": "failed",
+      "providerCalls": 11,
+      "observedToolCalls": 0
+    },
+    {
+      "id": "factory-retry-2026-11-13T03-17-45-698Z",
+      "status": "failed",
+      "providerCalls": 7,
+      "observedToolCalls": 0
+    },
+    {
+      "id": "factory-retry-2026-11-13T03-27-24-243Z",
+      "status": "completed",
+      "providerCalls": 5,
+      "observedToolCalls": 0
+    }
+  ],
+  "modelBackedLineageNotes": [
+    "Construction preserved as failed after bounded review/corrections and oversized DELETE failure.",
+    "First retry preserved as failed; browser harness crash obscured the selector failure.",
+    "Final retry captured the browser failure, corrected the app, then passed independent review and repeated API/browser release checks."
+  ],
+  "constructionWorkerOverlapMs": 149520,
+  "finalAudit": {
+    "ok": true,
+    "checks": [
+      "versioned event schema",
+      "contiguous unique event sequence",
+      "references resolve",
+      "dependencies precede task execution",
+      "canonical handoff schema",
+      "release exact reviewed and tested bytes"
+    ],
+    "runId": "factory-retry-2026-11-13T03-27-24-243Z",
+    "events": 34,
+    "overlapMs": null,
+    "providerCalls": 5,
+    "usage": {
+      "input_tokens": 135767,
+      "cached_input_tokens": 43392,
+      "output_tokens": 6545
+    },
+    "cost": null,
+    "verificationFailures": 1,
+    "corrections": 1,
+    "elapsedMs": 279956,
+    "replay": "ordered original timestamps; no interpolation of events",
+    "roles": [
+      "backend-developer",
+      "frontend-developer",
+      "release-verifier",
+      "code-reviewer"
+    ]
+  },
+  "finalSourceAndBuildSha256": "6e6e841f67992c5666923977251719aa8255c58b5d210e5972d0b326090e47ed",
+  "exportAuditFromSeparateInstallation": true
+}
