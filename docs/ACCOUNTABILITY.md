@@ -47,10 +47,44 @@ Terminal status is `pass`, `partial`, `fail` or `abandoned`; individual test sta
 
 `readiness` accepts an object mapping any subset of `README.md`, `CHANGELOG.md`, `LICENSE`, `SECURITY.md` and `package.json` to bounded text. Other paths are rejected. This intentionally limited metadata adapter is insufficient to satisfy the full ShipCheck release integration requirement.
 
-The callable host API exports `projectPackToSpec`, `validatePackWithSpec`, `recordRunSummary`, `captureFailureLog` and `inspectReadiness`. Callers must remain trusted controllers. The module exposes no generic command runner. Automatic mission lifecycle hooks are not enabled: recording data independently is not the same as wiring a mandatory release policy. Eval, broader security gates, full source-linked accounting, and automatic retention/recovery remain required follow-up work.
+The callable host API exports `projectPackToSpec`, `validatePackWithSpec`, `beginRunAccounting`, `inspectRunAccounting`, `finishRunAccounting`, `annotateRunAccounting`, `recordRunSummary`, `captureFailureLog` and `inspectReadiness`. Callers must remain trusted controllers. The module exposes no generic command runner. Recording accounting facts does not approve a release or establish a mandatory release policy. Eval, broader security gates and automatic retention/recovery still require separate integration and qualification.
+
+## Persistent mission accounting
+
+The controller starts accounting before performing work and keeps the returned lifecycle binding with its mission state:
+
+```js
+const binding = await beginRunAccounting({
+  missionId: 'mission-id',
+  provider: 'codex',
+  model: 'unreported',
+  evidence: 'artifacts/controller-provenance.json',
+  sourceProvenance: { commit: null, tree: null }
+}, { parent: 'CONTROLLER_OWNED_ACCOUNTING_DIRECTORY' });
+// The real RunLedger record is now persisted with status in_progress.
+const finished = await finishRunAccounting(binding, {
+  status: 'fail',
+  verdict: 'Independent API acceptance failed',
+  tests: [{ name: 'API acceptance', status: 'fail', evidence: 'artifacts/acceptance.json' }],
+  usage: null,
+  evidence: 'events.jsonl'
+});
+```
+
+The required start fields are `missionId`, `provider`, `model` and `evidence`. The optional `sourceProvenance` is a bounded JSON object retained in `metadata.json` and referenced by hash in a canonical RunLedger note. Its contents are supplied observations, not an authenticated source identity. RunLedger requires nonempty provider/model strings; an explicit `unreported` label means unknown identity, not a real model name. Unknown counters and costs remain null.
+
+Persist the original lifecycle binding (schema `kujo.factory.runledger-lifecycle/v1`) rather than reconstructing it from model output. `inspectRunAccounting(binding)` validates its stored identity and metadata hash, then reads the actual pinned RunLedger record. The directory and all parent paths must be plain directories; a forged ID, changed identity, changed source metadata, or symlink is rejected. The terminal result retains the original identity under `lifecycleBinding` for later inspection. `recordRunSummary` remains compatible and now calls start/finalize rather than maintaining a second implementation.
+
+Finalization records one immutable intent before appending tests, usage and the terminal verdict to the same ledger. An exact repeat verifies the actual record against the saved terminal result and returns it without appending any facts. A different intent is rejected. A failed or interrupted attempt preserves its intent, failed invocation receipts and the still-open or already-terminal canonical ledger; it is never automatically replayed. The controller must reconcile uncertain partial operations explicitly. A stale finalization lock similarly blocks continuation instead of assuming the previous process did nothing. These bounds do not claim general durable mission recovery or exactly-once external effects.
+
+A terminal `pass` records the verified pre-promotion candidate outcome. The later filesystem promotion can still fail, so it does not by itself mean the controller mission completed or a release was published. `annotateRunAccounting(initialBinding, note)` appends a bounded controller observation using canonical RunLedger `note`, preserves the terminal status and original terminal snapshot, and writes a separate annotation receipt. The controller uses this for promotion failures before blocking the local release and retaining CaseFile evidence. After such an annotation, the original terminal snapshot no longer matches the live ledger; it cannot be silently reused for promotion. The final mission status and release receipt remain authoritative about completion.
+
+Annotations are one attempted append per call. Repeated explicit calls may append the same note again; no automatic retry or deduplication is claimed. An uncertain annotation failure retains its intent and failure receipt for reconciliation. The controller must never interpret an annotation failure as permission to approve or retry an external effect.
+
+Spawn failures also retain execution receipts with `code:null` and `reason:spawn_error`. Begin failures expose their evidence directory on the error and, when a canonical ID was already created, `error.accountingBinding`. This lets the controller preserve the original attempt rather than fabricate a successful accounting record or silently start a replacement.
 
 ## Qualification
 
-`node --test tests/accountability.test.mjs` runs the real pinned Spec, RunLedger, CaseFile and ShipCheck programs against deterministic synthetic inputs. It covers requirement/test projection, strict validation and export, retained failures, null unknown usage/cost, measured fixture usage, no parent Git discovery, log-only capture, literal malicious-looking text, nonexecution of package scripts, invalid input rejection and symlink refusal. These are real adapter execution tests with fixture data; they are not live-provider, application construction, rootless runtime or release qualification.
+`node --test tests/accountability.test.mjs` runs the real pinned Spec, RunLedger, CaseFile and ShipCheck programs against deterministic synthetic inputs. It covers requirement/test projection, strict validation and export, retained failures, null unknown usage/cost, measured fixture usage, no parent Git discovery, log-only capture, literal malicious-looking text, nonexecution of package scripts, invalid input rejection and symlink refusal. Persistent lifecycle tests also cover an observable in-progress record, same-ID finalization, exact-repeat idempotency, changed-intent rejection, preserved upstream spawn failure, source-identity tampering and stale-lock refusal. These are real adapter execution tests with fixture data; they are not live-provider, application construction, rootless runtime or release qualification.
 
 The first exploratory run exposed two adapter defects: Spec IDs require UUID v4, so the pack ID now lives in projection metadata; Git discovery could ascend from private staging, so the environment now enforces a discovery ceiling. The corrected tests assert both boundaries. No upstream source was changed by this adapter work.
