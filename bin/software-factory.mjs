@@ -37,6 +37,8 @@ if(['roles','skills','workflows'].includes(verb)){
  const {telemetryCommand}=await import('../factory/telemetry.mjs');console.log(JSON.stringify(telemetryCommand(...args),null,2));
 }else if(verb==='maintenance'){
  const {maintenanceCommand}=await import('../factory/maintenance.mjs');const result=await maintenanceCommand(process.argv.slice(3));console.log(JSON.stringify(result,null,2));if(!result.ok)process.exitCode=1;
+}else if(verb==='quality'){
+ const {qualityCommand}=await import('../factory/quality-evaluation.mjs');const result=await qualityCommand(process.argv.slice(3));console.log(JSON.stringify(result,null,2));if(!result.ok)process.exitCode=1;
 }else if(verb==='retention'){
  const {retentionCommand}=await import('../factory/operations-retention.mjs');console.log(JSON.stringify(await retentionCommand(process.argv.slice(3)),null,2));
 }else if(verb==='operations'){
