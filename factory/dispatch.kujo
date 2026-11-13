@@ -72,7 +72,18 @@ worker_tool := create_tool("factory_worker", "Bounded local role worker", {"type
 worker_tool["__dispatch_deadline_bounded"] := true
 installed := apply_plugin_to_runtime(workflow, create_tool_registry(), create_plugin("kujo-software-factory", {}, {}, [worker_tool]))
 workflow = installed["workflow"]
-options := {"auto_approve": false, "interactive": false, "event_hook": func(event) { append_file(run_dir + "/dispatch-events.jsonl", to_json(event) + "\n") }}
+pause_before := env_or("FACTORY_PAUSE_BEFORE", "")
+assert(pause_before == "" || has_key(seen, pause_before), "Operator pause must name a declared task")
+assert(pause_before == "" || env_or("FACTORY_RESUME_ID", "") == "", "Recovery cannot inherit a checkpoint interruption request")
+options := {"auto_approve": false, "interactive": false, "event_hook": func(event) {
+    append_file(run_dir + "/dispatch-events.jsonl", to_json(event) + "\n")
+    if pause_before != "" && event["event_type"] == "step_started" && event["step_id"] == pause_before {
+        # Native hook precedes step persistence/execution. Fixed bounded operator
+        # interruption window; no approval or generic executable authority.
+        paused := spawn_process([env_or("NODE_BIN", "node"), env("FACTORY_ROOT") + "/scripts/pause-factory-checkpoint.mjs", run_dir, pause_before], {"cwd": env("FACTORY_ROOT"), "inherit_env": true, "timeout_ms": 61000, "max_output_bytes": 65536})
+        assert(false, "Operator checkpoint window ended; continuation prohibited")
+    }
+}}
 resume_id := env_or("FACTORY_RESUME_ID", "")
 result := {}
 summary_path := run_dir + "/dispatch-result.json"
