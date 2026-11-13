@@ -1,0 +1,75 @@
+# Application-owned adapter; imports the pinned sibling Dispatch, not a copied engine.
+# Run from DISPATCH_ROOT with FACTORY_ROOT and FACTORY_RUN_DIR absolute paths.
+from src.core.step import create_step
+from src.core.state import create_run_state
+from src.core.runner import run_workflow
+from src.core.plugins import create_plugin, apply_plugin_to_runtime
+from src.core.utils import dict_get_or
+from src.tools.tool import create_tool_registry, create_tool
+from src.workflows.workflow import create_workflow
+
+func factory_id_valid(value) {
+    if type(value) != "string" || len(value) == 0 || len(value) > 80 { return false }
+    for character in split(value, "") {
+        if contains("abcdefghijklmnopqrstuvwxyz0123456789-_", character) == 0 { return false }
+    }
+    return true
+}
+
+func factory_worker(input, context) {
+    run_dir := env("FACTORY_RUN_DIR")
+    factory_root := env("FACTORY_ROOT")
+    timeout_ms := context["execution_timeout_ms"]
+    if timeout_ms <= 0 { timeout_ms = 900000 }
+    # A fixed executable and argv boundary. Workers own validation, isolated
+    # candidate writes, provider usage, corrections, and release policy.
+    result := spawn_process([env_or("NODE_BIN", "node"), factory_root + "/factory/worker.mjs", run_dir, context["step_id"]], {"cwd": factory_root, "inherit_env": true, "timeout_ms": timeout_ms, "max_output_bytes": 1048576})
+    if result.success == false {
+        return {"ok": false, "error": {"code": "factory_worker_failed", "message": "Worker failed or exceeded its bound; inspect the task evidence: " + context["step_id"], "retryable": false}}
+    }
+    try {
+        envelope := parse_json(trim(result.stdout))
+        if type(envelope) != "dict" || dict_get_or(envelope, "ok", false) != true || type(dict_get_or(envelope, "data", null)) != "dict" {
+            return {"ok": false, "error": {"code": "factory_worker_contract", "message": "Worker did not return an ok/data object", "retryable": false}}
+        }
+        return envelope
+    } except err {
+        return {"ok": false, "error": {"code": "factory_worker_contract", "message": "Worker stdout was not one JSON envelope", "retryable": false}}
+    }
+}
+
+run_dir := env("FACTORY_RUN_DIR")
+assert(run_dir != "", "FACTORY_RUN_DIR is required")
+assert(env("FACTORY_ROOT") != "", "FACTORY_ROOT is required")
+definition := parse_json(read_file(run_dir + "/workflow.json"))
+assert(type(definition["tasks"]) == "array" && len(definition["tasks"]) > 0 && len(definition["tasks"]) <= 32, "Workflow requires 1–32 tasks")
+steps := []
+seen := {}
+for task in definition["tasks"] {
+    task_id := task["id"]
+    assert(factory_id_valid(task_id), "Task ID must use lowercase letters, digits, hyphen, underscore")
+    assert(has_key(seen, task_id) == 0, "Duplicate task ID")
+    dependencies := dict_get_or(task, "dependsOn", [])
+    assert(type(dependencies) == "array", "dependsOn must be an array")
+    for dependency in dependencies { assert(has_key(seen, dependency), "Dependencies must name earlier tasks") }
+    seen[task_id] := true
+    timeout_ms := dict_get_or(task, "timeoutMs", 900000)
+    assert(type(timeout_ms) == "int" && timeout_ms >= 1000 && timeout_ms <= 3600000, "Task timeout must be 1000–3600000 ms")
+    parallel := dict_get_or(task, "parallelSafe", false)
+    assert(type(parallel) == "bool", "parallelSafe must be boolean")
+    steps := push(steps, create_step(task_id, dict_get_or(task, "name", task_id), "tool", {"agent_id": dict_get_or(task, "agentId", ""), "tool_name": "factory_worker", "depends_on": dependencies, "output_key": task_id, "parallel_safe": parallel, "idempotency_key": task_id, "timeout_ms": timeout_ms, "effect_class": "local_reversible", "input_schema": {"type": "dict"}, "output_schema": {"type": "dict"}}))
+}
+workflow := create_workflow({"id": dict_get_or(definition, "id", "software-factory"), "name": dict_get_or(definition, "name", "Kujo Software Factory"), "description": "Role-scoped worker execution; release authority remains the independent candidate gate", "input_schema": {"type": "dict"}, "output_schema": {"type": "dict"}, "agents": {}, "tools": [], "steps": steps, "max_parallel_steps": 2, "memory_config": {}, "default_retry_policy": {"max_attempts": 1}, "approval_config": {"auto_approve": false}})
+worker_tool := create_tool("factory_worker", "Bounded local role worker", {"type": "dict"}, {"type": "dict"}, factory_worker, null)
+# Reviewed bounded handler: exactly one spawn_process with deadline/output caps,
+# followed by bounded JSON parsing. This is not a generic shell tool.
+worker_tool["__dispatch_deadline_bounded"] := true
+installed := apply_plugin_to_runtime(workflow, create_tool_registry(), create_plugin("kujo-software-factory", {}, {}, [worker_tool]))
+workflow = installed["workflow"]
+options := {"auto_approve": false, "interactive": false, "event_hook": func(event) { append_file(run_dir + "/dispatch-events.jsonl", to_json(event) + "\n") }}
+state := create_run_state(workflow, {"topic": dict_get_or(definition, "name", "Software factory mission"), "factory_run_dir": run_dir}, run_dir + "/dispatch", {"auto_approve": false, "interactive": false})
+result := run_workflow(workflow, state, installed["tool_registry"], options)
+summary := {"schema": "kujo.factory.dispatch-result/v1", "ok": result["ok"], "status": result["run_state"]["status"], "runId": result["run_state"]["run_id"], "runDir": result["run_state"]["run_dir"], "releaseAuthority": "independent-candidate-gate"}
+write_file(run_dir + "/dispatch-result.json", to_json(summary))
+print(to_json(summary))
+assert(result["ok"] && result["run_state"]["status"] == "completed", "Factory workflow failed; release remains blocked")

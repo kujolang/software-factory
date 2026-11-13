@@ -1,0 +1,24 @@
+name: Verify standalone factory
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    strategy:
+      matrix:
+        os: [ubuntu-24.04, macos-14]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26.12.1
+          cache: npm
+      - name: Install Docker CLI on macOS (no daemon)
+        if: runner.os == 'macOS'
+        run: brew install docker
+      - run: npm ci
+      - run: npm run setup
+      - run: npm run doctor -- --offline
+      - run: npm run verify
+# Live engine isolation and model missions are operator qualification, not inferred from this offline job.

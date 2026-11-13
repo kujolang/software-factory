@@ -1,0 +1,17 @@
+{
+  "schema": "kujo.software-factory.sources/v1",
+  "repositories": {
+    "dispatch": {
+      "url": "https://github.com/kujolang/dispatch.git",
+      "commit": "18b5c737a73904ae942f0bd1c3baa1f77c2bfb40"
+    },
+    "workcell": {
+      "url": "https://github.com/kujolang/workcell.git",
+      "commit": "189d7ab6e975301a0e5100b65e8ad3fe4a584573"
+    },
+    "kujo-agents": {
+      "url": "https://github.com/kujolang/kujo-agents.git",
+      "commit": "a7e9d0236d6e64b5db30273b32f4ad8c124f5173"
+    }
+  }
+}

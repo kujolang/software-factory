@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kujolang.ai/schemas/factory-event.v1.json",
+  "title": "Kujo Factory observation event",
+  "type": "object",
+  "required": ["schema", "id", "runId", "seq", "timestamp", "type", "summary"],
+  "properties": {
+    "schema": {"const": "kujo.factory.event/v1"},
+    "id": {"type": "string", "format": "uuid"},
+    "runId": {"type": "string", "minLength": 1},
+    "seq": {"type": "integer", "minimum": 1},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "type": {"type": "string", "pattern": "^[a-z]+\\.[a-z_]+$"},
+    "summary": {"type": "string"},
+    "agentId": {"type": "string"},
+    "taskId": {"type": "string"},
+    "dependencies": {"type": "array", "items": {"type": "string"}},
+    "artifacts": {"type": "array", "items": {"type": "string"}},
+    "evidence": {"type": "array", "items": {"type": "string"}},
+    "data": {"type": "object"}
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,40 @@
+{
+  "name": "@kujolang/software-factory",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local software production with scoped agent proposals, independent checks and rootless Workcell execution",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kujolang/software-factory.git"
+  },
+  "engines": {
+    "node": ">=26.12.1 <27"
+  },
+  "bin": {
+    "software-factory": "bin/software-factory.mjs"
+  },
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "doctor": "node scripts/doctor.mjs",
+    "configure": "node scripts/configure.mjs",
+    "login": "node scripts/login.mjs",
+    "start": "node bin/software-factory.mjs serve",
+    "factory": "node bin/software-factory.mjs",
+    "image:build": "node factory/build-workcell-image.mjs",
+    "test": "node --test factory/tests.test.mjs factory/test-recheck.mjs tests/*.test.mjs",
+    "test:dispatch": "node --test factory/test-dispatch.mjs",
+    "test:isolation": "node factory/workcell-tests.mjs",
+    "test:controller-death": "node factory/workcell-controller-death-test.mjs",
+    "verify": "npm test && npm run test:dispatch && node scripts/check-docs.mjs",
+    "engine:connect": "node scripts/connect-colima.mjs",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "dependencies": {
+    "@kujolang/kujo-runtime": "1.9.0",
+    "@openai/codex": "0.144.4",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1"
+  }
+}

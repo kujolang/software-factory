@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Issue Tracker</title>
+  <link rel="stylesheet" href="/style.css">
+  <script type="module" src="/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to board</a>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">LOCAL WORKSPACE</p>
+      <h1>Issue Tracker</h1>
+      <p class="scope">A local, single-operator demonstration. Data stays in this local SQLite workspace.</p>
+    </div>
+    <div class="header-actions">
+      <button id="new-project" class="button secondary" type="button">New project</button>
+      <button id="new-task" class="button primary" type="button">New task</button>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="toolbar" aria-labelledby="workspace-heading">
+      <div>
+        <label for="project-filter">Project</label>
+        <select id="project-filter" aria-describedby="project-help"></select>
+        <p id="project-help" class="hint">Choose a project to manage it or view all tasks.</p>
+      </div>
+      <div class="project-actions" aria-label="Selected project actions">
+        <button id="edit-project" class="button quiet" type="button">Edit project</button>
+        <button id="delete-project" class="button danger" type="button">Delete project</button>
+      </div>
+    </section>
+
+    <div id="global-status" class="status-message" role="status" aria-live="polite"></div>
+    <div id="error-banner" class="error-banner" role="alert" hidden>
+      <span id="error-text"></span>
+      <button id="dismiss-error" class="icon-button" type="button" aria-label="Dismiss error">×</button>
+    </div>
+
+    <section class="project-summary" aria-labelledby="workspace-heading">
+      <p class="eyebrow">CURRENT VIEW</p>
+      <h2 id="workspace-heading">Loading workspace…</h2>
+      <p id="project-description" class="muted"></p>
+    </section>
+
+    <section aria-labelledby="board-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">WORKFLOW</p>
+          <h2 id="board-heading">Kanban board</h2>
+        </div>
+        <p id="task-count" class="count" aria-live="polite"></p>
+      </div>
+      <div id="board-loading" class="panel-state" hidden>Loading tasks…</div>
+      <div id="board-empty" class="panel-state" hidden></div>
+      <div id="board" class="board">
+        <section class="column" aria-labelledby="todo-heading">
+          <header><h3 id="todo-heading">To do</h3><span id="todo-count" class="badge">0</span></header>
+          <div id="todo-list" class="task-list"></div>
+        </section>
+        <section class="column" aria-labelledby="doing-heading">
+          <header><h3 id="doing-heading">Doing</h3><span id="doing-count" class="badge">0</span></header>
+          <div id="doing-list" class="task-list"></div>
+        </section>
+        <section class="column" aria-labelledby="done-heading">
+          <header><h3 id="done-heading">Done</h3><span id="done-count" class="badge">0</span></header>
+          <div id="done-list" class="task-list"></div>
+        </section>
+      </div>
+    </section>
+
+    <section class="activity-section" aria-labelledby="activity-heading">
+      <div class="section-heading">
+        <div><p class="eyebrow">HISTORY</p><h2 id="activity-heading">Activity</h2></div>
+        <p class="hint">Newest first</p>
+      </div>
+      <div id="activity-loading" class="panel-state" hidden>Loading activity…</div>
+      <ol id="activity-list" class="activity-list"></ol>
+      <p id="activity-empty" class="panel-state" hidden>No activity yet.</p>
+    </section>
+  </main>
+
+  <dialog id="project-dialog" aria-labelledby="project-dialog-title">
+    <form id="project-form" method="dialog" novalidate>
+      <div class="dialog-heading"><div><p class="eyebrow">PROJECT</p><h2 id="project-dialog-title">New project</h2></div><button class="icon-button dialog-close" type="button" aria-label="Close project form">×</button></div>
+      <input id="project-id" type="hidden">
+      <label for="project-name">Name <span aria-hidden="true">*</span></label>
+      <input id="project-name" name="name" maxlength="120" required autocomplete="off">
+      <label for="project-description-input">Description</label>
+      <textarea id="project-description-input" name="description" maxlength="4000" rows="4"></textarea>
+      <p id="project-form-error" class="form-error" role="alert"></p>
+      <div class="dialog-actions"><button class="button quiet dialog-cancel" type="button">Cancel</button><button class="button primary" type="submit">Save project</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="task-dialog" aria-labelledby="task-dialog-title">
+    <form id="task-form" method="dialog" novalidate>
+      <div class="dialog-heading"><div><p class="eyebrow">TASK</p><h2 id="task-dialog-title">New task</h2></div><button class="icon-button dialog-close" type="button" aria-label="Close task form">×</button></div>
+      <input id="task-id" type="hidden">
+      <label for="task-title">Title <span aria-hidden="true">*</span></label>
+      <input id="task-title" name="title" maxlength="200" required autocomplete="off">
+      <label for="task-description">Description</label>
+      <textarea id="task-description" name="description" maxlength="4000" rows="4"></textarea>
+      <div class="form-grid">
+        <div><label for="task-status">Status</label><select id="task-status" name="status"><option value="todo">To do</option><option value="doing">Doing</option><option value="done">Done</option></select></div>
+        <div><label for="task-priority">Priority</label><select id="task-priority" name="priority"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></div>
+      </div>
+      <label for="task-assignee">Assignee</label>
+      <input id="task-assignee" name="assignee" maxlength="100" autocomplete="off">
+      <p id="task-form-error" class="form-error" role="alert"></p>
+      <div class="dialog-actions"><button class="button quiet dialog-cancel" type="button">Cancel</button><button class="button primary" type="submit">Save task</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title" aria-describedby="confirm-message">
+    <form method="dialog">
+      <div class="dialog-heading"><div><p class="eyebrow">CONFIRM</p><h2 id="confirm-title">Delete item?</h2></div></div>
+      <p id="confirm-message"></p>
+      <div class="dialog-actions"><button id="confirm-cancel" class="button quiet" value="cancel">Cancel</button><button id="confirm-delete" class="button danger" value="confirm">Delete</button></div>
+    </form>
+  </dialog>
+
+  <template id="task-template">
+    <article class="task-card">
+      <div class="task-topline"><span class="priority"></span><span class="project-tag"></span></div>
+      <h4></h4><p class="task-description"></p><p class="assignee"></p>
+      <div class="task-actions"><button class="button compact move-prev" type="button"></button><button class="button compact move-next" type="button"></button><button class="button compact edit-task" type="button">Edit</button><button class="button compact danger delete-task" type="button">Delete</button></div>
+    </article>
+  </template>
+</body>
+</html>

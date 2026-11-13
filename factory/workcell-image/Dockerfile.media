@@ -1,0 +1,5 @@
+# Apply only the demo selector update to the already qualified local image.
+# No network access or dependency installation is needed for this layer.
+FROM kujolang/factory-node:local
+COPY browser-demo.mjs /opt/factory/browser-demo.mjs
+RUN chmod a-w /opt/factory/browser-demo.mjs
