@@ -13,6 +13,10 @@ Software Factory coordinates scoped proposals through Kujo Dispatch, runs genera
 
 **Standalone, local, early release.** Give your agent an idea and the [software-pack guide](docs/PACKS.md). It can define the product contract and tests without rewriting the controller. Packs support Node APIs, SQLite when needed, and static browser interfaces. The issue tracker remains the default; converter and notes packs show other products. Agent City is not required.
 
+## Ecosystem integration increment
+
+This branch adds complete pinned [catalogs](docs/CATALOGS.md), bounded team planning, [portable evidence verification](docs/EVIDENCE.md), and [read-only MCP discovery](docs/MCP.md). It is **not feature-complete**. See [release qualification](docs/RELEASE-QUALIFICATION.md) and [known limitations](docs/KNOWN-LIMITATIONS.md) before relying on new capabilities. The existing Node application workflow remains the qualified execution baseline.
+
 ## Start here
 
 Requirements: Git, Node **26.12.1 or later 26.x**, a Codex account, and a local **rootless Docker engine with seccomp**. npm installs the pinned Kujo and Codex CLIs locally. No global Kujo installation or sibling repositories are needed.

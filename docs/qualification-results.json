@@ -1,0 +1,143 @@
+{
+  "schema": "kujo.factory.integration-qualification/v1",
+  "date": "2026-11-13",
+  "releaseReady": false,
+  "runtimeChecks": [
+    {
+      "command": "npm run smoke",
+      "exitCode": 0,
+      "startedAt": "2026-11-13T15:35:59.059782+00:00",
+      "durationSeconds": 34.926,
+      "log": ".runtime/ecosystem-qualification/smoke.log",
+      "logSha256": "7a6e9bfe6035db9d07121a9a7d3d9c27c6c299f4a6a3e9117157b8975ba15cfa",
+      "scope": "real current-host Workcell fixture qualification; no new full model mission"
+    },
+    {
+      "command": "npm run test:isolation",
+      "exitCode": 0,
+      "startedAt": "2026-11-13T15:36:33.989737+00:00",
+      "durationSeconds": 25.119,
+      "log": ".runtime/ecosystem-qualification/test-isolation.log",
+      "logSha256": "b085170d5a6de2f3d647bc03203e68f1763134d4fabcc834a8c82645d2520584",
+      "scope": "real current-host Workcell fixture qualification; no new full model mission"
+    },
+    {
+      "command": "npm run test:controller-death",
+      "exitCode": 0,
+      "startedAt": "2026-11-13T15:36:59.109724+00:00",
+      "durationSeconds": 15.65,
+      "log": ".runtime/ecosystem-qualification/test-controller-death.log",
+      "logSha256": "f465f1427c54646feded7b746e1112c55bd630721c0b0bc23e35ab7f367d3a33",
+      "scope": "real current-host Workcell fixture qualification; no new full model mission"
+    },
+    {
+      "command": "npm run test:packs",
+      "exitCode": 0,
+      "startedAt": "2026-11-13T15:37:14.760457+00:00",
+      "durationSeconds": 44.68,
+      "log": ".runtime/ecosystem-qualification/test-packs.log",
+      "logSha256": "d1450b7d86ba902ad250da7701dcd35fd823d3a94a63994f4f315c33ef1edc99",
+      "scope": "real current-host Workcell fixture qualification; no new full model mission"
+    }
+  ],
+  "providerChecks": [
+    {
+      "evidence": ".runtime/qualification/providers/codex-schema.json",
+      "sha256": "1dffc7b81fd03c028a1c47495db321e7e21386b4e9a02d7442405dd6396b19d4",
+      "kind": "live-codex-schema-smoke",
+      "scope": "Single structured-output call only; not mission or runtime release qualification",
+      "receipt": {
+        "schema": "kujo.factory.provider-receipt/v1",
+        "provider": "codex",
+        "model": null,
+        "startedAt": "2026-11-13T15:37:23.779Z",
+        "usage": [
+          {
+            "input_tokens": 12303,
+            "cached_input_tokens": 0,
+            "output_tokens": 17
+          }
+        ],
+        "cost": null,
+        "costNote": "No verified monetary accounting supplied",
+        "shellTools": false,
+        "observedToolCalls": 0,
+        "fixture": false,
+        "status": "completed",
+        "code": 0,
+        "reason": null,
+        "retryable": false,
+        "finishedAt": "2026-11-13T15:37:31.474Z",
+        "durationMs": 7695
+      }
+    },
+    {
+      "evidence": ".runtime/qualification/providers/ollama-local-schema-retry.json",
+      "sha256": "ecdf5821bf66ca6ca9344ee87b8e5bc429d930a58c183274af9fb8839281df03",
+      "kind": "live-local-model-schema-smoke",
+      "scope": "Single structured-output call only; not mission or runtime release qualification",
+      "receipt": {
+        "schema": "kujo.factory.provider-receipt/v1",
+        "provider": "ollama",
+        "model": "qwen2.5-coder:1.5b-instruct",
+        "startedAt": "2026-11-13T15:36:00.743Z",
+        "usage": {
+          "input_tokens": 54,
+          "output_tokens": 8,
+          "cached_input_tokens": null
+        },
+        "cost": null,
+        "costNote": "No verified monetary accounting supplied",
+        "shellTools": false,
+        "observedToolCalls": 0,
+        "fixture": false,
+        "status": "completed",
+        "code": 0,
+        "reason": null,
+        "retryable": false,
+        "sourceCommit": "5821d7baee785ac8c10cf07dae8f29dc43b846ab",
+        "finishedAt": "2026-11-13T15:36:07.566Z",
+        "durationMs": 6823
+      }
+    }
+  ],
+  "verification": {
+    "command": "npm run verify",
+    "exitCode": 0,
+    "tests": 83,
+    "nativeDispatchTests": 8,
+    "failed": 0,
+    "skipped": 0,
+    "markdownFilesChecked": 41,
+    "log": ".runtime/ecosystem-qualification/verify.log",
+    "logSha256": "41a3a36e5fd30b95a0cc2e6e7c312cb3d4a8d3614078aec7c42da920cdfe4b64"
+  },
+  "notExecuted": [
+    "clean Linux/macOS install",
+    "WSL2 qualification",
+    "offline install",
+    "upgrade/rollback",
+    "new runtime matrix",
+    "full provider missions",
+    "durable resume matrix"
+  ],
+  "preservedFailures": [
+    ".runtime/ecosystem-qualification/first-attempt/",
+    ".runtime/qualification/providers/ollama-local-schema.json",
+    ".runtime/ecosystem-qualification/upstream-videoops-validator.log"
+  ],
+  "catalogCheck": {
+    "command": "node bin/software-factory.mjs skills verify",
+    "ok": true,
+    "counts": {
+      "roles": 85,
+      "chainOfCommand": 28,
+      "skills": 136,
+      "workflows": 45
+    }
+  },
+  "doctor": {
+    "command": "npm run doctor -- --offline --json",
+    "exitCode": 0
+  }
+}

@@ -7,3 +7,7 @@ Candidate code, missions and proposals are untrusted. Software packs contain bou
 Do not report secrets in a public issue. For suspected vulnerabilities, use the repository's private vulnerability reporting if available, or contact the repository maintainer privately before sharing exploit details. Include the exact factory commit, dependency/image versions, expected boundary, a minimal safe reproducer and redacted evidence. Ordinary defects can use public issues.
 
 Do not bypass preflight or execute an untrusted candidate on the host to diagnose a failed sandbox run. Preserve receipts and use scoped recovery. Dependency and image updates require fresh qualification; old evidence is not transferable.
+
+## Integration increment
+
+Catalog packages are pinned and integrity checked; guidance never authorizes tools. All proposal roles retain disabled tools and independent acceptance. Specialist routing is controller-owned. The stdio MCP surface is read-only and scoped to the launching OS user. Portable evidence checks hashes and internal bindings; unsigned evidence cannot authenticate its producer. Optional Ed25519 signatures authenticate a manifest attestation against an independently supplied trusted key, not actual execution, human approval or deployment permission. See [evidence boundaries](docs/EVIDENCE.md). New runtime/provider/recovery claims remain blocked by qualification.

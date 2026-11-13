@@ -27,3 +27,7 @@ Retry creates a new run with fresh review and checks of the failed candidate. Re
 To replay exports, configure `--runs /absolute/export-parent` and start the viewer. The viewer cannot authorize release, run commands, or deploy anything.
 
 Ctrl-C stops the observer. Ctrl-C during a mission stops its active command tree; the independent container watchdog still enforces the lease deadline. See [recovery](TROUBLESHOOTING.md) for abrupt process death. There is no claim of automatic mission resumption after a crash.
+
+## Integration interfaces
+
+See [catalogs and team planning](CATALOGS.md), [accountability commands](ACCOUNTABILITY.md), [provider selection](PROVIDERS.md), [portable evidence](EVIDENCE.md) and [read-only MCP](MCP.md). These additions do not qualify arbitrary lifecycle workflows or additional languages. Review [known limitations](KNOWN-LIMITATIONS.md) before execution.

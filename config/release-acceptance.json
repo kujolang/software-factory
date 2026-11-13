@@ -1,0 +1,284 @@
+{
+  "schema": "kujo.factory.release-acceptance/v1",
+  "date": "2026-11-13",
+  "releaseReady": false,
+  "releaseRecommendation": "blocked-incomplete",
+  "criteria": [
+    {
+      "id": "AC-01",
+      "requirement": "Full Chain of Command available, validated and routed",
+      "status": "partial",
+      "implementation": [
+        "factory/catalog.mjs",
+        "factory/selection.mjs",
+        "factory/worker.mjs"
+      ],
+      "tests": [
+        "tests/catalog.test.mjs"
+      ],
+      "evidence": [
+        "docs/qualification-results.json"
+      ],
+      "limits": "All 28 discovered; canonical schemas pass. All-role execution, semantic handoffs and Dispatch selection remain incomplete."
+    },
+    {
+      "id": "AC-02",
+      "requirement": "Complete canonical skills catalog discoverable and validated",
+      "status": "partial",
+      "implementation": [
+        "config/catalog.lock.json",
+        "factory/catalog.mjs"
+      ],
+      "tests": [
+        "tests/catalog.test.mjs"
+      ],
+      "evidence": [
+        "docs/qualification-results.json"
+      ],
+      "limits": "136 complete packages verified; dependency compatibility and execution activation incomplete."
+    },
+    {
+      "id": "AC-03",
+      "requirement": "Relevant accountability components genuinely integrated",
+      "status": "partial",
+      "implementation": [
+        "factory/accountability.mjs",
+        "factory/cli.mjs"
+      ],
+      "tests": [
+        "tests/accountability.test.mjs",
+        "tests/packs.test.mjs"
+      ],
+      "evidence": [
+        "docs/qualification-results.json"
+      ],
+      "limits": "Four real adapters and pack Spec gate; remaining audited components and lifecycle hooks incomplete."
+    },
+    {
+      "id": "AC-04",
+      "requirement": "Every required integration has executable tests",
+      "status": "blocked",
+      "implementation": [
+        "config/factory-capabilities.json"
+      ],
+      "tests": [
+        "tests/accountability.test.mjs"
+      ],
+      "evidence": [
+        "docs/qualification-results.json"
+      ],
+      "limits": "Tests cover implemented adapters only; remaining integrations not implemented."
+    },
+    {
+      "id": "AC-05",
+      "requirement": "Existing security boundaries remain intact",
+      "status": "partial",
+      "implementation": [
+        "factory/workcell.mjs",
+        "factory/providers.mjs",
+        "factory/catalog.mjs"
+      ],
+      "tests": [
+        "factory/workcell-tests.mjs",
+        "tests/providers.test.mjs",
+        "tests/catalog.test.mjs"
+      ],
+      "evidence": [
+        "docs/qualification-results.json"
+      ],
+      "limits": "Existing real isolation suite passes; broaden threat and permission qualification for all new paths."
+    },
+    {
+      "id": "AC-06",
+      "requirement": "Independent verification cannot be bypassed by implementation agents",
+      "status": "partial",
+      "implementation": [
+        "factory/worker.mjs",
+        "factory/pack.mjs"
+      ],
+      "tests": [
+        "factory/tests.test.mjs",
+        "tests/packs.test.mjs"
+      ],
+      "evidence": [
+        "docs/qualification-results.json"
+      ],
+      "limits": "Existing source-bound gates retained and tested; new full-mission provider paths still need qualification."
+    },
+    {
+      "id": "AC-07",
+      "requirement": "At least two independently qualified provider paths",
+      "status": "partial",
+      "implementation": [
+        "factory/providers.mjs",
+        "factory/provider-ollama.kujo"
+      ],
+      "tests": [
+        "tests/providers.test.mjs"
+      ],
+      "evidence": [
+        "docs/qualification-results.json"
+      ],
+      "limits": "Codex and native local Ollama live schema checks pass; representative complete missions incomplete."
+    },
+    {
+      "id": "AC-08",
+      "requirement": "Multiple language runtime profiles independently qualified",
+      "status": "blocked",
+      "implementation": [
+        "factory/workcell-image/Dockerfile"
+      ],
+      "tests": [],
+      "evidence": [],
+      "limits": "Only existing Node/static/SQLite runtime; no newly qualified language profiles."
+    },
+    {
+      "id": "AC-09",
+      "requirement": "Evidence export and independent verification",
+      "status": "verified",
+      "implementation": [
+        "factory/evidence.mjs",
+        "factory/export.mjs"
+      ],
+      "tests": [
+        "tests/evidence.test.mjs"
+      ],
+      "evidence": [
+        "docs/qualification-results.json"
+      ],
+      "limits": "Standalone offline export/import/verify/compare and optional trusted-key signatures tested; no execution-authenticity claim."
+    },
+    {
+      "id": "AC-10",
+      "requirement": "Recovery and interruption behavior tested",
+      "status": "partial",
+      "implementation": [
+        "factory/workcell-controller-death-test.mjs"
+      ],
+      "tests": [
+        "factory/workcell-controller-death-test.mjs"
+      ],
+      "evidence": [
+        "docs/qualification-results.json"
+      ],
+      "limits": "Independent watchdog death cleanup passes; durable mission continuation/reconciliation incomplete."
+    },
+    {
+      "id": "AC-11",
+      "requirement": "Source-control workflows produce reviewable artifacts",
+      "status": "blocked",
+      "implementation": [],
+      "tests": [],
+      "evidence": [],
+      "limits": "Onboarding, branch/PR/issue/CI adapters not implemented."
+    },
+    {
+      "id": "AC-12",
+      "requirement": "Factory Floor meaningful status and evidence",
+      "status": "partial",
+      "implementation": [
+        "factory/web/app.js",
+        "factory/cli.mjs"
+      ],
+      "tests": [
+        "tests/observer.test.mjs"
+      ],
+      "evidence": [
+        "docs/qualification-results.json"
+      ],
+      "limits": "Existing run replay plus full catalog; costs, provider, diff and recovery views incomplete."
+    },
+    {
+      "id": "AC-13",
+      "requirement": "MCP and skills interfaces documented and tested",
+      "status": "partial",
+      "implementation": [
+        "factory/mcp.mjs",
+        "docs/MCP.md",
+        "docs/CATALOGS.md"
+      ],
+      "tests": [
+        "tests/mcp.test.mjs",
+        "tests/catalog.test.mjs"
+      ],
+      "evidence": [
+        "docs/qualification-results.json"
+      ],
+      "limits": "Read-only stdio tested; authorized mutation and external-host conformance incomplete."
+    },
+    {
+      "id": "AC-14",
+      "requirement": "Clean installation runs representative missions",
+      "status": "blocked",
+      "implementation": [
+        "scripts/setup.mjs",
+        "scripts/setup-accountability.mjs"
+      ],
+      "tests": [],
+      "evidence": [],
+      "limits": "Existing-machine install succeeds; fresh Linux/macOS/WSL and full mission matrix not run."
+    },
+    {
+      "id": "AC-15",
+      "requirement": "Documentation accurately describes support",
+      "status": "partial",
+      "implementation": [
+        "docs/KNOWN-LIMITATIONS.md",
+        "docs/IMPLEMENTATION-LEDGER.md"
+      ],
+      "tests": [
+        "scripts/check-docs.mjs"
+      ],
+      "evidence": [
+        "docs/qualification-results.json"
+      ],
+      "limits": "Limitations explicit; final broader release docs pending full implementation."
+    },
+    {
+      "id": "AC-16",
+      "requirement": "Experimental capabilities not misrepresented",
+      "status": "verified",
+      "implementation": [
+        "config/factory-capabilities.json",
+        "docs/KNOWN-LIMITATIONS.md"
+      ],
+      "tests": [
+        "tests/catalog.test.mjs"
+      ],
+      "evidence": [
+        "docs/qualification-results.json"
+      ],
+      "limits": "Inventory and kit maturity remain advisory; no experimental auto-gates."
+    },
+    {
+      "id": "AC-17",
+      "requirement": "Previous acceptance/isolation tests continue passing",
+      "status": "verified",
+      "implementation": [
+        "docs/qualification-results.json"
+      ],
+      "tests": [
+        "factory/tests.test.mjs",
+        "factory/workcell-tests.mjs",
+        "scripts/test-packs.mjs"
+      ],
+      "evidence": [
+        "docs/qualification-results.json"
+      ],
+      "limits": "Real current-host smoke, isolation, controller-death and pack checks passed."
+    },
+    {
+      "id": "AC-18",
+      "requirement": "Foreman remains excluded",
+      "status": "verified",
+      "implementation": [
+        "config/factory-capabilities.json"
+      ],
+      "tests": [],
+      "evidence": [],
+      "limits": "Explicitly excluded; no dependency or executable integration."
+    }
+  ],
+  "continuation": "docs/IMPLEMENTATION-LEDGER.md",
+  "rule": "No file, stub, mock or schema compilation alone establishes working capability."
+}

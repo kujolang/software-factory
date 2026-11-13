@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased — ecosystem integration increment (release blocked)
+
+Added complete pinned role/skill/workflow catalogs, advisory team routing, real Spec/RunLedger/CaseFile/ShipCheck adapters, a Spec pack gate, Codex/native local Ollama proposal providers, portable evidence verification/signatures, read-only MCP and Factory Floor catalog inspection. Preserved rootless isolation and independent release gates. The full requested release remains incomplete; see docs/RELEASE-QUALIFICATION.md and docs/IMPLEMENTATION-LEDGER.md.
+
 ## Unreleased
 
 - Added reviewed software packs with frozen contracts, API cases and browser steps.
