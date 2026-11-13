@@ -1,6 +1,14 @@
 #!/usr/bin/env node
 import {root} from '../factory/settings.mjs';
 import {spawnSync} from 'node:child_process';
+if(process.argv[2]==='--budget-policy'){
+ if(process.argv.length<5)throw Error('Usage: software-factory --budget-policy POLICY.json COMMAND ...');
+ if(process.argv[4]==='resume')throw Error('Resume retains the original frozen provider budget; a replacement policy is prohibited');
+ const fs=await import('node:fs'),path=await import('node:path');const policy=path.resolve(process.argv[3]);
+ for(let p=policy;;p=path.dirname(p)){if(fs.lstatSync(p).isSymbolicLink())throw Error('Budget policy symlink rejected');if(path.dirname(p)===p)break;}
+ const stat=fs.lstatSync(policy);if(!stat.isFile()||stat.nlink!==1||stat.size>65536)throw Error('Budget policy file exceeds boundary');
+ process.env.FACTORY_BUDGET_POLICY_FILE=policy;process.argv.splice(2,2);
+}
 const verb=process.argv[2]||'help';
 if(['run','retry','recheck','resume'].includes(verb)){
  const preflight=spawnSync(process.execPath,[root+'/scripts/doctor.mjs'],{stdio:'inherit'});
@@ -41,6 +49,10 @@ if(['roles','skills','workflows'].includes(verb)){
  const result=await runSQLiteMission({input});console.log(JSON.stringify(result,null,2));if(!result.ok)process.exitCode=1;
 }else if(verb==='visual'){
  const {visualBaselineCommand}=await import('../factory/visual-baseline-command.mjs');const result=await visualBaselineCommand(process.argv.slice(3));console.log(JSON.stringify(result,null,2));if(result.ok===false)process.exitCode=1;
+}else if(verb==='react-static'){
+ const {reactStaticCommand}=await import('../factory/react-static.mjs');const result=await reactStaticCommand(process.argv.slice(3));console.log(JSON.stringify(result,null,2));if(result.ok===false)process.exitCode=1;
+}else if(verb==='react-mission'){
+ const {reactMissionCommand}=await import('../factory/react-mission.mjs');const result=await reactMissionCommand(process.argv.slice(3));console.log(JSON.stringify(result,null,2));if(result.ok===false)process.exitCode=1;
 }else if(verb==='node-package'){
  const {nodePackageCommand}=await import('../factory/node-package-command.mjs');
  const result=await nodePackageCommand(process.argv.slice(3));console.log(JSON.stringify(result,null,2));if(result.ok===false)process.exitCode=1;
