@@ -1,3 +1,4 @@
+import {verifyTrackedSourceIdentity} from './tracked-source-identity.mjs';
 import fs from 'node:fs';import path from 'node:path';import {createHash} from 'node:crypto';
 import {startIsolatedApp} from './workcell.mjs';import {workcellBinary,root} from './settings.mjs';import {command,digest} from './core.mjs';import {validateCLICases,validateCLISource,readCLIFile} from './cli-runtime.mjs';
 const request=JSON.parse(fs.readFileSync(process.argv[2]));const profile=validateCLICases(request.profile,request.cases);
@@ -11,9 +12,7 @@ if(validateCLISource(path.join(app,'source'))!==request.sourceHash)throw Error('
 if(!fs.statSync(path.join(app,'source',profile.entrypoint)).isFile())throw Error('Runtime entrypoint missing');
 fs.writeFileSync(path.join(app,'server.mjs'),"import http from 'node:http';export const createServer=()=>http.createServer((q,s)=>{s.writeHead(q.url==='/api/health'?200:404,{'Content-Type':'application/json'});s.end('{}');});\n");
 const workcellRoot=path.dirname(path.dirname(workcellBinary));
-const revision=await command('git',['-C',workcellRoot,'rev-parse','HEAD'],{timeout:5000,maxBytes:1024});
-const changes=await command('git',['-C',workcellRoot,'-c','core.fsmonitor=false','status','--porcelain','--untracked-files=normal'],{timeout:5000,maxBytes:65536});
-const workcellSource={commit:revision.code===0&&!revision.reason?revision.out.trim():null,clean:changes.code===0&&!changes.reason&&changes.out==='',expectedCommit:JSON.parse(fs.readFileSync(path.join(root,'sources.lock.json'))).repositories.workcell.commit};
+const workcellSource=verifyTrackedSourceIdentity(workcellRoot,JSON.parse(fs.readFileSync(path.join(root,'sources.lock.json'))).repositories.workcell.commit);
 const results=[];
 for(const [index,item]of request.cases.entries()){
  const evidence=path.join(request.dir,'case-'+index);const lease=await startIsolatedApp(app,{evidenceDir:evidence,timeoutMs:120000,executionProfile:"default"});let observed,build=null,toolVersion,staged=null,executionLease=null,executionEvidence=null;

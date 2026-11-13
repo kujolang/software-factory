@@ -1,3 +1,4 @@
+import {verifyTrackedSourceIdentity} from '../factory/tracked-source-identity.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import {spawnSync} from 'node:child_process';
@@ -12,7 +13,7 @@ check('node',()=>{const [major,minor,patch]=process.versions.node.split('.').map
 check('git',()=>run('git',['--version']),'Install Git.');
 check('kujo',()=>{const v=run(kujoBinary(),['--version']);if(v!=='kujo 1.9.0')throw Error('Expected kujo 1.9.0; got '+v);return v;},'Run npm ci; retain optional platform dependencies; remove an incompatible KUJO_BIN override.');
 const lock=JSON.parse(fs.readFileSync(path.join(root,'sources.lock.json'),'utf8'));
-for(const[name,source]of Object.entries(lock.repositories))check(name,()=>{const dest=({dispatch:dispatchRoot,'kujo-agents':agentsRoot,workcell:path.dirname(path.dirname(workcellBinary))})[name]||dependency(name);if(fs.lstatSync(dest).isSymbolicLink())throw Error('Dependency directory is a symlink');const sha=run('git',['rev-parse','HEAD'],dest);if(sha!==source.commit)throw Error('Dependency revision mismatch');if(run('git',['-c','core.fsmonitor=false','status','--porcelain','--ignore-submodules=all'],dest))throw Error('Dependency checkout modified');return sha;},'Run npm run setup. Preserve modified dependencies before moving them aside.');
+for(const[name,source]of Object.entries(lock.repositories))check(name,()=>{const dest=({dispatch:dispatchRoot,'kujo-agents':agentsRoot,workcell:path.dirname(path.dirname(workcellBinary))})[name]||dependency(name);if(name==='workcell')return verifyTrackedSourceIdentity(dest,source.commit).commit;if(fs.lstatSync(dest).isSymbolicLink())throw Error('Dependency directory is a symlink');const sha=run('git',['rev-parse','HEAD'],dest);if(sha!==source.commit)throw Error('Dependency revision mismatch');if(run('git',['-c','core.fsmonitor=false','status','--porcelain','--ignore-submodules=all'],dest))throw Error('Dependency checkout modified');return sha;},'Run npm run setup. Preserve modified dependencies before moving them aside.');
 if(provider==='codex')check('codex',()=>{const v=run(codexBinary,['--version']);if(!v.includes('0.144.4'))throw Error('Expected Codex CLI 0.144.4');return v;},'Run npm ci, or select the tested CLI with FACTORY_CODEX_BIN.');
 const {catalogDoctor}=await import('../factory/catalog.mjs');check('catalogs',()=>{const result=catalogDoctor();if(!result.ok)throw Error('Catalog integrity or contracts failed');return result.counts;},'Run npm run setup and preserve modified packages.');
 const {verifyAccountabilityDependency}=await import('../factory/accountability.mjs');for(const name of ['spec','runledger','casefile','shipcheck'])check(name,()=>verifyAccountabilityDependency(name).commit,'Run npm run setup.');
