@@ -52,7 +52,7 @@ export async function executeMissionWorkflow(input,{parent=path.join(root,'.runt
     const packBytes=fs.readFileSync(i.pack),sealBytes=fs.readFileSync(file(i.pack+'.seal.json',100000));fs.writeFileSync(path.join(directory,'pack.json'),packBytes,{flag:'wx',mode:0o600});fs.writeFileSync(path.join(directory,'pack.json.seal.json'),sealBytes,{flag:'wx',mode:0o600});readSealedPack(path.join(directory,'pack.json'));
     args=['run',path.join(directory,'mission.txt'),'--pack',path.join(directory,'pack.json')];
     if(contract.route==='repository')args.push('--source',i.source);
-    else{const team={type:'new-application',skills:contract.skills,additionalRoles:selectTeam({type:i.type}).roles.map(r=>r.id)};const selected=selectTeam(team);if(selected.blockedReasons.length)throw Error(selected.blockedReasons.join('; '));writeSpecRecord(directory,'team.json',team);args.push('--team',path.join(directory,'team.json'));}
+    {const team={type:contract.route==='repository'?i.type:'new-application',skills:contract.skills,additionalRoles:selectTeam({type:i.type}).roles.map(r=>r.id)};const selected=selectTeam(team);if(selected.blockedReasons.length)throw Error(selected.blockedReasons.join('; '));writeSpecRecord(directory,'team.json',team);args.push('--team',path.join(directory,'team.json'));}
    }
    writeSpecRecord(directory,'delegation.json',{executable:'node',entrypoint:'bin/software-factory.mjs',args,authority:'Existing controller command owns verification; adapter cannot approve',inputSha256:admission.inputSha256});
    const processResult=await command(process.execPath,[path.join(root,'bin/software-factory.mjs'),...args],{cwd:root,timeout:7200000,maxBytes:2000000});writeSpecRecord(directory,'process.json',processResult);

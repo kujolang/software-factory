@@ -56,8 +56,17 @@ export function validateProviderRouting(value){
 }
 
 export function applicationTeam(input,baseline){
+ if(input?.type!=='new-application')throw Error('This execution path constructs new Node applications; other lifecycle templates need their own qualified executor');
+ return selectedExecutionTeam(input,baseline);
+}
+export function repositoryTeam(input,baseline){
+ if(!['github-issue','bug-repair','feature','refactoring','security-remediation','test-coverage','maintenance'].includes(input?.type))throw Error('Unsupported repository development lifecycle');
+ const result=selectedExecutionTeam(input,baseline);
+ result.plan.executionStatus='Source-bound Node development with canonical consultations and independent acceptance; no external writes';
+ return result;
+}
+function selectedExecutionTeam(input,baseline){
  const plan=selectTeam(input);
- if(plan.type!=='new-application')throw Error('This execution path constructs new Node applications; other lifecycle templates need their own qualified executor');
  if(plan.blockedReasons.length)throw Error(plan.blockedReasons.join('; '));
  if(plan.humanReview)throw Error('Team requires recorded human review; automatic execution is prohibited');
  skillContext(plan.skills.map(skill=>skill.id)); // Reject unavailable/oversized guidance before creating a mission.
