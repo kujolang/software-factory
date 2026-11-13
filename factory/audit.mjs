@@ -102,7 +102,7 @@ export function audit(dir) {
     .map((p) => json(path.join(dir, "artifacts", p)));
   const usage = { input_tokens: 0, cached_input_tokens: 0, output_tokens: 0 };
   for (const r of receipts)
-    for (const u of r.usage)
+    for (const u of r.usage || [])
       for (const k of Object.keys(usage)) usage[k] += u[k] || 0;
   const failures = list.filter((e) => e.type === "verification.failed").length;
   const result = {
@@ -112,7 +112,8 @@ export function audit(dir) {
     events: list.length,
     overlapMs,
     providerCalls: receipts.length,
-    usage,
+    usage: receipts.some(r=>r.usageKnown===false||r.usage==null) ? null : Object.fromEntries(Object.entries(usage).map(([key,total])=>[key,receipts.some(r=>(r.usage||[]).some(u=>!Number.isFinite(u[key])))?null:total])),
+    observedUsageSubtotal: usage,
     cost: null,
     verificationFailures: failures,
     corrections: list.filter((e) => e.type === "correction.requested").length,

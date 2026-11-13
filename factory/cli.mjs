@@ -1,3 +1,6 @@
+import {validatePackWithSpec} from './accountability.mjs';
+import {controllerProvenance} from './provenance.mjs';
+import {catalog} from './catalog.mjs';
 import { readSealedPack, hashPack, runPack } from "./pack.mjs";
 import {
   agentsRoot,
@@ -121,6 +124,17 @@ function requirePlainTree(dir) {
   }
 }
 async function executeRun(dir, config) {
+  save(path.join(dir,"artifacts/controller-provenance.json"),controllerProvenance());
+  if(config.packHash){
+    try {
+      const binding=await validatePackWithSpec(runPack(dir,config),{parent:path.join(dir,"artifacts/spec")});
+      save(path.join(dir,"artifacts/spec-binding.json"),binding);
+    } catch(error) {
+      config.status="failed";config.finishedAt=new Date().toISOString();save(path.join(dir,"run.json"),config);
+      event(dir,"mission.failed",{summary:"Spec validation blocked implementation: "+error.message});
+      process.exitCode=1;return;
+    }
+  }
   console.log(
     JSON.stringify({
       runId: config.id,
@@ -527,6 +541,13 @@ if (verb === "run") {
           : [];
         return send(200, list);
       }
+      if (pathname === '/api/catalog') return send(200, {
+        schema: catalog.schema,
+        roles: catalog.roles,
+        skills: catalog.skills,
+        workflows: catalog.workflows,
+        authority: 'Read-only catalog; availability is not execution qualification',
+      });
       const runMatch = pathname.match(/^\/api\/runs\/([a-zA-Z0-9_-]+)$/);
       if (runMatch) return send(200, readRun(runMatch[1]));
       let file;
@@ -590,5 +611,5 @@ if (verb === "run") {
   );
 } else
   console.log(
-    "Commands: run <mission.txt> [--pack pack.json] | recheck <sourceRunId> | retry <failedRunId> | serve. Configure FACTORY_RUNS, FACTORY_AGENTS_ROOT, FACTORY_DISPATCH_ROOT, KUJO_BIN, FACTORY_PORT.",
+    "Commands: run <mission.txt> [--pack pack.json] | recheck <sourceRunId> | retry <failedRunId> | serve | roles/skills/workflows list|inspect|doctor|verify|sync | skills activate ID | team plan MISSION.json | evidence verify PATH. Configure FACTORY_RUNS, FACTORY_AGENTS_ROOT, FACTORY_DISPATCH_ROOT, KUJO_BIN, FACTORY_PORT.",
   );

@@ -1,9 +1,10 @@
+import {executeProposal} from './providers.mjs';
+import {loadRole,validateRolePayload,validateHandoff} from './catalog.mjs';
 import { runPack, runtimeContract, hashPack } from "./pack.mjs";
-import { codexBinary, model, providerHome } from "./settings.mjs";
+import { model, provider, ollamaHost } from "./settings.mjs";
 import { startIsolatedApp } from "./workcell.mjs";
 import fs from "node:fs";
 import path from "node:path";
-import os from "node:os";
 import { createHash } from "node:crypto";
 import { productDocs } from "./product-docs.mjs";
 import {
@@ -51,6 +52,7 @@ function handoff(from, to, id, scope, evidence = []) {
     stop_condition:
       "Return proposed artifacts and evidence; never approve your own release",
   };
+  validateHandoff(h, {base: agentsRoot});
   save(path.join(artifact, id + "-handoff.json"), h);
   emit("handoff.created", `${from} → ${to}`, {
     artifacts: ["artifacts/" + id + "-handoff.json"],
@@ -59,133 +61,31 @@ function handoff(from, to, id, scope, evidence = []) {
 }
 async function agent(role, id, prompt) {
   const rolePath = path.join(agentsRoot, "chain-of-command", role);
-  const instructions =
-    fs.readFileSync(path.join(rolePath, "AGENT.md"), "utf8") +
-    "\n" +
-    fs.readFileSync(path.join(rolePath, "SKILL.md"), "utf8");
-  const temp = fs.mkdtempSync(path.join(os.tmpdir(), "factory-provider-"));
-  const output = path.join(temp, "response.json");
+  const canonicalRole = loadRole("chain." + role, {base: agentsRoot});
+  const instructions = canonicalRole.instructions;
+  validateRolePayload(canonicalRole, "input", Object.fromEntries(canonicalRole.manifest.inputs.map(field => [field.name, prompt])));
   const start = Date.now();
-  event(dir, "agent.started", {
-    agentId: role,
-    taskId,
-    summary: `${role} processing ${id}`,
-    artifacts: ["artifacts/" + id + "-work-order.json"],
+  event(dir, "agent.started", {agentId:role,taskId,summary:`${role} processing ${id}`,artifacts:["artifacts/"+id+"-work-order.json"]});
+  save(path.join(artifact,id+"-work-order.json"), {role,taskId,mission:config.mission,scope:prompt,contractSource:path.relative(config.workspace,rolePath),permission:"PROPOSE",startedAt:new Date(start).toISOString()});
+  const record = receipt => save(path.join(artifact,id+"-receipt.json"), {
+    ...receipt, role, taskId,
+    roleContractSha256:createHash("sha256").update(instructions).digest("hex"),
+    workerSha256:createHash("sha256").update(fs.readFileSync(import.meta.filename)).digest("hex"),
+    usageKnown:receipt.usage!==null,
+    usage:receipt.usage===null?[]:Array.isArray(receipt.usage)?receipt.usage:[receipt.usage],
   });
-  save(path.join(artifact, id + "-work-order.json"), {
-    role,
-    taskId,
-    mission: config.mission,
-    scope: prompt,
-    contractSource: path.relative(config.workspace, rolePath),
-    permission: "PROPOSE",
-    startedAt: new Date(start).toISOString(),
-  });
-  const args = [
-    "exec",
-    "--ignore-user-config",
-    "--ephemeral",
-    "--sandbox",
-    "read-only",
-    "--disable",
-    "shell_tool",
-    "--disable",
-    "apps",
-    "--disable",
-    "in_app_browser",
-    "-c",
-    'web_search="disabled"',
-    "--skip-git-repo-check",
-    "-C",
-    temp,
-    "--json",
-    "--output-schema",
-    path.join(root, "factory/bundle.schema.json"),
-    "-o",
-    output,
-    "-",
-  ];
-  if (model) args.splice(1, 0, "--model", model);
-  const r = await command(codexBinary, args, {
-    cwd: temp,
-    env: { CODEX_HOME: providerHome },
-    timeout: 480000,
-    maxBytes: 1500000,
-    input:
-      "You are a text-only proposal agent. No tools, file reads, executions, or additional agents. Return JSON matching the supplied schema. No markdown fences inside content. Role contract:\n" +
-      instructions +
-      "\nHuman mission:\n" +
-      config.mission +
-      "\nAcceptance contract:\n" +
-      contract +
-      "\nWork order:\n" +
-      prompt,
-  });
-  const wire = r.out
-    .split("\n")
-    .filter(Boolean)
-    .flatMap((s) => {
-      try {
-        return [JSON.parse(s)];
-      } catch {
-        return [];
-      }
-    });
-  const toolCalls = wire.filter(
-    (e) =>
-      e.type === "item.completed" &&
-      [
-        "command_execution",
-        "file_change",
-        "mcp_tool_call",
-        "web_search",
-      ].includes(e.item?.type),
-  ).length;
-  const usage = wire
-    .filter((e) => e.type === "turn.completed")
-    .map((e) => e.usage);
-  save(path.join(artifact, id + "-receipt.json"), {
-    role,
-    taskId,
-    provider: "Codex CLI",
-    roleContractSha256: createHash("sha256").update(instructions).digest("hex"),
-    workerSha256: createHash("sha256")
-      .update(fs.readFileSync(import.meta.filename))
-      .digest("hex"),
-    model: model || "CLI default (not independently reported)",
-    code: r.code,
-    reason: r.reason,
-    startedAt: new Date(start).toISOString(),
-    finishedAt: new Date().toISOString(),
-    durationMs: r.durationMs,
-    usage,
-    cost: null,
-    costNote: "Subscription cost not exposed",
-    shellTools: false,
-    observedToolCalls: toolCalls,
-  });
+  let response;
   try {
-    if (r.code !== 0 || r.reason || toolCalls > 0 || !fs.existsSync(output))
-      throw Error(`Provider failed: ${r.code} ${r.reason}`);
-    const result = json(output);
-    save(path.join(artifact, id + "-proposal.json"), result);
-    event(
-      dir,
-      result.verdict === "fail" ? "agent.blocked" : "agent.completed",
-      {
-        agentId: role,
-        taskId,
-        summary: result.summary,
-        artifacts: [
-          "artifacts/" + id + "-proposal.json",
-          "artifacts/" + id + "-receipt.json",
-        ],
-      },
-    );
-    return result;
-  } finally {
-    fs.rmSync(temp, { recursive: true, force: true });
-  }
+    response = await executeProposal({provider,model,ollamaHost,
+      schema:json(path.join(root,"factory/bundle.schema.json")),
+      prompt:"You are a text-only proposal agent. No tools, file reads, executions, or additional agents. Return JSON matching the supplied schema. No markdown fences inside content. Role contract:\n"+instructions+"\nHuman mission:\n"+config.mission+"\nAcceptance contract:\n"+contract+"\nWork order:\n"+prompt,
+    });
+  } catch(error) {if(error.receipt)record(error.receipt);throw error;}
+  record(response.receipt);
+  const result=validateRolePayload(canonicalRole,"output",response.output);
+  save(path.join(artifact,id+"-proposal.json"),result);
+  event(dir,result.verdict==="fail"?"agent.blocked":"agent.completed",{agentId:role,taskId,summary:result.summary,artifacts:["artifacts/"+id+"-proposal.json","artifacts/"+id+"-receipt.json"]});
+  return result;
 }
 const backendAllowed = (p) => ["server.mjs", "db.mjs"].includes(p);
 const frontendAllowed = (p) =>

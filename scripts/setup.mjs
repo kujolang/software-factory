@@ -34,5 +34,7 @@ try{
  if(process.argv.includes('--build-image')){
   const result=spawnSync(process.execPath,['factory/build-workcell-image.mjs'],{cwd:root,stdio:'inherit'});if(result.status!==0)throw Error('Image build failed');
  }
+ const {setupAccountability}=await import('./setup-accountability.mjs');setupAccountability();
+ const {catalogDoctor}=await import('../factory/catalog.mjs');const catalogCheck=catalogDoctor();if(!catalogCheck.ok)throw Error('Catalog validation failed: '+JSON.stringify(catalogCheck.checks.filter(c=>!c.ok)));
  console.log('Dependencies ready. Next: npm run login; configure a rootless Docker endpoint; npm run image:build; npm run doctor. See docs/INSTALL.md.');
 }finally{fs.rmdirSync(guard);}

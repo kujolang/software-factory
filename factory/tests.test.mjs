@@ -1,3 +1,4 @@
+import {dependency} from './settings.mjs';
 import test from "node:test";
 import { productDocs } from "./product-docs.mjs";
 import assert from "node:assert/strict";
@@ -201,7 +202,7 @@ test("release worker rejects generated source that exits successfully before ass
     JSON.stringify({
       mission: "Controlled gate regression",
       workspace: dir,
-      agentsRoot: path.join(dir, "agents"),
+      agentsRoot: dependency("kujo-agents"),
       tasks: [
         {
           id: "release",
@@ -235,7 +236,7 @@ test("release worker rejects generated source that exits successfully before ass
     ),
     "missing isolated build blocks before reviewer",
   );
-  assert.ok(journal.some((e) => e.type === "release.blocked"));
+  assert.ok(journal.some((e) => e.type === "release.blocked" && /docker info failed/.test(e.summary)), JSON.stringify(journal));
   assert.ok(!journal.some((e) => e.type === "release.approved"));
 });
 

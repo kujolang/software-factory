@@ -18,6 +18,7 @@ test('standalone observer serves local assets and cannot mutate factory state',a
  const response=await fetch(url);assert.equal(response.status,200);assert.match(await response.text(),/Factory Floor/);
  assert.deepEqual(await(await fetch(url+'/api/runs')).json(),[]);
  assert.equal((await fetch(url+'/api/runs',{method:'POST',body:'{}'})).status,405);
+ const catalog=await(await fetch(url+'/api/catalog')).json();assert.equal(catalog.roles.filter(r=>r.package==='chain-of-command').length,28);assert.equal(catalog.skills.length,136);assert.equal((await fetch(url+'/api/catalog',{method:'POST'})).status,405);
  const badHost=await new Promise((resolve,reject)=>{const request=http.get(url+'/api/runs',{headers:{host:'outside.invalid'}},response=>{response.resume();resolve(response.statusCode);});request.on('error',reject);});
  assert.equal(badHost,403);
  assert.equal((await fetch(url+'/assets/DepartureMono-Regular.woff2')).status,200);

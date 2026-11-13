@@ -1,3 +1,4 @@
+import {kujoBinary} from '../factory/settings.mjs';
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
@@ -64,7 +65,7 @@ test("references preserve JSON types and encode path segments; expectations reje
   subset({ id: 1, title: "hi" }, { title: "hi" });
 });
 test("run snapshots sealed pack and fails without release approval", (t) => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "factory-pack-run-"));
+  const dir = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), "factory-pack-run-"));
   t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
   const file = path.join(dir, "pack.json");
   fs.writeFileSync(file, JSON.stringify(original));
@@ -73,7 +74,9 @@ test("run snapshots sealed pack and fails without release approval", (t) => {
     JSON.stringify({ reviewed: true, sha256: hashPack(original) }),
   );
   fs.writeFileSync(path.join(dir, "mission.txt"), "Build converter");
-  fs.writeFileSync(path.join(dir, "run"), "process.exit(0)");
+  const runtime=kujoBinary();
+  const shim=path.join(dir,"kujo-shim");
+  fs.writeFileSync(shim, `#!${process.execPath}\nimport {spawnSync} from 'node:child_process';const args=process.argv.slice(2);if(args.some(a=>a.endsWith('/factory/dispatch.kujo')))process.exit(0);const r=spawnSync(${JSON.stringify(runtime)},args,{stdio:'inherit'});process.exit(r.status??1);\n`,{mode:0o700});
   const cli = new URL("../factory/cli.mjs", import.meta.url);
   const r = spawnSync(
     process.execPath,
@@ -84,7 +87,7 @@ test("run snapshots sealed pack and fails without release approval", (t) => {
         ...process.env,
         FACTORY_RUNS: dir,
         FACTORY_DISPATCH_ROOT: dir,
-        KUJO_BIN: process.execPath,
+        KUJO_BIN: shim,
       },
       timeout: 10000,
     },
@@ -93,6 +96,8 @@ test("run snapshots sealed pack and fails without release approval", (t) => {
   const id = fs.readdirSync(dir).find((x) => x.startsWith("factory-"));
   const run = JSON.parse(fs.readFileSync(path.join(dir, id, "run.json")));
   assert.equal(run.status, "failed");
+  assert.equal(JSON.parse(fs.readFileSync(path.join(dir,id,"artifacts/spec-binding.json"))).validation.valid,true);
+  assert.ok(fs.existsSync(path.join(dir,id,"dispatch-process.json")), "Dispatch ran after real Spec validation");
   assert.deepEqual(runPack(path.join(dir, id), run), original);
 });
 test("retry copies its frozen pack and rejects changed pack evidence", (t) => {
@@ -121,7 +126,9 @@ test("retry copies its frozen pack and rejects changed pack evidence", (t) => {
       packId: original.id,
     }),
   );
-  fs.writeFileSync(path.join(dir, "run"), "process.exit(0)");
+  const runtime=kujoBinary();
+  const shim=path.join(dir,"kujo-shim");
+  fs.writeFileSync(shim, `#!${process.execPath}\nimport {spawnSync} from 'node:child_process';const args=process.argv.slice(2);if(args.some(a=>a.endsWith('/factory/dispatch.kujo')))process.exit(0);const r=spawnSync(${JSON.stringify(runtime)},args,{stdio:'inherit'});process.exit(r.status??1);\n`,{mode:0o700});
   const call = () =>
     spawnSync(
       process.execPath,

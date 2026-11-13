@@ -41,3 +41,11 @@ function presentation(){document.body.classList.toggle('presentation',params.get
 $('presentation').onclick=()=>{params.set('presentation',params.get('presentation')==='1'?'0':'1');history.replaceState(null,'',`?${params}`);presentation();};presentation();
 function frame(now){if(playing&&run){clock+=(now-lastFrame)*Number($('speed').value);let changed=false;while(cursor<run.events.length&&Date.parse(run.events[cursor].timestamp)<=clock){cursor++;changed=true;}if(cursor>=run.events.length){playing=false;changed=true;}if(changed)render();}lastFrame=now;requestAnimationFrame(frame);}requestAnimationFrame(frame);
 await initialize();setInterval(async()=>{if(run&&mode==='live')try{await load(run.id);}catch(error){$('source-status').textContent=`SOURCE STALE / ${error.message}`;}},2000);
+
+// Catalog metadata is rendered only as text; it cannot activate capabilities.
+try {
+ const response=await fetch('/api/catalog',{cache:'no-store'});if(!response.ok)throw Error('Catalog unavailable');
+ const catalog=await response.json();
+ const showCatalog=()=>{const kind=$('catalog-kind').value,query=$('catalog-search').value.toLowerCase();const rows=(catalog[kind]||[]).filter(x=>(x.id+' '+x.description).toLowerCase().includes(query));$('catalog-status').textContent=`${rows.length} ${kind} · read-only`;const box=$('catalog-items');box.replaceChildren();for(const row of rows){const item=text('details','');item.append(text('summary',row.name||row.id),text('p',row.description),text('pre',JSON.stringify({id:row.id,package:row.package,sourceCommit:row.sourceCommit,maturity:row.maturity,permissions:row.permissions,execution:row.execution},null,2)));box.append(item);}};
+ $('catalog-kind').onchange=showCatalog;$('catalog-search').oninput=showCatalog;showCatalog();
+}catch(error){$('catalog-status').textContent=error.message;}
