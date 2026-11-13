@@ -15,6 +15,9 @@ if(['roles','skills','workflows'].includes(verb)){
  if(process.argv.length!==5||process.argv[3]!=='plan')throw Error('Usage: software-factory team plan MISSION.json');
  const file=process.argv[4];if(fs.statSync(file).size>65536)throw Error('Mission input too large');
  console.log(JSON.stringify(selectTeam(JSON.parse(fs.readFileSync(file,'utf8'))),null,2));
+}else if(verb==='spec'&&process.argv[3]==='impact'){
+ if(process.argv.length!==6)throw Error('Usage: spec impact BEFORE_PACK AFTER_PACK');
+ const {inspectSpecImpact}=await import('../factory/spec-impact.mjs');console.log(JSON.stringify(await inspectSpecImpact(process.argv[4],process.argv[5]),null,2));
 }else if(verb==='spec'){
  if(process.argv.length!==5||process.argv[3]!=='prepare')throw Error('Usage: spec prepare IDEA.txt');
  const fs=await import('node:fs');const {runSpecPipeline,specPlain}=await import('../factory/spec-pipeline.mjs');
