@@ -1,0 +1,1 @@
+Build a polished local temperature converter using the frozen temperature-converter software pack. Keep the interface simple, responsive, accessible and monochrome. Follow the supplied runtime contract and all pack acceptance cases. No external services or deployment.

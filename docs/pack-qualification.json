@@ -1,0 +1,118 @@
+{
+  "schema": "kujo.software-factory.pack-qualification/v1",
+  "dateLocal": "2026-11-12",
+  "timezone": "America/Detroit",
+  "runtimeCommit": "bb1d7d5",
+  "documentationCommit": "41e192b",
+  "scope": "Local dependency-free Node HTTP, optional SQLite, static browser apps",
+  "ci": {
+    "url": "https://github.com/kujolang/software-factory/actions/runs/43362480842",
+    "result": "success",
+    "platforms": [
+      "ubuntu-24.04",
+      "macos-15"
+    ]
+  },
+  "markdownFilesReviewed": 27,
+  "legacyIssueTrackerSmoke": {
+    "ok": true,
+    "apiChecks": 30,
+    "browserChecks": 16
+  },
+  "packFixtures": [
+    {
+      "name": "converter",
+      "ok": true,
+      "apiSteps": 6,
+      "browserSteps": 4,
+      "packHash": "f700cd0796f07c0e4ec1821294ccaff58ddb083ff51e109ddad8c6d1822d0e19"
+    },
+    {
+      "name": "notes",
+      "ok": true,
+      "apiSteps": 4,
+      "browserSteps": 6,
+      "packHash": "20a40981f7f39b41fc92d680abdfb64a9822368599195977c169b69845d6756f"
+    },
+    {
+      "name": "broken-evidence",
+      "correctlyRejected": true
+    },
+    {
+      "name": "broken-browser-evidence",
+      "correctlyRejected": true
+    }
+  ],
+  "liveMission": {
+    "id": "factory-2026-11-13T03-52-04-284Z",
+    "status": "completed",
+    "release": "approved-local-candidate",
+    "sourceHash": "c315dc92c8c7fa6001d70438bd922ed17a7ec0715aee522c528323becece4649",
+    "packHash": "f700cd0796f07c0e4ec1821294ccaff58ddb083ff51e109ddad8c6d1822d0e19",
+    "audit": {
+      "ok": true,
+      "checks": [
+        "versioned event schema",
+        "contiguous unique event sequence",
+        "references resolve",
+        "dependencies precede task execution",
+        "real concurrent implementation intervals",
+        "canonical handoff schema",
+        "release exact reviewed and tested bytes"
+      ],
+      "runId": "factory-2026-11-13T03-52-04-284Z",
+      "events": 61,
+      "overlapMs": 66607,
+      "providerCalls": 9,
+      "usage": {
+        "input_tokens": 165745,
+        "cached_input_tokens": 62464,
+        "output_tokens": 14584
+      },
+      "cost": null,
+      "verificationFailures": 1,
+      "corrections": 1,
+      "elapsedMs": 536593,
+      "replay": "ordered original timestamps; no interpolation of events",
+      "roles": [
+        "systems-architect",
+        "backend-developer",
+        "general-commander",
+        "frontend-developer",
+        "release-verifier",
+        "code-reviewer"
+      ]
+    },
+    "imageId": "sha256:220511effff7162dc1ac4ebe45119e73e16a8d42d86418bfdbc8b4222def11dc"
+  },
+  "export": {
+    "auditPassed": true,
+    "tamperedPackRejected": true
+  },
+  "developmentFailures": [
+    "A missing pack snapshot caused an early development run to fail; its controller exit and failed Dispatch receipt were retained, and its final failed status was recorded explicitly. Unit coverage now checks run snapshot and retry behavior.",
+    "An image rebuild overlapping a lease launch was rejected by digest/policy checks; the live mission retained that failed attempt and passed after the image was stable.",
+    "Concurrent local qualification produced a native process failure and short lease startup failures. Qualification was rerun sequentially without relaxing deadlines."
+  ],
+  "limits": [
+    "Pack review is an operator/setup-agent responsibility; a seal proves content identity, not sufficient test coverage.",
+    "No automatic standalone language-model planner in pack init: the coding agent writes requirements and tests using the documented guide.",
+    "No new runtimes, external packages/services, deployment targets or multi-tenant qualification."
+  ],
+  "deterministic": {
+    "unitTests": 40,
+    "nativeDispatchTests": 8,
+    "allPassedSequentially": true,
+    "markdownLinkAndPortablePathChecks": 27
+  },
+  "isolation": {
+    "ok": true,
+    "checks": 24
+  },
+  "controllerDeath": {
+    "ok": true,
+    "autonomousExitCode": 124,
+    "stoppedMetadataRequiredRecovery": true,
+    "recoveryRemovedContainer": true
+  }
+}

@@ -31,6 +31,8 @@ npm run factory -- run idea.txt --pack packs/my-app.json
 
 Commit the pack and its `.seal.json` beside your project configuration. Each run copies the pack into its own directory and binds its hash to verification and release. Editing the original pack does not change an existing run. Changed tests need another review and seal; retries use the original run's frozen pack.
 
+To reproduce the converter mission, run `npm run factory -- run packs/converter.idea.txt --pack packs/converter.json`. This uses the provider account.
+
 Omit `--pack` to use the original issue-tracker workflow. Its existing acceptance checks remain available.
 
 ## Pack fields
