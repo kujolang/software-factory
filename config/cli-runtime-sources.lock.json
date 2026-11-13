@@ -31,5 +31,16 @@
     "integrity": "sha512-8FYau96o3NKOhbjKi/qNvG/W5jhzxkbdm5sj9AbZ/5T5sWqn3hJgLfGx27sRKZWTvyzCP8dLRBTf5tBTSRVUNA==",
     "qualification": "not built",
     "npmLock": "config/typescript-runtime-package-lock.json"
+  },
+  "nativeExecution": {
+    "schema": "kujo.factory.native-cli-execution/v2",
+    "workcell": {
+      "url": "https://github.com/kujolang/workcell.git",
+      "commit": "144ab49da88a17fd0d786d01d98030d7ec7798cb"
+    },
+    "workspaceReadOnly": true,
+    "maxArtifactBytes": 16777216,
+    "hostExecution": false,
+    "tmpNoexec": true
   }
 }
