@@ -1,0 +1,17 @@
+# Subordinate release policy
+
+`config/release-policy.json` defines the controller-owned `local-node-independent-release` v1 policy. It is not candidate input, a skill permission, a model decision or deployment authorization. The implementation rejects unknown policy fields, weakened control lists and unsupported versions. A policy change requires code review and new qualification.
+
+`prepareReleasePolicy({dir, app, packet})` runs before the independent release-verifier role. It reads the retained verification/review/build records and candidate test-contract identity, validates the source inventory, actual API/browser/syntax output shapes and dependency-free runtime restrictions, then invokes the pinned canonical ShipCheck through `inspectReadiness` on a private metadata projection. It writes an immutable `artifacts/release-policy-preflight.json` pass/blocked decision. Failure to run or validate the canonical report blocks this gate.
+
+The metadata projection copies only bounded README, changelog, license, security and package metadata as data. No candidate source, scripts, Git configuration or executable test is run on the host. The canonical ShipCheck `readme`, `version-metadata` and `changelog` observations are binding under this explicit factory policy. Its other observations remain visible and advisory because the staging directory intentionally has no candidate Git repository, tests or full source. A passing factory policy never claims that upstream `summary.gate_passed` was true. This uses ShipCheck observations within a reviewed factory scope; it does not impersonate a successful canonical `shipcheck gate` command.
+
+`finalizeReleasePolicy({dir, app, packet, checked})` runs only after the independent release proposal and repeated trusted API/browser acceptance. It reads the original preflight record, rejects changed source, packet, evaluator, policy, harness or ShipCheck receipt bytes, requires the separate `release-verifier` receipt and passing proposal with no files, rejects explicit mock receipts, and validates the repeated actual acceptance output. The final immutable record is `artifacts/release-policy-final.json`.
+
+Both functions return `passed`, `blockers`, `approvalGranted:false` and `deploymentAuthorized:false`. The worker calls `assertReleasePolicy(result)` to block the existing release path on a failed subordinate gate. Only the existing independent controller flow may copy the exact candidate and emit its local release decision after this gate. No model assertion substitutes for test execution. Records supplied directly to these host APIs must be controller-owned; this module is not an authentication or execution-proof system.
+
+Identity bindings include SHA-256 of exact policy bytes, evaluator/accountability implementation and lock bytes, trusted harness files, reviewed candidate source, release packet and the canonical ShipCheck binding. The policy requires repeated test output and retains both decisions rather than overwriting a failed attempt. Retrying a mission must create a new run.
+
+## Verification
+
+`node --test tests/release-policy.test.mjs` runs the actual pinned ShipCheck on synthetic metadata, then exercises source/test/build/model/receipt/policy-identity mutation and nonexecution cases. The trusted execution records in these unit fixtures are explicitly synthetic; they do not qualify a real application or model mission. Real Workcell and complete mission qualification remain separate release requirements.
