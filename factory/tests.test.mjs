@@ -288,15 +288,18 @@ test("missing engine blocks candidate assertion mutation without host execution"
   assert.match(r.err, /docker info failed/);
 });
 
-test("SIGTERM to worker cleans up its active command process group", async (t) => {
+for (const [signal, exitCode] of [["SIGTERM", 143], ["SIGINT", 130]])
+test(`${signal} to worker cleans up its active command process group`, async (t) => {
   const { spawn } = await import("node:child_process");
   const dir = fixture(t),
-    pidFile = path.join(dir, "pid");
+    pidFile = path.join(dir, "pid"),
+    exitObservation = path.join(dir, "exit-observation.json"),
+    resumed = path.join(dir, "resumed");
   const moduleUrl = pathToFileURL(
     path.join(import.meta.dirname, "core.mjs"),
   ).href;
   const childCode = `require('node:fs').writeFileSync(${JSON.stringify(pidFile)},String(process.pid));setInterval(()=>{},1000);`;
-  const source = `import {command} from ${JSON.stringify(moduleUrl)};await command(process.execPath,['-e',${JSON.stringify(childCode)}],{timeout:10000});`;
+  const source = `import {command} from ${JSON.stringify(moduleUrl)};import fs from "node:fs";process.once("exit",()=>{let alive=false;try{process.kill(Number(fs.readFileSync(${JSON.stringify(pidFile)},"utf8")),0);alive=true}catch{}fs.writeFileSync(${JSON.stringify(exitObservation)},JSON.stringify({alive}));});await command(process.execPath,['-e',${JSON.stringify(childCode)}],{timeout:10000});fs.writeFileSync(${JSON.stringify(resumed)},"unexpected continuation");`;
   const parent = spawn(
     process.execPath,
     ["--input-type=module", "-e", source],
@@ -312,8 +315,10 @@ test("SIGTERM to worker cleans up its active command process group", async (t) =
   assert.ok(fs.existsSync(pidFile), "child started");
   const pid = Number(fs.readFileSync(pidFile, "utf8"));
   const exited = new Promise((r) => parent.once("exit", r));
-  parent.kill("SIGTERM");
-  assert.equal(await exited, 143);
+  parent.kill(signal);
+  assert.equal(await exited, exitCode);
+  assert.equal(fs.existsSync(resumed),false,"signal cleanup cannot resume mission work");
+  assert.deepEqual(JSON.parse(fs.readFileSync(exitObservation,"utf8")),{alive:false},"worker reaps its child before exiting");
   let alive = true;
   for (let i = 0; i < 100; i++) {
     try {

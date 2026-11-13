@@ -11,10 +11,22 @@ function killActiveChildren() {
     } catch {}
   }
 }
+let shutdownSignal = "";
 for (const signal of ["SIGTERM", "SIGINT"])
   process.once(signal, () => {
+    if (shutdownSignal) return;
+    shutdownSignal = signal;
+    const code = signal === "SIGTERM" ? 143 : 130;
+    const pending = new Set(activeChildren);
+    // Reap owned children before exiting; immediate exit can orphan zombies.
+    // A stuck pipe or platform failure must not keep the controller alive forever.
+    const deadline = setTimeout(() => process.exit(code), 2000);
+    for (const child of pending) child.once("close", () => {
+      pending.delete(child);
+      if (!pending.size) { clearTimeout(deadline); process.exit(code); }
+    });
     killActiveChildren();
-    process.exit(signal === "SIGTERM" ? 143 : 130);
+    if (!pending.size) { clearTimeout(deadline); process.exit(code); }
   });
 process.once("exit", killActiveChildren);
 export const root = path.resolve(import.meta.dirname, "..");
@@ -134,6 +146,7 @@ export async function command(
     env = {},
   } = {},
 ) {
+  if (shutdownSignal) throw Error("Controller shutdown in progress");
   const start = Date.now();
   const child = spawn(bin, args, {
     cwd,
@@ -165,8 +178,12 @@ export async function command(
   let code;
   try {
     code = await new Promise((resolve, reject) => {
-      child.once("error", reject);
-      child.once("close", resolve);
+      // Signal shutdown owns final exit; do not resume mission work while reaping.
+      child.once("error", (error) => { if (!shutdownSignal) reject(error); });
+      child.once("close", (code) => {
+        if (shutdownSignal) activeChildren.delete(child);
+        else resolve(code);
+      });
     });
   } finally {
     clearTimeout(timer);
