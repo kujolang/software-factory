@@ -1,6 +1,6 @@
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
-let run, mode = 'live', cursor = 0, playing = false, clock = 0, lastFrame = 0, selected;
+let run, mode = 'live', cursor = 0, playing = false, clock = 0, lastFrame = 0, selected, lastOperatorSnapshot;
 const text = (tag, content, className) => { const el = document.createElement(tag); el.textContent = content ?? ''; if(className) el.className = className; return el; };
 const date = (value) => { const d = new Date(value); return Number.isFinite(d.getTime()) ? d.toISOString().replace('T',' ').replace('.000Z',' UTC') : 'Timestamp unavailable'; };
 const events = () => (run?.events ?? []).slice(0, mode === 'live' ? undefined : cursor);
@@ -12,7 +12,7 @@ function detail(e) {
  box.append(text('pre',JSON.stringify({id:e.id,runId:e.runId,seq:e.seq,agentId:e.agentId,taskId:e.taskId,dependencies:e.dependencies,...(e.data?{data:e.data}:{})},null,2)));
 }
 function render() {
- if(!run) return;const visible=events(), all=run.events||[];
+ if(!run) return;renderOperator();const visible=events(), all=run.events||[];
  const taskEvents=(t)=>visible.filter(e=>e.taskId===t.id && /^(task|correction)\./.test(e.type));
  const tasks=run.tasks||[], statuses=tasks.map(t=>statusFor(taskEvents(t)));
  $('mission-text').textContent=run.mission || 'Mission text unavailable';
@@ -49,3 +49,21 @@ try {
  const showCatalog=()=>{const kind=$('catalog-kind').value,query=$('catalog-search').value.toLowerCase();const rows=(catalog[kind]||[]).filter(x=>(x.id+' '+x.description).toLowerCase().includes(query));$('catalog-status').textContent=`${rows.length} ${kind} · read-only`;const box=$('catalog-items');box.replaceChildren();for(const row of rows){const item=text('details','');item.append(text('summary',row.name||row.id),text('p',row.description),text('pre',JSON.stringify({id:row.id,package:row.package,sourceCommit:row.sourceCommit,maturity:row.maturity,permissions:row.permissions,execution:row.execution},null,2)));box.append(item);}};
  $('catalog-kind').onchange=showCatalog;$('catalog-search').oninput=showCatalog;showCatalog();
 }catch(error){$('catalog-status').textContent=error.message;}
+
+function renderOperator(){
+ const op=run?.operator;
+ const snapshot=JSON.stringify([run?.id,run?.status,op,mode,$('evidence-filter').value]);if(snapshot===lastOperatorSnapshot)return;lastOperatorSnapshot=snapshot;
+ $('operator-note').textContent=op?`${op.authority} ${op.snapshot}${mode==='replay'?' — these records are the latest snapshot, not the selected replay instant.':''}`:'Operator snapshot unavailable for this recording.';
+ for(const id of ['operator-summary','operator-agents','operator-failures','operator-state','operator-diffs','operator-evidence'])$(id).replaceChildren();
+ if(!op)return;
+ const known=value=>value===null||value===undefined?'unknown':String(value);
+ $('operator-summary').append(text('p',`Recorded mission status: ${run.status||'unknown'} · Input tokens: ${known(op.usage?.input_tokens)} · Output tokens: ${known(op.usage?.output_tokens)} · Cost: ${known(op.cost)} · Pending recorded approvals: ${op.approvalPending?.length??0}`));
+ const evidenceLink=(ref)=>{if(typeof ref!=='string'||!ref.startsWith('artifacts/')||ref.includes('\\')||ref.split('/').some(p=>!p||p==='.'||p==='..'))return text('span','Unavailable evidence path');const a=text('a',ref);a.href=`/evidence/${encodeURIComponent(run.id)}/${ref.split('/').map(encodeURIComponent).join('/')}`;a.target='_blank';a.rel='noopener';return a;};
+ for(const agent of op.agents||[]){const box=text('details','');box.append(text('summary',`${agent.role||'Unreported role'} · ${agent.provider||'unknown'} / ${agent.model||'unreported model'} · ${agent.status||'unknown'}${agent.fixture?' · FIXTURE':''}`),text('pre',JSON.stringify(agent,null,2)),evidenceLink(agent.path));$('operator-agents').append(box);}
+ if(!op.agents?.length)$('operator-agents').append(text('p','No provider receipts recorded.'));
+ for(const item of [...(op.gates||[]),...(op.failures||[])]){const box=text('details','');box.append(text('summary',item.kind||item.path),text('pre',JSON.stringify(item,null,2)),evidenceLink(item.path));$('operator-failures').append(box);}
+ $('operator-state').append(text('pre',JSON.stringify({skills:op.skills??'No skill activation record',teamPlan:op.teamPlan??'No team selection record',approvalPending:op.approvalPending,recovery:op.recovery,warnings:op.warnings},null,2)));
+ for(const change of op.changes||[]){const box=text('details','');box.append(text('summary',change.path),text('p',change.authority+(change.truncated?' · Preview truncated':'')),evidenceLink(change.proposal));const columns=text('div','','proposal-columns');for(const [label,value] of [['Previous observed proposal',change.before],['Current proposal',change.after]]){const pane=text('div','');pane.append(text('strong',label),text('pre',value??'No previous proposal recorded'));columns.append(pane);}box.append(columns);$('operator-diffs').append(box);}
+ const filter=$('evidence-filter').value.toLowerCase();const matches=(op.evidence||[]).filter(e=>e.path.toLowerCase().includes(filter));$('operator-evidence').append(text('p',`${matches.length} recorded paths; showing at most 200`));for(const item of matches.slice(0,200)){const row=text('p','');row.append(evidenceLink(item.path),text('small',` · ${item.bytes} bytes`));$('operator-evidence').append(row);}
+}
+$('evidence-filter').oninput=renderOperator;
