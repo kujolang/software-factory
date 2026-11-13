@@ -525,6 +525,225 @@
       "humanApproval": false,
       "softwareReleaseApproval": false,
       "deploymentAuthorization": false
+    },
+    "postShutdownEngineRegressions": {
+      "sourceProductionCommit": "b045b56",
+      "workcellCommit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+      "results": [
+        {
+          "command": "npm run smoke",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 54864,
+          "log": ".runtime/ledger-completion/shutdown-fixed-smoke.log",
+          "logSha256": "a91d210c7d3e4f9060d70b25c9f84a62864effa1df9e6f8a98599c64377d7005"
+        },
+        {
+          "command": "npm run test:isolation",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 27913,
+          "log": ".runtime/ledger-completion/shutdown-fixed-test-isolation.log",
+          "logSha256": "b085170d5a6de2f3d647bc03203e68f1763134d4fabcc834a8c82645d2520584"
+        },
+        {
+          "command": "npm run test:controller-death",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 16973,
+          "log": ".runtime/ledger-completion/shutdown-fixed-test-controller-death.log",
+          "logSha256": "a13f5a2757ad10a0cc9a0863b8d8467ea52db9aa0713727aa7a8b34adbebafe3"
+        },
+        {
+          "command": "npm run test:packs",
+          "exitCode": 0,
+          "signal": null,
+          "durationMs": 66143,
+          "log": ".runtime/ledger-completion/shutdown-fixed-test-packs.log",
+          "logSha256": "5746c76a349e4c2c9df8297050b7b0f2fd5b516056ac6c7998b002949221142c"
+        }
+      ],
+      "allPassed": true,
+      "laterChanges": "Workcell source integrity checks and test fixture handshake; default engine policy unchanged."
+    },
+    "postShutdownAggregate": {
+      "command": "npm run verify",
+      "tests": 226,
+      "nativeDispatchTests": 8,
+      "markdownFiles": 54,
+      "failed": 0,
+      "log": {
+        "path": ".runtime/ledger-completion/verify-shutdown-fixed.log",
+        "sha256": "d79bc1dc8cffb1975e870c30fed47c9ef1007e77efdb3816eac8041197884b16"
+      },
+      "scope": "Before later Git object integrity and test-fixture corrections; fresh-checkout aggregate follows separately."
+    },
+    "dependencyAudit": {
+      "command": "npm audit --json",
+      "exitCode": 0,
+      "knownVulnerabilities": 0,
+      "log": {
+        "path": ".runtime/ledger-completion/dependency-audit.json",
+        "sha256": "a77a214b17cf147b93c9189dffa9f5d1ec68df1ddc16aca7b22fcf7201f3c7f9"
+      },
+      "scope": "Current npm advisory database observation; not exhaustive supply-chain proof"
+    },
+    "sourceIdentityRequalification": {
+      "sourceCommit": "45be0c3dcd0164ad0439017b6e372f96d3cd3b7a",
+      "passed": true,
+      "log": {
+        "path": ".runtime/ledger-completion/native-identity-final.log",
+        "sha256": "d52e03c2ff55a32e7778bb70e65f2455aa261ab5ce951fc4e525f4c87c1c81de"
+      },
+      "report": "docs/CLI-RUNTIME-QUALIFICATION.json"
+    },
+    "cleanCheckoutSecondFailure": {
+      "sourceCommit": "2cfc12845cfa3697423f6b313c7e72b7d1d83faf",
+      "report": {
+        "path": ".runtime/install-qualification/checkout-KBgMD5/qualification.json",
+        "sha256": "9e6e25d1a7674a43db2fd5286557ef1fb0a631cd9b92ae5fe24af6af1cca347f"
+      },
+      "failures": [
+        "Non-atomic PID fixture admitted empty PID as process-group zero",
+        "Consultation fixture inherited ESM instead of CommonJS"
+      ],
+      "fixes": [
+        "acb5fe3",
+        "9e9cf7c"
+      ],
+      "failureEvidencePreserved": true,
+      "cleanupRecord": {
+        "path": ".runtime/install-qualification/checkout-KBgMD5/disposable-cache-cleanup.json",
+        "sha256": "126d7bfd9eaf06aa5feb10be18c79b2105e3b83d00f6fe54e213b43a5336512a"
+      }
+    },
+    "freshPublishedCheckout": {
+      "sourceCommit": "45be0c3dcd0164ad0439017b6e372f96d3cd3b7a",
+      "ok": true,
+      "tests": 229,
+      "nativeDispatchTests": 8,
+      "markdownFiles": 54,
+      "report": {
+        "path": ".runtime/install-qualification/checkout-NVug6p/qualification.json",
+        "sha256": "99e0a26c9bbbedc17dc95e60cc41d1f1793635b63f897d72dcf5082222fb8426"
+      },
+      "steps": [
+        {
+          "id": "git-init",
+          "command": [
+            "git",
+            "-c",
+            "core.hooksPath=/dev/null",
+            "init",
+            "--quiet"
+          ],
+          "exitCode": 0,
+          "signal": null,
+          "error": null,
+          "durationMs": 24,
+          "log": "git-init.log",
+          "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "id": "git-fetch",
+          "command": [
+            "git",
+            "-c",
+            "credential.helper=",
+            "-c",
+            "core.hooksPath=/dev/null",
+            "fetch",
+            "--depth=1",
+            "https://github.com/kujolang/software-factory.git",
+            "45be0c3dcd0164ad0439017b6e372f96d3cd3b7a"
+          ],
+          "exitCode": 0,
+          "signal": null,
+          "error": null,
+          "durationMs": 2864,
+          "log": "git-fetch.log",
+          "logSha256": "b133a5a96cf8c524306f8267e9bf02c1fceb59fb491d84eeac41079ed9697174"
+        },
+        {
+          "id": "git-checkout",
+          "command": [
+            "git",
+            "-c",
+            "core.hooksPath=/dev/null",
+            "checkout",
+            "--detach",
+            "45be0c3dcd0164ad0439017b6e372f96d3cd3b7a"
+          ],
+          "exitCode": 0,
+          "signal": null,
+          "error": null,
+          "durationMs": 107,
+          "log": "git-checkout.log",
+          "logSha256": "c44fb1f3f4b422b35963a4954b7abef99a6811217eaeb7d0e567fc4c92cacd3b"
+        },
+        {
+          "id": "npm-ci",
+          "command": [
+            "npm",
+            "ci",
+            "--ignore-scripts",
+            "--no-audit",
+            "--no-fund"
+          ],
+          "exitCode": 0,
+          "signal": null,
+          "error": null,
+          "durationMs": 23440,
+          "log": "npm-ci.log",
+          "logSha256": "0d61409260c10b8329c78f78a90a70957f4f6592e75672821f558a244f73565e"
+        },
+        {
+          "id": "setup",
+          "command": [
+            "npm",
+            "run",
+            "setup"
+          ],
+          "exitCode": 0,
+          "signal": null,
+          "error": null,
+          "durationMs": 30133,
+          "log": "setup.log",
+          "logSha256": "4d403c7988287b6ae687e5c1bf52182b2c06bb6ed1331fc39ce63ca26a26c18d"
+        },
+        {
+          "id": "offline-doctor",
+          "command": [
+            "npm",
+            "run",
+            "doctor",
+            "--",
+            "--offline",
+            "--json"
+          ],
+          "exitCode": 0,
+          "signal": null,
+          "error": null,
+          "durationMs": 4502,
+          "log": "offline-doctor.log",
+          "logSha256": "7781e9c6c41944dfcb6689dcf6951fa34cf243b7c9c4c077b0eee5a3b5a4699e"
+        },
+        {
+          "id": "verify",
+          "command": [
+            "npm",
+            "run",
+            "verify"
+          ],
+          "exitCode": 0,
+          "signal": null,
+          "error": null,
+          "durationMs": 44099,
+          "log": "verify.log",
+          "logSha256": "7c825d45d436cd964d82be3422d223ac315a03ffd6ade6b6cb1ce9d71dcaf182"
+        }
+      ],
+      "scope": "Fresh published checkout with isolated HOME/cache and no copied dependencies/settings/authentication, on the existing host. No clean-machine, provider, engine, or mission execution claim."
     }
   }
 }

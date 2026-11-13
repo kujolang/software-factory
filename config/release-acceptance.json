@@ -289,7 +289,7 @@
       "evidence": [
         "docs/qualification-results.json"
       ],
-      "limits": "Fresh published checkout installs and passes offline doctor; later aggregate exposed provenance/fixture bugs now fixed. Final fresh-checkout retry pending. Clean OS, Linux/WSL, representative installed missions and upgrade/rollback matrix remain unqualified."
+      "limits": "Fresh public checkout45be0c3 passed npm ci, setup, offline doctor and229+8 tests on current macOS host with isolated HOME/cache and no copied dependencies/settings/auth. Clean OS/Linux/WSL, installed live missions and upgrade/rollback matrix remain unqualified."
     },
     {
       "id": "AC-15",

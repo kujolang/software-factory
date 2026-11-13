@@ -760,5 +760,55 @@
     "config/cli-runtime-profiles.json": "967859f74cd53eebd22213ff2c90de49488f8fe8d719a4d1ad0dac1ddf829254",
     "config/cli-runtime-sources.lock.json": "de693fdd2945f9b9fdf968ada03c72d1d8ea99b1845ab24dad968ea14d8776e9",
     "sources.lock.json": "67407995783d72ab15328c7eb1d18a98fb75d140e98091dbcfea05fab07efca4"
+  },
+  "sourceIdentityRequalification": {
+    "sourceCommit": "45be0c3dcd0164ad0439017b6e372f96d3cd3b7a",
+    "command": "node scripts/qualify-installed-native-cli.mjs",
+    "exitCode": 0,
+    "log": {
+      "path": ".runtime/ledger-completion/native-identity-final.log",
+      "sha256": "d52e03c2ff55a32e7778bb70e65f2455aa261ab5ce951fc4e525f4c87c1c81de"
+    },
+    "result": {
+      "ok": true,
+      "base": "/Users/robertdevore/2026/Kujolang/kujo-repos/software-factory/.runtime/native-installed-qualification-Y4Dw7J",
+      "records": [
+        {
+          "profile": "go-cli",
+          "elapsedMs": 26324,
+          "sourceHash": "502d64a669a2d45e804d35d7f892e53063cd232861006621db3713b3ca52b542",
+          "workcellSource": {
+            "commit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+            "expectedCommit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+            "clean": true,
+            "trackedFiles": 270,
+            "trackedBytes": 1820045,
+            "trackedInventorySha256": "8d3fce926a99fdab023288284d7d9fe22cab7c3b6644825a0392529fa9ff8175",
+            "scope": "Pinned tracked Git blob bytes and executable modes; ignored files and generated caches are not authenticated"
+          },
+          "imageId": "sha256:6535831b94cd8d317b51b306ce5c057a61fe27100e26e3c9aa75c6c8f22101ee",
+          "stdoutSha256": "ac2624f0c928f95a5a21f577c8de93925e532309e199b45248fc5d9fb8dff084",
+          "evidence": "go-cli/evidence"
+        },
+        {
+          "profile": "rust-cli",
+          "elapsedMs": 11142,
+          "sourceHash": "028997150d8b5dba2d363b566189380229ab8400eca8c49676c3b9c9347ccec9",
+          "workcellSource": {
+            "commit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+            "expectedCommit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+            "clean": true,
+            "trackedFiles": 270,
+            "trackedBytes": 1820045,
+            "trackedInventorySha256": "8d3fce926a99fdab023288284d7d9fe22cab7c3b6644825a0392529fa9ff8175",
+            "scope": "Pinned tracked Git blob bytes and executable modes; ignored files and generated caches are not authenticated"
+          },
+          "imageId": "sha256:6a5c8acb308500d7d0837a23882e763d9f8dfefae36b2db62f092f7b6436a0c5",
+          "stdoutSha256": "08f056e7b1a36609a99c47779657ecd947ce6a00a7046bc16c6ddab1712b1d15",
+          "evidence": "rust-cli/evidence"
+        }
+      ],
+      "scope": "Installed public CLI standard-library positives; no full application/runtime compatibility claim"
+    }
   }
 }
