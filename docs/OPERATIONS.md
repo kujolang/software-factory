@@ -16,13 +16,13 @@ Native structural repair plans explicitly prohibit replay, resume, unconsuming e
 
 `factory operations verify-snapshot PATH` checks exact inventory hashes and rejects missing, changed, extra and symlinked files. This is unsigned integrity verification, not authentication or execution proof. The snapshot and embedded diagnostics can contain private mission information and must remain private unless deliberately shared.
 
-`factory operations retention RUNS` reports a dry-run list for human review, using a 30-day default and explicit terminal timestamps. API callers may choose another positive day count. Missing terminal timestamps retain the run. The adapter never deletes anything; verify backups and evidence obligations before separately authorizing deletion.
+`factory operations retention RUNS` reports a dry-run list for human review, using a 30-day default and explicit terminal timestamps. API callers may choose another positive day count. Missing terminal timestamps retain the run. This legacy report never deletes anything. The separate exact-preview retention interface below provides explicitly authorized archival removal.
 
 ## Qualification
 
 `node --test tests/operations.test.mjs` runs the actual pinned native engine with explicitly synthetic offline tools. Tests kill the process group while a native step is running, verify retained uncertainty, inspect/snapshot without reexecution, reject tampering, then independently kill a controller after a durable native approval pause and resume that fixture through upstream `run_workflow`. The completed earlier tool is not repeated; separate fixture result files preserve both observations. No provider, application or external service executes. Tests also verify immutable workflow drift, mutable terminal timestamps and retention dry-run behavior.
 
-This qualifies read-only diagnosis and archival operations on the tested host. Automatic recovery, running-step retry, cross-host runtime restoration, SQLite checkpoint restoration, cost reservation reconciliation, approval replay, source-changing repair and automated deletion remain unsupported.
+This qualifies read-only diagnosis and archival operations on the tested host. Automatic recovery, running-step retry, cross-host runtime restoration, SQLite checkpoint restoration, cost reservation reconciliation, approval replay, source-changing repair and autonomous deletion remain unsupported.
 
 ## Authorized same-host continuation
 
@@ -45,3 +45,13 @@ Abandoned slots are retained. After safe resume assessment, `reclaimMissionAdmis
 `operations restore-archive BUNDLE DEST` delegates verified evidence import and explicitly returns `resumeAuthorized:false`. Archival evidence is not the original authoritative native checkpoint. An imported bundle cannot be resumed in place; starting new work requires a separately reviewed mission.
 
 Legacy tool runs have an empty control journal. Upstream retained-host `recover inspect` requires a nonzero control cursor and reports these as unsupported. Factory continuation admits only an empty zero-cursor journal with no retained effect or approval authority; the native runner still performs its own journal reconciliation under the run lock before factory admission. Nonempty retained-host histories require separate reconciliation and are not supported by this continuation path.
+
+## Exact-preview local retention
+
+`retentionCommand` in `factory/operations-retention.mjs` provides `preview RUNS`, `apply PREVIEW.json ARCHIVES SHA256 --operator NAME --authorize-delete`, `verify-archive ARCHIVE`, and `restore-archive ARCHIVE DEST`. CLI routing is separate from this controller API. Save the returned preview JSON outside the mission store and review its exact SHA256 before applying. Only completed missions with an explicit terminal timestamp older than 30 days qualify by default. Failed, cancelled, interrupted, active, recent and undated missions remain retained. Failed attempt evidence inside an otherwise completed mission is copied with all other bytes.
+
+Apply requires both explicit deletion authorization and the exact preview digest. It reserves the same global mission lock used by admission, rejects changed source identities/content/status, and copies the complete bounded mission into a private archive outside the mission store. It verifies every file hash and empty directory before moving the original into a uniquely named quarantine, rechecking it, then removing it. A durable archive intent precedes that move; a result receipt follows removal. A crash can leave a lock, archive or quarantine requiring human reconciliation; none is automatically reclaimed or deleted. A batch can partially complete, with separate receipts for each completed mission.
+
+These archives preserve all mission files, including private raw logs omitted by portable evidence export. Keep them private; this is local storage maintenance, not a safe-to-publish evidence format. Limits are 512 MiB, 20,000 entries and depth 24 per mission; symlinks, hardlinks and special files fail closed. Archiving requires temporary free space and does not reduce total bytes until an operator moves the archive to separate storage. Byte integrity is unsigned and establishes neither authenticity nor execution proof. Retention does not delete archived evidence.
+
+Archive restore verifies and copies into a nested `payload` directory, preserving the distinction between archival recovery and registered executable mission state. It does not acquire approvals, register a mission, restore process liveness, or authorize resume. `node --test tests/operations-retention.test.mjs` verifies complete archive/removal/restore, failed evidence preservation, active admission exclusion, stale previews and terminal status, explicit authorization, tamper rejection and link rejection using temporary fixtures only.
