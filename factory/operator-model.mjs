@@ -1,3 +1,4 @@
+import {extraGateObservations} from './gate-observations.mjs';
 // Read-only, bounded projection of persisted observations. Never grants authority.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -28,7 +29,7 @@ export function readOperatorModel(directory){
    if(stat.isSymbolicLink())throw Error('Operator evidence symlink rejected');
    if(stat.isDirectory()){walk(rel,depth+1);continue;}if(!stat.isFile())throw Error('Operator evidence special file rejected');
    inventory.push({path:rel,bytes:stat.size});
-   if(depth===0&&/\.json$/.test(name)&&(/-(receipt|proposal)\.json$/.test(name)||/^failure-/.test(name)||['verification.json','release.json','release-verified.json','evaluation.json','release-policy-final.json','mission-accountability.json','mission-observations.json','team-plan.json','skill-activations.json'].includes(name))){
+   if(depth===0&&/\.json$/.test(name)&&(/-(receipt|proposal)\.json$/.test(name)||/^failure-/.test(name)||['performance.json','secret-source-scan.json','verification.json','release.json','release-verified.json','evaluation.json','release-policy-final.json','mission-accountability.json','mission-observations.json','team-plan.json','skill-activations.json'].includes(name))){
     try{const bytes=read(rel);records.set(rel,{value:JSON.parse(bytes),sha256:hash(bytes)});}catch(error){if(/symlink|special file/.test(error.message))throw error;warnings.push({path:rel,error:'Record unavailable, malformed or exceeds read bounds'});}
    }
   }
@@ -47,7 +48,7 @@ export function readOperatorModel(directory){
    agents.push({path:ref,sha256,role:short(v.role),taskId:short(v.taskId),provider:short(v.provider),model:short(v.model),status:short(v.status)??(Number.isInteger(v.code)?`process exit ${v.code}`:null),reason:short(v.reason),fixture:v.fixture===true,startedAt:short(v.startedAt),durationMs:number(v.durationMs),usage:known?{input_tokens:total('input_tokens'),output_tokens:total('output_tokens'),cached_input_tokens:total('cached_input_tokens')}:null,cost:null,costNote:'No qualified monetary accounting; unknown is not zero',observedToolCalls:number(v.observedToolCalls),skillActivations:Array.isArray(v.skillActivations)?v.skillActivations.slice(0,16).map(s=>({id:short(s.id),sourceCommit:short(s.sourceCommit),sha256:short(s.sha256),packagePath:short(s.packagePath),permissions:[]})):[]});
   }
   if(v.schema==='kujo.factory.failure-observation/v1')failures.push({path:ref,sha256,kind:short(v.kind),summary:short(v.summary),taskId:short(v.taskId),observedAt:short(v.observedAt),evidence:Array.isArray(v.evidence)?v.evidence.filter(e=>safePath(e?.path)).slice(0,30):[]});
-  if(['verification.json','release.json','release-verified.json','evaluation.json','release-policy-final.json','mission-accountability.json'].includes(path.basename(ref)))gates.push({path:ref,sha256,status:short(v.status),ok:typeof v.ok==='boolean'?v.ok:null,passed:typeof v.passed==='boolean'?v.passed:null,sourceHash:short(v.sourceHash??v.hash??v.candidateHash),blockers:Array.isArray(v.blockers)?v.blockers.slice(0,30).map(short):[],deploymentAuthorized:false});
+  if(['performance.json','secret-source-scan.json','verification.json','release.json','release-verified.json','evaluation.json','release-policy-final.json','mission-accountability.json'].includes(path.basename(ref)))gates.push({...extraGateObservations(v),path:ref,sha256,status:short(v.status),ok:typeof v.ok==='boolean'?v.ok:null,passed:typeof v.passed==='boolean'?v.passed:null,sourceHash:short(v.sourceHash??v.hash??v.candidateHash),blockers:Array.isArray(v.blockers)?v.blockers.slice(0,30).map(short):[],deploymentAuthorized:false});
   // These are submitted proposal revisions, not a claim that files were admitted.
   if(ref.endsWith('-proposal.json')&&Array.isArray(v.files))for(const file of v.files.slice(0,64)){
    if(changes.length>=128)break;if(!safePath(file?.path)||typeof file.content!=='string')continue;
