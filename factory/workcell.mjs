@@ -79,6 +79,8 @@ export async function workcellPreflight() {
   const info = JSON.parse(
     (await docker(["info", "--format", "{{json .SecurityOptions}}"])).out,
   );
+  if (!Array.isArray(info) || info.some(x => typeof x !== 'string'))
+    throw Error('docker info failed: missing security metadata');
   if (
     !info.some((x) => x.includes("rootless")) ||
     !info.some((x) => x.includes("seccomp"))

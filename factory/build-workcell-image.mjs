@@ -6,6 +6,7 @@ const context=fileURLToPath(new URL('./workcell-image/',import.meta.url));
 const probe=spawnSync('docker',['info','--format','{{json .SecurityOptions}}'],{encoding:'utf8'});
 if(probe.status!==0)throw Error('Docker engine unavailable');
 const options=JSON.parse(probe.stdout);
+if(!Array.isArray(options))throw Error('Docker security metadata unavailable');
 if(!options.some(x=>x.includes('rootless'))||!options.some(x=>x.includes('seccomp')))throw Error('Factory image build requires rootless Docker with seccomp');
 const result=spawnSync('docker',['build','--tag',process.env.FACTORY_WORKCELL_IMAGE || 'kujolang/factory-node:local',context],{stdio:'inherit'});
 if(result.error)throw result.error;
