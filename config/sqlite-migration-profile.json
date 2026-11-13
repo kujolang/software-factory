@@ -1,0 +1,13 @@
+{
+  "schema": "kujo.factory.sqlite-migration-profile/v1",
+  "id": "sqlite-sql-v1",
+  "nodeVersion": "v26.12.1",
+  "imageId": "sha256:c62fa7844cd38dd67d18421162af5016b2973a48d6db0a119982b2bf4b661383",
+  "qualification": "qualified-sqlite-fixtures-linux-amd64",
+  "scope": "Disposable SQLite database; bounded SQL forward migration and transaction-failure rollback; no production authorization",
+  "qualificationEvidence": {
+    "record": ".runtime/sqlite-migration-qualification/qualification-U1M9Ue/qualification.json",
+    "sha256": "3197cffb1fe02f2fbfc0fbcb87e09e912203e6f1eff08b8f8eb3f0c804444a2a",
+    "cases": 9
+  }
+}
