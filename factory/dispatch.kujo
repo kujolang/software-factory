@@ -23,7 +23,11 @@ func factory_worker(input, context) {
     if timeout_ms <= 0 { timeout_ms = 900000 }
     # A fixed executable and argv boundary. Workers own validation, isolated
     # candidate writes, provider usage, corrections, and release policy.
-    result := spawn_process([env_or("NODE_BIN", "node"), factory_root + "/factory/worker.mjs", run_dir, context["step_id"]], {"cwd": factory_root, "inherit_env": true, "timeout_ms": timeout_ms, "max_output_bytes": 1048576})
+    kind := env_or("FACTORY_WORKFLOW_KIND", "application")
+    assert(kind == "application" || kind == "specification", "Unknown trusted factory workflow kind")
+    worker := "/factory/worker.mjs"
+    if kind == "specification" { worker = "/factory/spec-pipeline-worker.mjs" }
+    result := spawn_process([env_or("NODE_BIN", "node"), factory_root + worker, run_dir, context["step_id"]], {"cwd": factory_root, "inherit_env": true, "timeout_ms": timeout_ms, "max_output_bytes": 1048576})
     if result.success == false {
         return {"ok": false, "error": {"code": "factory_worker_failed", "message": "Worker failed or exceeded its bound; inspect the task evidence: " + context["step_id"], "retryable": false}}
     }
@@ -69,7 +73,9 @@ workflow = installed["workflow"]
 options := {"auto_approve": false, "interactive": false, "event_hook": func(event) { append_file(run_dir + "/dispatch-events.jsonl", to_json(event) + "\n") }}
 state := create_run_state(workflow, {"topic": dict_get_or(definition, "name", "Software factory mission"), "factory_run_dir": run_dir}, run_dir + "/dispatch", {"auto_approve": false, "interactive": false})
 result := run_workflow(workflow, state, installed["tool_registry"], options)
-summary := {"schema": "kujo.factory.dispatch-result/v1", "ok": result["ok"], "status": result["run_state"]["status"], "runId": result["run_state"]["run_id"], "runDir": result["run_state"]["run_dir"], "releaseAuthority": "independent-candidate-gate"}
+release_authority := "independent-candidate-gate"
+if env_or("FACTORY_WORKFLOW_KIND", "application") == "specification" { release_authority = "none-specification-review-only" }
+summary := {"schema": "kujo.factory.dispatch-result/v1", "ok": result["ok"], "status": result["run_state"]["status"], "runId": result["run_state"]["run_id"], "runDir": result["run_state"]["run_dir"], "releaseAuthority": release_authority}
 write_file(run_dir + "/dispatch-result.json", to_json(summary))
 print(to_json(summary))
 assert(result["ok"] && result["run_state"]["status"] == "completed", "Factory workflow failed; release remains blocked")
