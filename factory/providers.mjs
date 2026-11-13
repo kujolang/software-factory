@@ -4,11 +4,13 @@ import path from 'node:path';
 import {spawn, execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import Ajv2020 from 'ajv/dist/2020.js';
+import {executeSDKProposal,sdkProviderCatalog} from './provider-sdk.mjs';
 import {root, dependency, codexBinary, providerHome, kujoBinary} from './settings.mjs';
 
 export const providerCatalog = Object.freeze([
   {id:'codex', transport:'restricted-cli', structuredOutput:true, tools:false, streaming:false, usage:'reported', qualification:'live schema smoke passed; full mission requalification required'},
   {id:'ollama', transport:'kujo-native-local-chat', structuredOutput:true, tools:false, streaming:false, usage:'reported', qualification:'live local schema smoke passed; full mission qualification required'},
+  ...sdkProviderCatalog,
   {id:'mock', transport:'offline-fixture', structuredOutput:true, tools:false, streaming:false, usage:null, qualification:'deterministic tests only; never execution proof'},
 ]);
 const active = new Set();
@@ -109,6 +111,15 @@ export async function executeProposal(options = {}) {
       if(Buffer.byteLength(encoded)>maxBytes)throw failure('output_limit');
       output=JSON.parse(encoded);
       receipt.model='offline-fixture';
+    } else if(sdkProviderCatalog.some(p=>p.id===provider)) {
+      if(!model)throw failure('model_required');
+      if(maxOutputTokens!==null&&maxOutputTokens>16000)throw failure('invalid_token_limit');
+      const credentialFile=options.credentialFile||process.env['FACTORY_'+provider.toUpperCase()+'_CREDENTIAL_FILE'];
+      try {
+        const response=await executeSDKProposal({provider,model,prompt,schema,credentialFile,signal,timeoutMs:Math.min(timeoutMs,300000),maxTokens:maxOutputTokens||8192});
+        if(Buffer.byteLength(JSON.stringify(response.output))>maxBytes)throw failure('output_limit');
+        output=response.output;Object.assign(receipt,{usage:response.receipt.usage,sourceCommits:response.receipt.sourceCommits,structuredOutput:response.receipt.structuredOutput,providerNativeSchema:false,executionEvidence:response.executionEvidence});
+      }catch(error){if(error.receipt)Object.assign(receipt,{usage:error.receipt.usage,retryable:error.receipt.retryable===true,sourceCommits:error.receipt.sourceCommits,executionEvidence:error.executionEvidence});throw error;}
     } else {
       temp=fs.mkdtempSync(path.join(os.tmpdir(),'factory-provider-'));
       fs.chmodSync(temp,0o700);

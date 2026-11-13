@@ -48,9 +48,9 @@ export function validateProviderRouting(value){
  if(!object(value)||Object.keys(value).length>28)throw Error('Invalid role provider routing');
  for(const [id,route] of Object.entries(value)){
   const item=inspectCatalog('roles','chain.'+id);
-  if(item.package!=='chain-of-command'||!object(route)||Object.keys(route).some(k=>!['provider','model'].includes(k))||!['codex','ollama'].includes(route.provider))throw Error('Unsupported role provider route');
+  if(item.package!=='chain-of-command'||!object(route)||Object.keys(route).some(k=>!['provider','model'].includes(k))||!['codex','ollama','openai','anthropic','gemini'].includes(route.provider))throw Error('Unsupported role provider route');
   if(route.model!==undefined&&(typeof route.model!=='string'||!route.model.trim()||route.model.length>200||/[\r\n\0]/.test(route.model)))throw Error('Invalid routed model');
-  if(route.provider==='ollama'&&!route.model)throw Error('Local role route requires a model');
+  if(route.provider!=='codex'&&!route.model)throw Error('Routed API/local provider requires a model');
  }
  return value;
 }
@@ -86,7 +86,7 @@ export function collectCandidateConsultations({dir,config,sourceHash}){
   const proposal=read('artifacts/'+task.id+'-proposal.json'),receipt=read('artifacts/'+task.id+'-receipt.json'),binding=read('artifacts/'+task.id+'-candidate-binding.json');
   const b=binding.value,r=receipt.value,p=proposal.value;
   if(b.schema!=='kujo.factory.candidate-consultation/v1'||b.taskId!==task.id||b.role!==task.agentId||b.sourceHash!==sourceHash||b.verificationSha256!==verification.sha256||b.proposalSha256!==proposal.sha256||b.receiptSha256!==receipt.sha256||b.approvalGranted!==false||b.deploymentAuthorized!==false)throw Error('Consultation source or record identity changed');
-  if(r.role!==task.agentId||r.taskId!==task.id||r.status!=='completed'||r.code!==0||r.observedToolCalls!==0||r.fixture!==false||!['codex','ollama'].includes(r.provider)||!['pass','proposed'].includes(p.verdict)||!Array.isArray(p.files)||p.files.length)throw Error('Consultation missing successful restricted advisory receipt');
+  if(r.role!==task.agentId||r.taskId!==task.id||r.status!=='completed'||r.code!==0||r.observedToolCalls!==0||r.fixture!==false||!['codex','ollama','openai','anthropic','gemini'].includes(r.provider)||!['pass','proposed'].includes(p.verdict)||!Array.isArray(p.files)||p.files.length)throw Error('Consultation missing successful restricted advisory receipt');
   return {taskId:task.id,role:task.agentId,sourceHash,verificationSha256:verification.sha256,proposal:{path:proposal.path,sha256:proposal.sha256,output:p},receipt:{path:receipt.path,sha256:receipt.sha256,record:r},binding:{path:binding.path,sha256:binding.sha256},authority:'Advisory findings for independent release review; no implementation effects or approval authority',approvalGranted:false,deploymentAuthorized:false};
  });
 }
