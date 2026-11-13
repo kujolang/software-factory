@@ -1,0 +1,32 @@
+{
+  "schema": "kujo.factory.visual-runtime/v1",
+  "baseImage": "sha256:0c858030a48881dd918554ea0420070659c282d21703630ff7df23657618e0f8",
+  "python": "3.13.9",
+  "platform": "linux/amd64",
+  "lensCommit": "91049646d70c11bf0c6071f39cf7dfac6b1ba70b",
+  "qualification": "qualified-native-visual-comparison-linux-amd64",
+  "wheels": [
+    {
+      "package": "pillow",
+      "version": "12.3.0",
+      "filename": "pillow-12.3.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/f7/62/de5bdd77d935331f4f802edc11e4d82950f642caad6cb2f949837b8560e2/pillow-12.3.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "bytes": 6937129,
+      "sha256": "0847a763afefb695bc912d7c131e7e0632d4edc1d8698f58ddabec8e46b8b6d3"
+    },
+    {
+      "package": "numpy",
+      "version": "2.2.6",
+      "filename": "numpy-2.2.6-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "url": "https://files.pythonhosted.org/packages/19/49/4df9123aafa7b539317bf6d342cb6d227e49f7a35b99c287a6109b13dd93/numpy-2.2.6-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl",
+      "bytes": 16526072,
+      "sha256": "1bc23a79bfabc5d056d106f9befb8d50c31ced2fbc70eedb8155aec74a45798f"
+    }
+  ],
+  "qualifiedImage": "sha256:d2453fc8e7815e4acc2906105c3c1f92e1d455f74f5332e4ce3abeda073d8b8d",
+  "qualificationEvidence": {
+    "path": ".runtime/visual-baseline-qualification/execution-IhVFSF/qualification.json",
+    "sha256": "6946650f2ce5d9382c984f9514aea4401c4dff8c52e0db8093ec9b560e3a24f5",
+    "approvalFixture": true
+  }
+}
