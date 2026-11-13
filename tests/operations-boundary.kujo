@@ -1,0 +1,31 @@
+# Synthetic offline workers with production checkpoint/admission APIs and native locks.
+from src.core.step import create_step
+from src.core.state import create_run_state, load_run_state
+from src.core.runner import run_workflow, run_workflow_with_admission
+from src.tools.tool import create_tool_registry, create_tool, register_tool
+from src.workflows.workflow import create_workflow
+from src.core.utils import dict_get_or
+func worker(input, context) {
+    result := spawn_process([env("NODE_BIN"),env("FACTORY_ROOT")+"/tests/operations-checkpoint-fixture.mjs",env("FIXTURE_DIR"),context["step_id"]],{"timeout_ms":10000,"max_output_bytes":65536})
+    if result.success == false {return {"ok":false,"error":{"code":"fixture_failed","message":result.stderr,"retryable":false}}}
+    return parse_json(trim(result.stdout))
+}
+workflow := create_workflow({"id":"recovery-boundary","name":"Synthetic recovery boundary","description":"No candidate/provider effects","input_schema":{"type":"dict"},"output_schema":{"type":"dict"},"agents":{},"tools":[],"steps":[create_step("first","First","tool",{"tool_name":"factory_worker","output_key":"first","idempotency_key":"first","effect_class":"local_reversible","timeout_ms":900000,"input_schema":{"type":"dict"},"output_schema":{"type":"dict"}}),create_step("last","Last","tool",{"tool_name":"factory_worker","depends_on":["first"],"output_key":"last","idempotency_key":"last","effect_class":"local_reversible","timeout_ms":900000,"input_schema":{"type":"dict"},"output_schema":{"type":"dict"}})],"memory_config":{},"default_retry_policy":{"max_attempts":1},"approval_config":{"auto_approve":false}})
+fixture_tool := create_tool("factory_worker","Synthetic fixed observation",{"type":"dict"},{"type":"dict"},worker,null)
+fixture_tool["__dispatch_deadline_bounded"] := true
+registry := register_tool(create_tool_registry(),fixture_tool)
+mode := env("FIXTURE_MODE")
+options := {"auto_approve":false,"interactive":false,"event_hook":func(event){if mode=="initial"&&event["event_type"]=="step_started"&&event["step_id"]=="last" {write_file(env("FIXTURE_DIR")+"/marker.txt","persisted completed/pending boundary");_:=spawn_process(["/bin/sleep","30"])}}}
+state := {}
+result := {}
+if mode=="initial" {
+ state=create_run_state(workflow,{"topic":"offline boundary","factory_run_dir":env("FIXTURE_DIR")},env("FIXTURE_DIR")+"/dispatch",{"auto_approve":false,"interactive":false})
+ result=run_workflow(workflow,state,registry,options)
+} else {
+ loaded:=load_run_state(env("FIXTURE_DIR")+"/dispatch",env("FACTORY_RESUME_ID"));assert(loaded["ok"],"load failed")
+ admission:=func(current){r:=spawn_process([env("NODE_BIN"),env("FACTORY_ROOT")+"/factory/operations.mjs","admit-resume",env("FIXTURE_DIR"),env("FACTORY_RECOVERY_ATTEMPT")],{"timeout_ms":60000,"max_output_bytes":65536});if r.success==false {return {"ok":false,"error":{"code":"admission_denied","message":r.stderr,"retryable":false}}};value:=parse_json(trim(r.stdout));assert(value["nativeId"]==current["run_id"]&&value["nativeRevision"]==dict_get_or(current,"revision",null),"revision mismatch");return {"ok":true,"run_state":current}}
+ result=run_workflow_with_admission(workflow,loaded["run_state"],registry,options,admission)
+}
+write_file(env("FIXTURE_DIR")+"/result-"+mode+".json",to_json(result))
+if result["ok"] == false {print(to_json(result))}
+assert(result["ok"],"native run rejected")

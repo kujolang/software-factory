@@ -1,3 +1,5 @@
+import {assertMissionOperationsBudget} from './operations-policy.mjs';
+import {recordMissionCheckpoint} from './operations.mjs';
 import {evaluateLens,verifyLensBinding} from './lens.mjs';
 import {roleContract,admitRoleProposal,skillContext,validateProviderRouting,collectCandidateConsultations} from './role-runtime.mjs';
 import {inspectRunAccounting} from './accountability.mjs';
@@ -233,6 +235,7 @@ try {
   if(config.accountabilityRequired!==true)throw Error("Worker requires controller-started mission accounting");
   const accounting=await inspectRunAccounting(json(path.join(artifact,"accounting-start.json")));
   if(accounting.record.status!=="in_progress"||accounting.record.task_name!==config.id)throw Error("Worker accounting identity is not active for this mission");
+  assertMissionOperationsBudget(dir);
   emit("task.started", task.title, { dependencies: task.dependencies });
   handoff(
     task.handoffFrom ??
@@ -580,6 +583,7 @@ try {
       ? "Proposal returned without implementation; verification must route correction"
       : task.title + " complete",
   );
+  if(!proposalBlocked&&fs.existsSync(path.join(artifact,"recovery-binding.json")))recordMissionCheckpoint(dir,taskId);
   console.log(JSON.stringify({ ok: true, data: { taskId } }));
 } catch (e) {
   emit("task.failed", String(e.message));

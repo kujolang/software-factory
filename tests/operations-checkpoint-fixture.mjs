@@ -1,0 +1,3 @@
+// Trusted synthetic fixture: emits observations only, never candidate/provider code.
+import fs from 'node:fs';import path from 'node:path';import {recordMissionCheckpoint} from '../factory/operations.mjs';
+const [dir,taskId]=process.argv.slice(2);const emit=type=>fs.appendFileSync(path.join(dir,'events.jsonl'),JSON.stringify({type,taskId})+'\n');emit('task.started');fs.appendFileSync(path.join(dir,'counter.txt'),taskId+'\n');fs.writeFileSync(path.join(dir,'application/result.txt'),taskId);fs.writeFileSync(path.join(dir,'artifacts',taskId+'.json'),JSON.stringify({synthetic:true,taskId}));emit('task.completed');recordMissionCheckpoint(dir,taskId);console.log(JSON.stringify({ok:true,data:{synthetic:true,taskId}}));
