@@ -1,0 +1,339 @@
+{
+  "schema": "kujo.factory.change-tools-lock/v1",
+  "repositories": {
+    "fence": {
+      "url": "https://github.com/kujolang/fence.git",
+      "commit": "d3173049b5365af975624fddd48e943d39738c75",
+      "files": {
+        "LICENSE": {
+          "sha256": "4b6449939f8dce26dc5fb87756740a5977da9085517af127d9e634e6a6492506",
+          "bytes": 1087
+        },
+        "fence.kujo": {
+          "sha256": "49dd228dd97493aba0a2be8f58b96778cb7b4b62ccf59d0ddbdaa4fab9dea390",
+          "bytes": 396
+        },
+        "src/analyze.kujo": {
+          "sha256": "f7125f9378bf3d83f8283a05515245bf046b89b3248be01f780a04d2598a8904",
+          "bytes": 10674
+        },
+        "src/baseline.kujo": {
+          "sha256": "705005eb01777ade9a378601bd2e14a65f2f72e4214de8d23d5f3a03eadb6e75",
+          "bytes": 5187
+        },
+        "src/cache.kujo": {
+          "sha256": "655f021741ecd7f39abcb99f1a00ef28d440ad71d343a996f5a510b42b8d9423",
+          "bytes": 5748
+        },
+        "src/cli.kujo": {
+          "sha256": "8489dd3798c84fa2eb78f7f9f5a2b1e57cf6a7b118f19ebdfa9498c870c8da95",
+          "bytes": 2159
+        },
+        "src/cliargs.kujo": {
+          "sha256": "b4e5c519e52a5247bad2edb159a11d29840fd91dd5accc8f94862a9b2629fad8",
+          "bytes": 2609
+        },
+        "src/cmd_baseline.kujo": {
+          "sha256": "d907a184458f116dee8e66f8ba4e2f39e2e721076a9f5b6c3b0d27e9ca69d469",
+          "bytes": 2836
+        },
+        "src/cmd_check.kujo": {
+          "sha256": "162573b092bcb9de339b98da6ce85c0d47b2de33f9814a7d0bdf438d3e3a88a9",
+          "bytes": 8220
+        },
+        "src/cmd_doctor.kujo": {
+          "sha256": "42ab6b8c8cc497447af34821874d651a09c5defc0eaba14cfa10472770922e32",
+          "bytes": 1776
+        },
+        "src/cmd_explain.kujo": {
+          "sha256": "8341a507e1966e5a18eaa3cef1d2d5033dd71eeac57feadee120e3a2ff9efbad",
+          "bytes": 5556
+        },
+        "src/cmd_graph.kujo": {
+          "sha256": "6d1f05ebd43844b580db6155dfb3819035f587ab086e645855d6efe163627c08",
+          "bytes": 2212
+        },
+        "src/cmd_ignores.kujo": {
+          "sha256": "823ab224a06d4173314b519bf0bfb55fb4b777a83a3c0ac35532706e021c051b",
+          "bytes": 2615
+        },
+        "src/cmd_init.kujo": {
+          "sha256": "a98be7869d1659a08de7a6a138cc65699d5233a3540e7afb5780010bf1b84e63",
+          "bytes": 1246
+        },
+        "src/cmd_validate.kujo": {
+          "sha256": "faf6e36764b20d05bf0dbf5db45d421c2d3ce3601e49e00f8e59480b2919482f",
+          "bytes": 1031
+        },
+        "src/cmd_workspace.kujo": {
+          "sha256": "e80fcb92a7234c6fb90aecd800000e807347786bb91c498f1f6c68ac2659c337",
+          "bytes": 3946
+        },
+        "src/config.kujo": {
+          "sha256": "0e98b49e76bd8b4fb977b129a85d418d8cb87714540b805963faf9d4fb2223dd",
+          "bytes": 9823
+        },
+        "src/cycles.kujo": {
+          "sha256": "5f121d613af8a033ef6da0a9f232e7ce358a03d257a31d09bbe13b603282ee82",
+          "bytes": 4429
+        },
+        "src/decisions.kujo": {
+          "sha256": "d3c77e4fe7e0a0bccdc9d15ccd81ad8a96ebb4fbd2dca95377df9734fb6bffde",
+          "bytes": 2182
+        },
+        "src/git.kujo": {
+          "sha256": "34606995b45a6e269f159154186a8f9d41f60a458e14d247bf4cfc2090f0e770",
+          "bytes": 4084
+        },
+        "src/glob.kujo": {
+          "sha256": "da32edaf4242b7e3b207a9382e15f0411b063b169a3c071e3fbe9cf499722e71",
+          "bytes": 6125
+        },
+        "src/graph.kujo": {
+          "sha256": "ad6220a0bbcb3703c81f7ef09fdbea5b37b4fb34b34bd6cbbcd64169dc01fdf6",
+          "bytes": 5031
+        },
+        "src/ignores.kujo": {
+          "sha256": "d48b5c60a1b134b9bb7b54bf9c4d98f24556a5e800a16668f99b9eb41fdc54f4",
+          "bytes": 2313
+        },
+        "src/imports.kujo": {
+          "sha256": "e58ffe8c199d15d3dfc68a8a2a46c1d6adaed505b00b5a11008e3be0e59166cf",
+          "bytes": 9913
+        },
+        "src/imports_ext.kujo": {
+          "sha256": "03a9c41fe3f5f703d1f67f86f79e3624cf86868da4538d04ff51c59aa6b46e25",
+          "bytes": 6664
+        },
+        "src/meta.kujo": {
+          "sha256": "45e2d07363352ddfcd80722fbfc98d0118e4361bb07376007a73f15ff2a381da",
+          "bytes": 3241
+        },
+        "src/output.kujo": {
+          "sha256": "cb24fe493cce733a3e5bc8bf28a5b80d4b81537fcf7e926757a7bc200f9259d4",
+          "bytes": 2297
+        },
+        "src/parser_adapters.kujo": {
+          "sha256": "f73f95fb90c9c196f42569840398ed6b5affd955fd751c5e77ca52b42b94266c",
+          "bytes": 2917
+        },
+        "src/paths.kujo": {
+          "sha256": "311c25cf82309e9578b38fa0c2e271580199b36adf85607897845c8ec39401c5",
+          "bytes": 3121
+        },
+        "src/reports.kujo": {
+          "sha256": "6e7334f63636ccb97ba77e3944ee0aa5a9c7d1454145663661a54871900cedd6",
+          "bytes": 13833
+        },
+        "src/resolve.kujo": {
+          "sha256": "ab956b6028b5c75759bbe24c88fa94149445072aabfefc135142f3cab7ffa5d2",
+          "bytes": 12055
+        },
+        "src/rules.kujo": {
+          "sha256": "8d106746e986d20b94803e82bde94ce947a88918ea348d794716a054ebd6053b",
+          "bytes": 6106
+        },
+        "src/templates.kujo": {
+          "sha256": "11b837c7c3822caef5cc7fbf555b5130829c4ffe9d500253c149896795b6b06e",
+          "bytes": 10312
+        },
+        "src/util.kujo": {
+          "sha256": "5eab0d7f4b28399637fb4a783689f12fb783788691721dd15d3f2417d1b64e3e",
+          "bytes": 3911
+        },
+        "src/validate.kujo": {
+          "sha256": "81351cb61e857ea51ff63c311c26770a8ab147cb2b9134607a167091be54a91f",
+          "bytes": 10855
+        },
+        "src/walk.kujo": {
+          "sha256": "0420c62bae3b5c3546f9632cf5603b6a0304c7211bfcea5547bc77b384636a7e",
+          "bytes": 7458
+        },
+        "src/zones.kujo": {
+          "sha256": "fa986316d328acbe174c687347f96b1901015bb069a1b7405bb768fde31a4082",
+          "bytes": 1374
+        }
+      }
+    },
+    "concord": {
+      "url": "https://github.com/kujolang/concord.git",
+      "commit": "f8812e7f00f55e4d1d3f46e70d902bce89ec7be7",
+      "files": {
+        "LICENSE": {
+          "sha256": "4b6449939f8dce26dc5fb87756740a5977da9085517af127d9e634e6a6492506",
+          "bytes": 1087
+        },
+        "concord.kujo": {
+          "sha256": "210a5b0c23b6da520492520beaabe506e8cf2856e9eaa41577630cf26599ab63",
+          "bytes": 11599
+        },
+        "src/checks/cli_docs.kujo": {
+          "sha256": "34ea73a3cad833ac907f8b116f74c71835b11ae161d2f025158b882aabd6c039",
+          "bytes": 5323
+        },
+        "src/checks/example_validity.kujo": {
+          "sha256": "5e5219af546bfd8bfbddfd461db0977238b100bf01f7a6604c1b9fbb7cd121bf",
+          "bytes": 5863
+        },
+        "src/checks/manifest_docs.kujo": {
+          "sha256": "c6b96d03a6adab33e1c006272d6d0e6684b09c77471a358d52005ee124eefd73",
+          "bytes": 5705
+        },
+        "src/checks/shared.kujo": {
+          "sha256": "35c6892caf8160729097e9b34fd5e99d11574d85ebc22977880d6cd1c7e21dd4",
+          "bytes": 1948
+        },
+        "src/checks/source_of_truth.kujo": {
+          "sha256": "dd32acb4758f1fe8b661105400eefe30619ff878ecf8b08b8e5ef450f29faa2c",
+          "bytes": 4835
+        },
+        "src/checks/spec_eval.kujo": {
+          "sha256": "bacb203bcfa7f0773253478c40fccb46f39cf3801026c0a919a237fb35b271f2",
+          "bytes": 4538
+        },
+        "src/checks/version_consistency.kujo": {
+          "sha256": "7486969b12bc8073155d3668163d78a266137038923265f5790af1804388b616",
+          "bytes": 3914
+        },
+        "src/common.kujo": {
+          "sha256": "2859d5bbace28d37fd9f6ddb40d963b681110f136faf38c1e04bee4ea4bebd79",
+          "bytes": 5607
+        },
+        "src/fix_tasks.kujo": {
+          "sha256": "8ac2eb57b755050987130d6ae7d81ef8326d3879d006d75d8dfb929e675b0f6c",
+          "bytes": 2772
+        },
+        "src/reporter.kujo": {
+          "sha256": "12549931c14e4db9746c23cd934e342714f7be0d07dcf67c13bff8245a1a5bac",
+          "bytes": 4721
+        },
+        "src/scanner.kujo": {
+          "sha256": "f355bdbe9e19f0d6d641a05d0c5d0a42c74dac0ac5652ce5edbf1da9f5d8aec0",
+          "bytes": 14653
+        },
+        "src/snapshot.kujo": {
+          "sha256": "42238ee23f832fabece4d7d301e54c377b1cb79a906c49fd51eef8b877c804e0",
+          "bytes": 2392
+        }
+      }
+    },
+    "changebucket": {
+      "url": "https://github.com/kujolang/changebucket.git",
+      "commit": "030eea63c60449f82c9ba2680227485d318fdb6d",
+      "files": {
+        "LICENSE": {
+          "sha256": "4b6449939f8dce26dc5fb87756740a5977da9085517af127d9e634e6a6492506",
+          "bytes": 1087
+        },
+        "VERSION": {
+          "sha256": "1575e1af4a95f12f70b4ee6a6adce8160953d93ea17dc2611b90883ccc3ad3b8",
+          "bytes": 6
+        },
+        "changebucket.kujo": {
+          "sha256": "74613364f008c52238aaeb89db99076229bca83a1e9ace50ee2b7037f179a9fd",
+          "bytes": 309
+        },
+        "src/analyze.kujo": {
+          "sha256": "69e689de4de6c2dba1131d6ba246c001a44fc996ce7af9536413b5c321a11e48",
+          "bytes": 10025
+        },
+        "src/budget.kujo": {
+          "sha256": "7e253ca9ee4a36e42aebf79f8af9b3af5bd3b251e8d0a44d674b5058ce347bde",
+          "bytes": 3426
+        },
+        "src/classify.kujo": {
+          "sha256": "3730daaecb143bf7e8e5b1a15adc8f109962e0590f76e630a97b8236bddeae43",
+          "bytes": 7187
+        },
+        "src/cli.kujo": {
+          "sha256": "7154a208d725073985777d8289e833e772b1b0bc4845ab0f15e1eee05bd04a0c",
+          "bytes": 10774
+        },
+        "src/diffsrc.kujo": {
+          "sha256": "55e29cf2f64269e442af30f902d731996936ce64076a416c9de433edf4049909",
+          "bytes": 11684
+        },
+        "src/render.kujo": {
+          "sha256": "05b61a121090f9b888065833d8b1b68e36fc07481817ba09f9a04c50ca60044e",
+          "bytes": 12817
+        },
+        "src/util.kujo": {
+          "sha256": "18cc122eaff9f7d115bcfa5ef47535c7f3f96336fa58840c13a76e5d4bdba8bd",
+          "bytes": 1709
+        }
+      }
+    },
+    "patchbrief": {
+      "url": "https://github.com/kujolang/patchbrief.git",
+      "commit": "92c5cc833730dc427b54a069e9a275bad5969ddc",
+      "files": {
+        "LICENSE": {
+          "sha256": "4b6449939f8dce26dc5fb87756740a5977da9085517af127d9e634e6a6492506",
+          "bytes": 1087
+        },
+        "patchbrief.kujo": {
+          "sha256": "2c3f803827f97824d5f3daba6d61a93d7a6f071055fb7ddd6aa2c6c78b898ec4",
+          "bytes": 4098
+        },
+        "src/common.kujo": {
+          "sha256": "c16d1a65666ffc007edfa9569a0c74ee836a2f2ce9ed7cf9d16d6ee2cca49cab",
+          "bytes": 4792
+        },
+        "src/git.kujo": {
+          "sha256": "2f095e742435479066868b4830c2125f9f47ae02cf460ad0ab1d766fa60580c9",
+          "bytes": 6847
+        },
+        "src/handoff.kujo": {
+          "sha256": "0c20b657e10aa1036ef7d7bc6f71f18b078af82156231109bd9661aa00c3d4a5",
+          "bytes": 5044
+        },
+        "src/suggest_tests.kujo": {
+          "sha256": "8a592a34eef333720823f925d2739d62b982f3c695cfece4ba6cdc09e45e2bb1",
+          "bytes": 4508
+        },
+        "src/summarize.kujo": {
+          "sha256": "dc0ce7d90dcf081d2609bfaf0ace99cc804d1b061c48c78687af18bf7035a1f3",
+          "bytes": 10490
+        }
+      }
+    },
+    "kennel": {
+      "url": "https://github.com/kujolang/kennel.git",
+      "commit": "6e2fc20560037970df5202e1b1ca8f61c3395570",
+      "files": {
+        "kennel.toml": {
+          "sha256": "3e7502b7a6060866d36a57c494839adb92a2b42c6a6db5c50e2358ef811875de",
+          "bytes": 1274
+        },
+        "LICENSE": {
+          "sha256": "4b6449939f8dce26dc5fb87756740a5977da9085517af127d9e634e6a6492506",
+          "bytes": 1087
+        },
+        "manifest.kujo": {
+          "sha256": "a807ed6ffb58b1d8ba052d4afb92281bfa1fc8e24ba332579a1a816ca634dba8",
+          "bytes": 861
+        },
+        "dependency_spec.kujo": {
+          "sha256": "8ced5561affb3fae8889e45f9b2169dfdc470094b02953b6b13db62a4dbb81f7",
+          "bytes": 320
+        },
+        "src/validator.kujo": {
+          "sha256": "7d71519d221d21007140a5b94f610328b4c062095075ce364721fd17760bf8ed",
+          "bytes": 1508
+        },
+        "src/manifest.kujo": {
+          "sha256": "d9d2e22b13c5c97c5bf99862e8597ec253e9995b22c75eee8ef3da1844f7e69b",
+          "bytes": 6074
+        },
+        "src/dependency_spec.kujo": {
+          "sha256": "133cb4337d2f31a6dbc7f863559ec33efb8f138b466cfc2bb5471ff160b29986",
+          "bytes": 10115
+        },
+        "src/utils.kujo": {
+          "sha256": "9a132cc8a5f7f84ddf5227b6c3104489d0cba82f3db87cab1ccf9f4f0dc6b4a8",
+          "bytes": 6737
+        }
+      }
+    }
+  }
+}
