@@ -1,5 +1,7 @@
 # Kujo Software Factory
 
+[![Verification](https://github.com/kujolang/software-factory/actions/workflows/verify.yml/badge.svg)](https://github.com/kujolang/software-factory/actions/workflows/verify.yml)
+
 Give a team of agents a software mission. Inspect what they built, what reviewers rejected, and which tests actually passed.
 
 Software Factory coordinates scoped proposals through Kujo Dispatch, runs generated code inside rootless Workcell containers, and approves a local candidate only after independent checks. The Factory Floor lets you follow and replay the evidence.

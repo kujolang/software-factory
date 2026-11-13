@@ -1,3 +1,4 @@
+import {agentsRoot} from './settings.mjs';
 import fs from "node:fs";
 import path from "node:path";
 import assert from "node:assert/strict";
@@ -60,7 +61,7 @@ export function audit(dir) {
       assert.ok(overlapMs > 0);
     });
   }
-  const schema = json(path.join(process.env.FACTORY_AGENTS_ROOT || run.agentsRoot, "schemas/handoff.schema.json"));
+  const schema = json(path.join(agentsRoot, "schemas/handoff.schema.json"));
   const validate = new Ajv2020({ strict: false }).compile(schema);
   check("canonical handoff schema", () => {
     for (const p of fs

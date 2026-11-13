@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {spawnSync} from 'node:child_process';
-import {root,kujoBinary,dependency,codexBinary,providerHome} from '../factory/settings.mjs';
+import {root,kujoBinary,dependency,codexBinary,providerHome,agentsRoot,dispatchRoot,workcellBinary} from '../factory/settings.mjs';
 const args=process.argv.slice(2);
 if(args.some(a=>!['--offline','--json'].includes(a)))throw Error('Usage: npm run doctor -- [--offline] [--json]');
 const offline=args.includes('--offline'),checks=[];
@@ -12,7 +12,7 @@ check('node',()=>{const [major,minor,patch]=process.versions.node.split('.').map
 check('git',()=>run('git',['--version']),'Install Git.');
 check('kujo',()=>{const v=run(kujoBinary(),['--version']);if(v!=='kujo 1.9.0')throw Error('Expected kujo 1.9.0; got '+v);return v;},'Run npm ci; retain optional platform dependencies; remove an incompatible KUJO_BIN override.');
 const lock=JSON.parse(fs.readFileSync(path.join(root,'sources.lock.json'),'utf8'));
-for(const[name,source]of Object.entries(lock.repositories))check(name,()=>{const dest=dependency(name);if(fs.lstatSync(dest).isSymbolicLink())throw Error('Dependency directory is a symlink');const sha=run('git',['rev-parse','HEAD'],dest);if(sha!==source.commit)throw Error('Dependency revision mismatch');if(run('git',['status','--porcelain'],dest))throw Error('Dependency checkout modified');return sha;},'Run npm run setup. Preserve modified dependencies before moving them aside.');
+for(const[name,source]of Object.entries(lock.repositories))check(name,()=>{const dest=({dispatch:dispatchRoot,'kujo-agents':agentsRoot,workcell:path.dirname(path.dirname(workcellBinary))})[name]||dependency(name);if(fs.lstatSync(dest).isSymbolicLink())throw Error('Dependency directory is a symlink');const sha=run('git',['rev-parse','HEAD'],dest);if(sha!==source.commit)throw Error('Dependency revision mismatch');if(run('git',['status','--porcelain'],dest))throw Error('Dependency checkout modified');return sha;},'Run npm run setup. Preserve modified dependencies before moving them aside.');
 check('codex',()=>{const v=run(codexBinary,['--version']);if(!v.includes('0.144.4'))throw Error('Expected Codex CLI 0.144.4');return v;},'Run npm ci, or select the tested CLI with FACTORY_CODEX_BIN.');
 check('disk',()=>{const s=fs.statfsSync(root);const available=s.bavail*s.bsize;if(available<2*1024**3)throw Error('Less than 2 GiB free');return {availableGiB:Math.round(available/1024**3)};},'Free disk space before creating images or run receipts; initial image build should have at least 10 GiB available.');
 if(!offline){
