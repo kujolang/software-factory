@@ -16,7 +16,7 @@ const definitions=[
  ['factory_list_workflows','List upstream kits with maturity labels',empty],
  ['factory_list_mission_workflows','List typed lifecycle routes and explicit unsupported gates',empty],
  ['factory_list_missions','List bounded persisted mission status; no process liveness claim',empty],
- ['factory_read_mission','Read scoped status, task graph and evidence references; no source files',{type:'object',properties:{family:{type:'string',enum:['application','specification','documentation','cli','sqlite','package']},id:{type:'string',pattern:'^[A-Za-z0-9][A-Za-z0-9_-]{0,159}$'}},required:['family','id'],additionalProperties:false}],
+ ['factory_read_mission','Read scoped status, task graph and evidence references; no source files',{type:'object',properties:{family:{type:'string',enum:['application','specification','documentation','cli','sqlite','package','webops']},id:{type:'string',pattern:'^[A-Za-z0-9][A-Za-z0-9_-]{0,159}$'}},required:['family','id'],additionalProperties:false}],
  ['factory_validate_workflow','Validate typed lifecycle input without submission or model execution',{type:'object',properties:{mission:{type:'object'}},required:['mission'],additionalProperties:false}],
  ['factory_validate_mission','Validate a team planning request; does not submit a mission',{type:'object',properties:{mission:{type:'object'}},required:['mission'],additionalProperties:false}],
  ['factory_prepare_mission','Produce an advisory team plan; no execution authorization',{type:'object',properties:{mission:{type:'object'}},required:['mission'],additionalProperties:false}],

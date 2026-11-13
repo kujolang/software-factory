@@ -561,7 +561,7 @@ if(verb === "resume"){
     try {
       const pathname = new URL(req.url, "http://127.0.0.1").pathname;
       if(pathname==='/api/missions')return send(200,listMissions());
-      const missionMatch=pathname.match(/^\/api\/missions\/(application|specification|documentation|cli|sqlite|package)\/([A-Za-z0-9_-]+)$/);
+      const missionMatch=pathname.match(/^\/api\/missions\/(application|specification|documentation|cli|sqlite|package|webops)\/([A-Za-z0-9_-]+)$/);
       if(missionMatch)return send(200,readMission(missionMatch[1],missionMatch[2]));
       if (pathname === "/api/runs") {
         const list = fs.existsSync(runsRoot)
