@@ -258,3 +258,13 @@ test("retry preserves failed source and imports unverified bytes without inherit
   ])
     assert.equal(fs.existsSync(path.join(dir, "artifacts", name)), false);
 });
+
+for (const verb of ["retry", "recheck"]) for (const marker of ["config", "performance-policy.json", "performance.json"]) {
+  test(`${verb} rejects performance evidence downgrade via ${marker} before allocation`, t => {
+    const f=fixture(t), source=f.source("factory-performance",verb==="retry"?"failed":"completed");
+    if(marker==="config") { const run=json(path.join(source.dir,"run.json"));run.performanceRequired=true;fs.writeFileSync(path.join(source.dir,"run.json"),JSON.stringify(run)); }
+    else fs.writeFileSync(path.join(source.dir,"artifacts",marker),"{}");
+    const before=fs.readdirSync(f.base), result=f.call(source.name,verb);
+    assert.notEqual(result.status,0);assert.match(result.stderr,/Performance missions require/);assert.deepEqual(fs.readdirSync(f.base),before);
+  });
+}

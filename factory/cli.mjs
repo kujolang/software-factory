@@ -311,6 +311,8 @@ if(verb === "resume"){
   const sourceArtifacts = path.join(sourceDir, "artifacts");
   if (fs.lstatSync(sourceArtifacts).isSymbolicLink())
     throw Error("Source artifact symlink rejected");
+  if (source.performanceRequired || ["performance-policy.json", "performance.json"].some(name => fs.existsSync(path.join(sourceArtifacts, name))))
+    throw Error("Performance missions require a new source-bound performance mission with the original benchmark policy; generic retry/recheck cannot preserve its baseline");
   const pack = runPack(sourceDir, source);
   const sourceApp = path.join(sourceDir, "application");
   requirePlainTree(sourceApp);
