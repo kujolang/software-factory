@@ -17,6 +17,21 @@ Software Factory coordinates scoped proposals through Kujo Dispatch, runs genera
 
 This branch adds complete pinned [catalogs](docs/CATALOGS.md), bounded team planning, [portable evidence verification](docs/EVIDENCE.md), and [read-only MCP discovery](docs/MCP.md). It is **not feature-complete**. See [release qualification](docs/RELEASE-QUALIFICATION.md) and [known limitations](docs/KNOWN-LIMITATIONS.md) before relying on new capabilities. The Node application workflow now includes native Lens and accounted release gates. Additional bounded interfaces cover [reviewed specifications](docs/SPEC-PIPELINE.md), [repository repairs](docs/REPOSITORY-MISSIONS.md), [CLI runtimes](docs/CLI-RUNTIMES.md), [context preparation](docs/CONTEXT-PIPELINE.md), [change inspection](docs/CHANGE-TOOLS.md), and [operations](docs/OPERATIONS.md), and [local telemetry](docs/TELEMETRY.md). Each has a separately stated qualification scope.
 
+The catalog includes all 28 Chain of Command roles and the complete pinned skills packages. [Typed mission workflows](docs/MISSION-WORKFLOWS.md), [CLI construction](docs/CLI-MISSIONS.md), [documentation review](docs/MISSION-WORKFLOWS.md), [optional SDK providers](docs/SDK-PROVIDERS.md), [native quality evaluation](docs/QUALITY-EVALUATION.md), and [offline installation and rollback](docs/OFFLINE-INSTALL.md) share the existing authority boundaries. Optional or unqualified paths remain explicitly labeled; catalog availability does not grant permissions or establish release readiness.
+
+## Qualified, bounded development paths
+
+| Work | Interface and scope |
+| --- | --- |
+| Plan and construct | [Twenty lifecycle routes](docs/MISSION-WORKFLOWS.md), frozen Spec contracts, selected canonical roles and independent acceptance |
+| Repair or benchmark existing source | [Committed repository changes](docs/REPOSITORY-MISSIONS.md) and [fixed-request performance comparisons](docs/PERFORMANCE-WORKFLOWS.md) |
+| Build CLI software | [Python, TypeScript, Go, Rust and Kujo construction](docs/CLI-MISSIONS.md) in separately qualified runtime profiles |
+| Upgrade dependencies or data | [Locked Node dependency upgrades](docs/node-package-runtime.md) and [disposable SQLite migrations](docs/SQLITE-MIGRATIONS.md) |
+| Review documentation and websites | [Publishing House editorial review](docs/EDITORIAL-DOCUMENTATION.md), [WebOps evidence review](docs/WEBOPS-REVIEW.md), and [optional native visual baselines](docs/VISUAL-BASELINES.md) |
+| Operate and verify | [Local notifications and recovery](docs/OPERATIONS.md), [portable evidence](docs/EVIDENCE.md), [official MCP SDK interoperability](docs/MCP.md), and [offline installation/rollback](docs/OFFLINE-INSTALL.md) |
+
+Required source-secret checks and independent release gates remain controller-owned. A local candidate never grants publication, merge or deployment authority. Consult each profile's qualification and limitations before choosing it; optional capabilities do not silently activate.
+
 ## Start here
 
 Requirements: Git, Node **26.12.1 or later 26.x**, a Codex account or an installed local Ollama model, and a local **rootless Docker engine with seccomp**. npm installs the pinned Kujo and Codex CLIs locally. No global Kujo installation or sibling repositories are needed.
@@ -24,7 +39,7 @@ Requirements: Git, Node **26.12.1 or later 26.x**, a Codex account or an install
 ```sh
 git clone https://github.com/kujolang/software-factory.git
 cd software-factory
-npm ci
+npm ci --ignore-scripts
 npm run setup
 npm run login
 ```

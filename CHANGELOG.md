@@ -1,6 +1,17 @@
 # Changelog
 
 
+## Unreleased — lifecycle and qualification completion
+
+- Add executable typed SQLite migration, locked Node dependency-upgrade and performance-repair routes, with independent canonical review, real Workcell acceptance and standalone evidence verification.
+- Add Publishing House editorial review, bounded WebOps Lens-evidence review, optional independently approved visual baselines, and complete read-only mission-family views.
+- Require native Redact and selected credential checks before real provider calls and new candidate promotion; retain failed scans and prevent requirement-marker removal.
+- Add native Spec change-impact reports, empirical API/browser defect sensitivity, immutable upstream catalog comparison, local failure notifications and nondeleting observation-log rotation.
+- Qualify official MCP SDK interoperability, offline installation/rollback, production checkpoint recovery, and strengthened Go/Rust artifact-byte checks. Preserve historical failed attempts and distinguish them from later passing evidence.
+- Add a locked React static runtime with actual interactive/browser and hostile-input qualification. Model construction and final-source release acceptance remain tracked in the implementation ledger.
+
+No release publication, remote merge or deployment is authorized by these changes. Final acceptance is pending the frozen-source qualification matrix.
+
 ## Unreleased — additional bounded ecosystem paths
 
 - Require canonical role deliverables, bounded skill work orders and role-specific provider routes; keep independent release authority.
