@@ -11,8 +11,8 @@ const uid=run('colima',['ssh','--profile',profile,'--','id','-u']);if(!/^\d+$/.t
 run('colima',['ssh','--profile',profile,'--','systemctl','--user','is-active','docker']);
 const config=run('colima',['ssh-config','--profile',profile]);
 const host=config.match(/^Host ([\w-]+)$/m)?.[1];if(!host)throw Error('Unrecognized Colima SSH configuration');
-const configFile=path.join(dir,'ssh.conf');fs.writeFileSync(configFile,config+'\n',{mode:0o600});
-const socket=path.join(dir,'docker.sock'),endpoint='unix://'+socket;
+const configFile=path.join(dir,`ssh-${profile}.conf`);fs.writeFileSync(configFile,config+'\n',{mode:0o600});
+const socket=path.join(dir,`${profile}.sock`),endpoint='unix://'+socket;
 const env={...process.env,DOCKER_HOST:endpoint};delete env.DOCKER_CONTEXT;
 let info;
 try{info=run('docker',['info','--format','{{json .SecurityOptions}}'],env);}catch{
