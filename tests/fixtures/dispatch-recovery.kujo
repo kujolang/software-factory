@@ -1,0 +1,22 @@
+# Synthetic offline lifecycle fixture. No candidate/model/external effects.
+from src.core.step import create_step
+from src.core.state import create_run_state, load_run_state
+from src.core.runner import run_workflow
+from src.tools.tool import create_tool_registry, create_tool, register_tool
+from src.workflows.workflow import create_workflow
+mode := env("FIXTURE_MODE")
+func observe(input, context) {
+    append_file(env("FIXTURE_COUNTER"), context["step_id"] + "\n")
+    if env("FIXTURE_MODE") == "kill-running" {
+        write_file(env("FIXTURE_MARKER"), "handler-started")
+        _ := spawn_process(["/bin/sleep", "30"])
+    }
+    return {"ok":true,"data":{"fixture":true}}
+}
+workflow := create_workflow({"id":"recovery-fixture","name":"Recovery fixture","description":"Synthetic offline recovery fixture","input_schema":{"type":"dict"},"output_schema":{"type":"dict"},"agents":{},"tools":[],"steps":[create_step("first","First","tool",{"tool_name":"observe","output_key":"first","idempotency_key":"first","effect_class":"local_reversible"}),create_step("approve","Approve","approval",{"depends_on":["first"],"approval_gate":{"reason":"Synthetic approval","summary":"Fixture only"},"output_key":"approval"}),create_step("last","Last","tool",{"tool_name":"observe","depends_on":["approve"],"output_key":"last","idempotency_key":"last","effect_class":"local_reversible"})],"memory_config":{},"default_retry_policy":{"max_attempts":1},"approval_config":{"auto_approve":false}})
+registry := register_tool(create_tool_registry(), create_tool("observe","Synthetic observation",{"type":"dict"},{"type":"dict"},observe,null))
+state := {}
+if mode == "resume" {loaded := load_run_state(env("FIXTURE_OUTPUT"),env("FIXTURE_ID"));assert(loaded["ok"],"fixture load failed");state = loaded["run_state"]} else {state = create_run_state(workflow,{"topic":"offline fixture"},env("FIXTURE_OUTPUT"),{"auto_approve":false,"interactive":false})}
+result := run_workflow(workflow,state,registry,{"auto_approve":mode=="resume","interactive":false})
+write_file(env("FIXTURE_RESULT"),to_json({"ok":result["ok"],"status":result["run_state"]["status"],"run_id":result["run_state"]["run_id"]}))
+if mode == "pause-hold" {write_file(env("FIXTURE_MARKER"),"paused-persisted");_ := spawn_process(["/bin/sleep","30"])}
