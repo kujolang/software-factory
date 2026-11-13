@@ -256,3 +256,15 @@ test('failed new-format runs retain exportability without manufacturing approval
  const f=fixture(t);fs.writeFileSync(path.join(f.run,'run.json'),JSON.stringify({id:'fixture-failed',status:'failed',accountabilityRequired:true}));
  assert.equal(exportEvidence(f.run,f.bundle).claims.recordedStatus,'failed');assert.throws(()=>verifyRunReleaseRecords(f.run));
 });
+
+test('new release records cannot downgrade verification by removing accounting markers',t=>{
+ for(const marker of [false,null,'true',undefined]){
+  const f=accountedFixture(t),run=JSON.parse(fs.readFileSync(path.join(f.run,'run.json')));
+  if(marker===undefined)delete run.accountabilityRequired;else run.accountabilityRequired=marker;
+  f.write('run.json',run);
+  assert.throws(()=>verifyRunReleaseRecords(f.run),/requirement marker/);
+  assert.throws(()=>exportEvidence(f.run,f.bundle),/requirement marker/);
+  delete f.release.gateVersion;f.write('artifacts/release.json',f.release);
+  assert.throws(()=>verifyRunReleaseRecords(f.run),/requirement marker/);
+ }
+});

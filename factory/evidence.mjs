@@ -184,7 +184,12 @@ function consistency(dir, manifest, rows) {
       if (review.hash !== release.hash || review.verdict !== 'pass' || verification.ok !== true) throw Error('Recorded independent review binding mismatch');
       if (run.packHash !== undefined && (release.packHash !== run.packHash || verification.packHash !== run.packHash)) throw Error('Recorded release specification binding mismatch');
       checks.push('recorded source/build/review identity agreement');
-      if (run.accountabilityRequired) { nativeGateConsistency(dir, names, run, release, verification, review); checks.push('recorded native accounting/policy/Eval identity agreement'); }
+      const nativeGates = run.accountabilityRequired !== undefined || release.gateVersion !== undefined || names.has('artifacts/mission-accountability.json') || names.has('artifacts/accounting-start.json');
+      if (nativeGates) {
+        requireRecord(run.accountabilityRequired === true, 'native accounting requirement marker missing or inconsistent');
+        nativeGateConsistency(dir, names, run, release, verification, review);
+        checks.push('recorded native accounting/policy/Eval identity agreement');
+      }
     }
   }
   return {checks, recordedStatus: typeof run.status === 'string' ? run.status : null};
