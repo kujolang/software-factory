@@ -19,7 +19,7 @@ This branch adds complete pinned [catalogs](docs/CATALOGS.md), bounded team plan
 
 ## Start here
 
-Requirements: Git, Node **26.12.1 or later 26.x**, a Codex account, and a local **rootless Docker engine with seccomp**. npm installs the pinned Kujo and Codex CLIs locally. No global Kujo installation or sibling repositories are needed.
+Requirements: Git, Node **26.12.1 or later 26.x**, a Codex account or an installed local Ollama model, and a local **rootless Docker engine with seccomp**. npm installs the pinned Kujo and Codex CLIs locally. No global Kujo installation or sibling repositories are needed.
 
 ```sh
 git clone https://github.com/kujolang/software-factory.git
@@ -28,6 +28,8 @@ npm ci
 npm run setup
 npm run login
 ```
+
+Codex is the default provider. For local Ollama, skip login and follow [provider selection](docs/PROVIDERS.md); no cloud alias is accepted by the local adapter.
 
 Select a rootless engine following [Engine setup](docs/ENGINE.md), then:
 
@@ -73,7 +75,8 @@ See the [pack guide](docs/PACKS.md) for the full workflow. Test the shipped conv
 2. Backend and frontend proposal workers run concurrently.
 3. The controller admits only their allowed files.
 4. Independent review, API checks and browser checks gate bounded corrections.
-5. A separate release review and repeated checks bind approval to the exact source hash.
+5. A separate release review, native Eval and selected ShipCheck controls repeat source-bound checks.
+6. Canonical accounting completes before verified files become an approved local candidate. Rejected attempts remain in CaseFile evidence.
 
 Workers propose text and files; they cannot run commands. Generated applications execute only inside Workcell. The observer is read-only. Model statements are never substituted for test results.
 

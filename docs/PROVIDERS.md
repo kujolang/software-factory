@@ -8,7 +8,7 @@ code, approve a release, or authorize deployment.
 
 | Provider | Interface | Limits and qualification |
 |---|---|---|
-| `codex` | Pinned Codex CLI, fixed JSON schema, ephemeral read-only session | Tools, apps, browser and web search disabled; unexpected tool events rejected. Existing factory provider; the extracted adapter passed a live schema smoke and still needs fresh full-mission qualification. |
+| `codex` | Pinned Codex CLI, fixed JSON schema, ephemeral read-only session | Tools, apps, browser and web search disabled; unexpected tool events rejected. Existing factory provider; the extracted adapter passed a live schema smoke and a converter construction followed by a fresh independently verified retry; see RELEASE-QUALIFICATION.md for the retained initial rejection and exact scope. |
 | `ollama` | Pinned Kujo Ollama `create_client`, `client_list_models`, `client_chat` through a fixed bridge | Local installed models only, JSON Schema output, no tools or streaming. One live local schema smoke passed; full-mission qualification remains open. |
 | `mock` | Explicit host-supplied JSON fixture | Offline deterministic tests only. Receipt always marks `fixture: true`; never evidence of model execution. |
 

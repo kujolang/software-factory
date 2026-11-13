@@ -81,3 +81,7 @@ This is the source-audit baseline, not a completion checklist. See the release a
 | capsule | benchmark 0.1.0 | experimental or requiring additional qualification | optional | Keep disabled until a canonical redistributable source pin and install contract exist; use Scent/Scout for supported context adapters. |
 | ward | unresolved | missing and requiring implementation | optional | Disabled; obtain public versioned source and security contracts before any integration. |
 | github-evidence-checks | unresolved | missing and requiring implementation | optional | Implement commit-linked CI evidence adapter only against reviewed GitHub APIs; never infer a package API from its name. |
+
+## Implemented accountability increment
+
+The baseline classifications above remain the original audit. The machine inventory now records separate `currentImplementation` entries for Spec, RunLedger, CaseFile, Eval and ShipCheck. These native adapters participate in mission execution and accounted local release; each remains partial against the full ecosystem assignment. See [mission accountability](MISSION-ACCOUNTABILITY.md), [release qualification](RELEASE-QUALIFICATION.md) and the [acceptance manifest](../config/release-acceptance.json) for tested scope and remaining requirements.

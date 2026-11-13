@@ -2,6 +2,8 @@
 
 ## Unreleased — ecosystem integration increment (release blocked)
 
+Phase B continuation wires native RunLedger lifecycle, CaseFile failure retention, Eval and selected ShipCheck gates into missions. Verified artifacts now require terminal accounting before local promotion; offline audit/recheck/export validate native gate bindings. Evidence code is served inertly by the observer.
+
 Added complete pinned role/skill/workflow catalogs, advisory team routing, real Spec/RunLedger/CaseFile/ShipCheck adapters, a Spec pack gate, Codex/native local Ollama proposal providers, portable evidence verification/signatures, read-only MCP and Factory Floor catalog inspection. Preserved rootless isolation and independent release gates. The full requested release remains incomplete; see docs/RELEASE-QUALIFICATION.md and docs/IMPLEMENTATION-LEDGER.md.
 
 ## Unreleased

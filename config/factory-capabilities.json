@@ -1096,6 +1096,21 @@
           }
         ],
         "qualification": "Release metadata inspected; assets not executed or certified by this audit"
+      },
+      "currentImplementation": {
+        "asOf": "2026-11-13",
+        "classification": "present but incomplete",
+        "description": "Frozen software packs validate and export through native Spec before dispatch.",
+        "implementation": [
+          "factory/accountability.mjs"
+        ],
+        "tests": [
+          "tests/accountability.test.mjs"
+        ],
+        "evidence": [
+          "docs/qualification-results.json"
+        ],
+        "limitations": "General requirement contradiction/change-impact analysis remains incomplete."
       }
     },
     {
@@ -1190,6 +1205,21 @@
         "url": "https://github.com/kujolang/eval/releases/tag/v1.1.0",
         "assets": [],
         "qualification": "Release metadata inspected; assets not executed or certified by this audit"
+      },
+      "currentImplementation": {
+        "asOf": "2026-11-13",
+        "classification": "present but incomplete",
+        "description": "Pinned native file-only evidence evaluation runs before local release.",
+        "implementation": [
+          "factory/evaluation.mjs"
+        ],
+        "tests": [
+          "tests/evaluation.test.mjs"
+        ],
+        "evidence": [
+          "docs/qualification-results.json"
+        ],
+        "limitations": "Structural evidence checks do not qualify test quality or model comparisons."
       }
     },
     {
@@ -1273,6 +1303,21 @@
         "url": "https://github.com/kujolang/shipcheck/releases/tag/v1.0.2",
         "assets": [],
         "qualification": "Release metadata inspected; assets not executed or certified by this audit"
+      },
+      "currentImplementation": {
+        "asOf": "2026-11-13",
+        "classification": "present but incomplete",
+        "description": "Pinned native metadata checks enforce the selected local policy alongside independent acceptance.",
+        "implementation": [
+          "factory/release-policy.mjs"
+        ],
+        "tests": [
+          "tests/release-policy.test.mjs"
+        ],
+        "evidence": [
+          "docs/qualification-results.json"
+        ],
+        "limitations": "Full security/dependency/documentation release policies remain incomplete; nonselected staging checks advisory."
       }
     },
     {
@@ -1351,6 +1396,21 @@
         "url": "https://github.com/kujolang/runledger/releases/tag/v1.2.1",
         "assets": [],
         "qualification": "Release metadata inspected; assets not executed or certified by this audit"
+      },
+      "currentImplementation": {
+        "asOf": "2026-11-13",
+        "classification": "present but incomplete",
+        "description": "Native per-mission begin/finalize and immutable observed usage/test accounting gate local promotion.",
+        "implementation": [
+          "factory/lifecycle.mjs"
+        ],
+        "tests": [
+          "tests/lifecycle.test.mjs"
+        ],
+        "evidence": [
+          "docs/qualification-results.json"
+        ],
+        "limitations": "Per-agent native ledger records and complete cost budgets remain incomplete."
       }
     },
     {
@@ -1436,6 +1496,21 @@
         "url": "https://github.com/kujolang/casefile/releases/tag/v1.0.2",
         "assets": [],
         "qualification": "Release metadata inspected; assets not executed or certified by this audit"
+      },
+      "currentImplementation": {
+        "asOf": "2026-11-13",
+        "classification": "present but incomplete",
+        "description": "Native log-only failure packets preserve failed proposals, tests and missions.",
+        "implementation": [
+          "factory/lifecycle.mjs"
+        ],
+        "tests": [
+          "tests/lifecycle.test.mjs"
+        ],
+        "evidence": [
+          "docs/qualification-results.json"
+        ],
+        "limitations": "Crash reconciliation and richer incident classification remain incomplete."
       }
     },
     {
