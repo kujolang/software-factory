@@ -1,0 +1,73 @@
+{
+  "schema": "kujo.factory.webops-qualification/v1",
+  "implementationCommits": [
+    "4ab1bcd",
+    "a43c89e"
+  ],
+  "canonicalRoles": [
+    "webops.site-qa-operator",
+    "chain.code-reviewer"
+  ],
+  "tests": {
+    "nativeFixtureTests": 3,
+    "observerAndMCPTests": 10,
+    "fixtureScope": "Synthetic Lens and model outputs; actual native Dispatch, RunLedger and CaseFile"
+  },
+  "live": {
+    "runId": "webops-dTHTEJ",
+    "directory": ".runtime/webops/webops-dTHTEJ",
+    "startedAt": "2026-11-13T22:13:03.924Z",
+    "finishedAt": "2026-11-13T22:13:46.537Z",
+    "durationMs": 42613,
+    "provider": "codex",
+    "exitCode": 0,
+    "fixture": false,
+    "sourceProvenance": {
+      "commit": "a43c89e6344ca6640bc56e51a15dcc2182b738cd",
+      "tree": "95bdb3edbc1bddf8883f2d0c401bbacf263b4f79",
+      "dirty": true,
+      "identityScope": "Git HEAD; dirty working-tree bytes are separately hashed below"
+    },
+    "controllerProvenanceSha256": "84316bc29176c70836068f81d7cce04be414dca8fa7162dd1ba14a523521c592",
+    "sourceSnapshotSha256": "0c45d9c6aa41de91a655fe75d2cd6c2dd248ac1892e6a2db9936ffac283ffe93",
+    "reviewedArtifactSha256": "022fcb97b36db49e6266b7223c7f85972b3d5164ae21afbd61129f85a54858e8",
+    "usage": {
+      "cache_read_tokens": null,
+      "cache_write_tokens": null,
+      "input_tokens": 27969,
+      "output_tokens": 1445
+    },
+    "cost": {
+      "cache_cost": null,
+      "currency": "USD",
+      "input_cost": null,
+      "output_cost": null,
+      "total_cost": null
+    }
+  },
+  "logs": [
+    {
+      "path": ".runtime/ledger-completion/webops-review-tests-complete.log",
+      "sha256": "cfa29de8cf056165077143509ef79a2a6aed0e85e3eacf748c7d372adc4fdd4b"
+    },
+    {
+      "path": ".runtime/ledger-completion/webops-observer-tests.log",
+      "sha256": "c8bfbb049ea4bc5434751540bbb878e51a8aa13a8d13b9a61a476edbd6e61904"
+    },
+    {
+      "path": ".runtime/ledger-completion/webops-live.log",
+      "sha256": "89eb989407086e33b86a5a82fb53cca7a9bacf1e3a08a68ce0688aacf39419e2"
+    }
+  ],
+  "authority": {
+    "advisory": true,
+    "liveWebsiteActions": false,
+    "softwareReleaseApproval": false,
+    "deploymentAuthorized": false
+  },
+  "limitations": [
+    "Prior verified local Lens sample only; no new browser execution or current production observation",
+    "No SiteProbe crawl; text-only models receive findings and screenshot hashes, not pixels",
+    "Model advisory review is not deterministic QA or authentication of original evidence"
+  ]
+}
