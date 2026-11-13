@@ -11,7 +11,19 @@
     },
     "kujo-agents": {
       "url": "https://github.com/kujolang/kujo-agents.git",
-      "commit": "a7e9d0236d6e64b5db30273b32f4ad8c124f5173"
+      "commit": "ce87309d8c920695cf5337ca76155ff188a7bf24"
+    },
+    "kujo-skills": {
+      "url": "https://github.com/kujolang/kujo-skills.git",
+      "commit": "76c249632b08bc6e2c6d08846094040ac94f4b91"
+    },
+    "kujo-workflows": {
+      "url": "https://github.com/kujolang/kujo-workflows.git",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689"
+    },
+    "ollama": {
+      "url": "https://github.com/kujolang/ollama.git",
+      "commit": "5821d7baee785ac8c10cf07dae8f29dc43b846ab"
     }
   }
 }
