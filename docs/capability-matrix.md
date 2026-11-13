@@ -85,3 +85,8 @@ This is the source-audit baseline, not a completion checklist. See the release a
 ## Implemented accountability increment
 
 The baseline classifications above remain the original audit. The machine inventory now records separate `currentImplementation` entries for Spec, RunLedger, CaseFile, Eval and ShipCheck. These native adapters participate in mission execution and accounted local release; each remains partial against the full ecosystem assignment. See [mission accountability](MISSION-ACCOUNTABILITY.md), [release qualification](RELEASE-QUALIFICATION.md) and the [acceptance manifest](../config/release-acceptance.json) for tested scope and remaining requirements.
+
+
+## Implementation continuation
+
+The matrix above retains its original source-audit classifications. Current scoped implementation is recorded separately as `factoryIntegration` in [factory-capabilities.json](../config/factory-capabilities.json), with implementation pins, tests and explicit limits. Pinned Scout/Scent/Redact and native Fence/Concord/ChangeBucket/PatchBrief/Kennel manifest validation now have real adapter fixtures; Lens executes in Workcell with v3 evidence; selected role consultations execute through native Dispatch. Native retained inspection/plans do not authorize production resume. These additions do not promote whole upstream repositories to fully qualified release components. The [acceptance manifest](../config/release-acceptance.json) remains blocked where required execution breadth is missing.

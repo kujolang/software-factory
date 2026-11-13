@@ -11,15 +11,18 @@
       "implementation": [
         "factory/catalog.mjs",
         "factory/selection.mjs",
-        "factory/worker.mjs"
+        "factory/worker.mjs",
+        "factory/role-runtime.mjs"
       ],
       "tests": [
-        "tests/catalog.test.mjs"
+        "tests/catalog.test.mjs",
+        "tests/role-runtime.test.mjs"
       ],
       "evidence": [
-        "docs/qualification-results.json"
+        "docs/qualification-results.json",
+        "docs/RELEASE-QUALIFICATION.md"
       ],
-      "limits": "All 28 discovered; canonical schemas pass. All-role execution, semantic handoffs and Dispatch selection remain incomplete."
+      "limits": "Registry-backed selected consultations run through native Dispatch with restricted proposals; all-role semantic/live handoff, escalation and performance qualification remain incomplete."
     },
     {
       "id": "AC-02",
@@ -27,15 +30,18 @@
       "status": "partial",
       "implementation": [
         "config/catalog.lock.json",
-        "factory/catalog.mjs"
+        "factory/catalog.mjs",
+        "factory/role-runtime.mjs"
       ],
       "tests": [
-        "tests/catalog.test.mjs"
+        "tests/catalog.test.mjs",
+        "tests/role-runtime.test.mjs"
       ],
       "evidence": [
-        "docs/qualification-results.json"
+        "docs/qualification-results.json",
+        "docs/RELEASE-QUALIFICATION.md"
       ],
-      "limits": "136 complete packages verified; dependency compatibility and execution activation incomplete."
+      "limits": "Complete 136-skill catalog and selected execution guidance receipts exist; uniform upstream dependency metadata and full compatibility/execution accounting remain incomplete."
     },
     {
       "id": "AC-03",
@@ -47,19 +53,30 @@
         "factory/evaluation.mjs",
         "factory/release-policy.mjs",
         "factory/cli.mjs",
-        "factory/worker.mjs"
+        "factory/worker.mjs",
+        "factory/context.mjs",
+        "factory/change-tools.mjs",
+        "factory/lens.mjs",
+        "factory/spec-pipeline.mjs",
+        "factory/telemetry.mjs"
       ],
       "tests": [
         "tests/accountability.test.mjs",
         "tests/lifecycle.test.mjs",
         "tests/evaluation.test.mjs",
         "tests/release-policy.test.mjs",
-        "tests/packs.test.mjs"
+        "tests/packs.test.mjs",
+        "tests/context.test.mjs",
+        "tests/change-tools.test.mjs",
+        "tests/lens.test.mjs",
+        "tests/spec-pipeline.test.mjs",
+        "tests/telemetry.test.mjs"
       ],
       "evidence": [
-        "docs/qualification-results.json"
+        "docs/qualification-results.json",
+        "docs/RELEASE-QUALIFICATION.md"
       ],
-      "limits": "Native accounting/failure/Eval/selected ShipCheck lifecycle gates implemented. Other audited components and broader policies remain incomplete."
+      "limits": "Native lifecycle and scoped context/change/Lens/specification/Watchdog paths implemented. Broader security/dependency policies, live telemetry, retrieval and remaining audited adapters remain incomplete."
     },
     {
       "id": "AC-04",
@@ -103,18 +120,23 @@
         "factory/worker.mjs",
         "factory/pack.mjs",
         "factory/lifecycle.mjs",
-        "factory/release-policy.mjs"
+        "factory/release-policy.mjs",
+        "factory/lens.mjs",
+        "factory/spec-pipeline.mjs"
       ],
       "tests": [
         "factory/tests.test.mjs",
         "tests/packs.test.mjs",
         "tests/lifecycle.test.mjs",
-        "tests/release-policy.test.mjs"
+        "tests/release-policy.test.mjs",
+        "tests/lens.test.mjs",
+        "tests/spec-pipeline.test.mjs"
       ],
       "evidence": [
-        "docs/qualification-results.json"
+        "docs/qualification-results.json",
+        "docs/RELEASE-QUALIFICATION.md"
       ],
-      "limits": "No promotion before terminal accounting; current source and native gates rebound before approval. See full mission qualification separately; arbitrary teams/runtimes remain incomplete."
+      "limits": "New v3 approvals require native Lens evidence alongside accounted source-bound gates. Specification review produces no human seal or executed test claim; final-source and broader team/runtime qualification remain open."
     },
     {
       "id": "AC-07",
@@ -130,18 +152,31 @@
       "evidence": [
         "docs/qualification-results.json"
       ],
-      "limits": "Codex converter construction with a successful independent retry is recorded. Both providers pass live schema checks; complete Ollama mission and broader provider qualification remain incomplete."
+      "limits": "Real Codex construction/repair and Ollama bounded revalidation independently passed. Ollama construction, role-specific model combinations and additional provider paths remain unqualified; source checkpoints differ from final release."
     },
     {
       "id": "AC-08",
       "requirement": "Multiple language runtime profiles independently qualified",
-      "status": "blocked",
+      "status": "partial",
       "implementation": [
-        "factory/workcell-image/Dockerfile"
+        "factory/workcell-image/Dockerfile",
+        "factory/cli-runtime.mjs",
+        "config/cli-runtime-profiles.json"
       ],
-      "tests": [],
-      "evidence": [],
-      "limits": "Only existing Node/static/SQLite runtime; no newly qualified language profiles."
+      "tests": [
+        "tests/cli-runtime.test.mjs",
+        "scripts/qualify-python-cli.mjs",
+        "scripts/qualify-kujo-cli.mjs",
+        "scripts/qualify-compiled-cli.mjs",
+        "scripts/qualify-native-staging.mjs",
+        "scripts/qualify-installed-native-cli.mjs",
+        "tests/tracked-source-identity.test.mjs"
+      ],
+      "evidence": [
+        "docs/RELEASE-QUALIFICATION.md",
+        "docs/CLI-RUNTIME-QUALIFICATION.json"
+      ],
+      "limits": "Python/Kujo/TypeScript/Go/Rust scoped rootless CLI fixtures passed. Go/Rust require readonly v2; unsafe v1 remains disabled. Services/frameworks and dependency-managed applications require separate qualification."
     },
     {
       "id": "AC-09",
@@ -149,39 +184,53 @@
       "status": "verified",
       "implementation": [
         "factory/evidence.mjs",
-        "factory/export.mjs"
+        "factory/export.mjs",
+        "factory/lens.mjs"
       ],
       "tests": [
         "tests/evidence.test.mjs"
       ],
       "evidence": [
-        "docs/qualification-results.json"
+        "docs/qualification-results.json",
+        "docs/RELEASE-QUALIFICATION.md"
       ],
-      "limits": "Standalone offline verification requires actual native accounting/policy/Eval artifacts for new runs, with optional signatures. Integrity and internal provenance consistency are not execution authenticity."
+      "limits": "Offline v2/v3 verification binds native accounting/policy/Eval and required Lens report/screenshot artifacts. Optional signatures authenticate manifest attestations, not execution or deployment authority."
     },
     {
       "id": "AC-10",
       "requirement": "Recovery and interruption behavior tested",
       "status": "partial",
       "implementation": [
-        "factory/workcell-controller-death-test.mjs"
+        "factory/workcell-controller-death-test.mjs",
+        "factory/operations.mjs"
       ],
       "tests": [
-        "factory/workcell-controller-death-test.mjs"
+        "factory/workcell-controller-death-test.mjs",
+        "tests/operations.test.mjs"
       ],
       "evidence": [
-        "docs/qualification-results.json"
+        "docs/qualification-results.json",
+        "docs/RELEASE-QUALIFICATION.md"
       ],
-      "limits": "Watchdog death cleanup and unaccounted promotion rejection pass. Durable checkpoint continuation and external-effect reconciliation remain incomplete."
+      "limits": "Actual native process-kill fixtures preserve running uncertainty and paused-state idempotency. Read-only plans and backups exist; production worker resume/effect reconciliation remain disabled."
     },
     {
       "id": "AC-11",
       "requirement": "Source-control workflows produce reviewable artifacts",
-      "status": "blocked",
-      "implementation": [],
-      "tests": [],
-      "evidence": [],
-      "limits": "Onboarding, branch/PR/issue/CI adapters not implemented."
+      "status": "partial",
+      "implementation": [
+        "factory/git.mjs",
+        "factory/repository-mission.mjs"
+      ],
+      "tests": [
+        "tests/git.test.mjs",
+        "tests/repository-mission.test.mjs",
+        "tests/audit.test.mjs"
+      ],
+      "evidence": [
+        "docs/RELEASE-QUALIFICATION.md"
+      ],
+      "limits": "Real Git preparation/commit/conflict inspection, unpublished PR packets, live public CI read, and one actual standard Node repair with v3 approval plus uncommitted patch/audit/export/verification are retained. Broader repository/issue paths and authorized external publication need separate qualification."
     },
     {
       "id": "AC-12",
@@ -189,15 +238,19 @@
       "status": "partial",
       "implementation": [
         "factory/web/app.js",
-        "factory/cli.mjs"
+        "factory/cli.mjs",
+        "factory/operator-model.mjs"
       ],
       "tests": [
-        "tests/observer.test.mjs"
+        "tests/observer.test.mjs",
+        "tests/operator-model.test.mjs",
+        "scripts/qualify-factory-floor.mjs"
       ],
       "evidence": [
-        "docs/qualification-results.json"
+        "docs/qualification-results.json",
+        "docs/RELEASE-QUALIFICATION.md"
       ],
-      "limits": "Existing run replay plus full catalog; costs, provider, diff and recovery views incomplete."
+      "limits": "Read-only evidence/usage/failure/diff projections passed real Workcell browser qualification against synthetic data; not every requested operational dashboard is qualified."
     },
     {
       "id": "AC-13",
@@ -206,16 +259,21 @@
       "implementation": [
         "factory/mcp.mjs",
         "docs/MCP.md",
-        "docs/CATALOGS.md"
+        "docs/CATALOGS.md",
+        "factory/control-mcp.mjs",
+        "factory/role-runtime.mjs"
       ],
       "tests": [
         "tests/mcp.test.mjs",
-        "tests/catalog.test.mjs"
+        "tests/catalog.test.mjs",
+        "tests/control-mcp.test.mjs",
+        "tests/role-runtime.test.mjs"
       ],
       "evidence": [
-        "docs/qualification-results.json"
+        "docs/qualification-results.json",
+        "docs/RELEASE-QUALIFICATION.md"
       ],
-      "limits": "Read-only stdio tested; authorized mutation and external-host conformance incomplete."
+      "limits": "Default read-only MCP plus separately granted owned local control tested with real fixture subprocesses. External hosts/live model combinations and complete skill accounting remain open."
     },
     {
       "id": "AC-14",
@@ -225,9 +283,13 @@
         "scripts/setup.mjs",
         "scripts/setup-accountability.mjs"
       ],
-      "tests": [],
-      "evidence": [],
-      "limits": "Fresh public checkout on current macOS host installs and passes 118+8 checks without copied dependencies/settings/auth. Independent machines and Linux/WSL/full matrix not run."
+      "tests": [
+        "scripts/qualify-install.mjs"
+      ],
+      "evidence": [
+        "docs/qualification-results.json"
+      ],
+      "limits": "Fresh published checkout installs and passes offline doctor; later aggregate exposed provenance/fixture bugs now fixed. Final fresh-checkout retry pending. Clean OS, Linux/WSL, representative installed missions and upgrade/rollback matrix remain unqualified."
     },
     {
       "id": "AC-15",
@@ -264,19 +326,21 @@
     {
       "id": "AC-17",
       "requirement": "Previous acceptance/isolation tests continue passing",
-      "status": "verified",
+      "status": "partial",
       "implementation": [
         "docs/qualification-results.json"
       ],
       "tests": [
         "factory/tests.test.mjs",
         "factory/workcell-tests.mjs",
-        "scripts/test-packs.mjs"
+        "scripts/test-packs.mjs",
+        "scripts/qualify-lens.mjs"
       ],
       "evidence": [
-        "docs/qualification-results.json"
+        "docs/qualification-results.json",
+        "docs/RELEASE-QUALIFICATION.md"
       ],
-      "limits": "Real current-host smoke, isolation, controller-death and pack checks passed."
+      "limits": "Existing smoke/isolation/controller-death passed on Lens image; source continued changing afterward. Repeat final-source full acceptance/isolation matrix before release."
     },
     {
       "id": "AC-18",
@@ -291,5 +355,6 @@
     }
   ],
   "continuation": "docs/IMPLEMENTATION-LEDGER.md",
-  "rule": "No file, stub, mock or schema compilation alone establishes working capability."
+  "rule": "No file, stub, mock or schema compilation alone establishes working capability.",
+  "continuationScope": "Scoped native integrations and current-host fixtures; final-source and complete release matrix pending"
 }

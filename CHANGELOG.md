@@ -1,5 +1,18 @@
 # Changelog
 
+
+## Unreleased — additional bounded ecosystem paths
+
+- Require canonical role deliverables, bounded skill work orders and role-specific provider routes; keep independent release authority.
+- Bind native Lens reports and observed sandbox identities into portable release evidence.
+- Add reviewed-specification preparation, isolated repository repair and local patch preparation, Git/CI inspection, native context and change adapters.
+- Add separately qualified CLI runtime profiles, recovery diagnostics/archival snapshots, read-only upstream drift observations and explicit local MCP grants.
+- Add content-free native Watchdog snapshots and exact tracked Workcell source verification.
+- Qualify readonly v2 Go/Rust CLI execution while retaining disabled unsafe v1 and its failed evidence.
+- Expose operator usage, failures, gate evidence and proposed-file views without control endpoints.
+
+This is an incomplete integration increment. See the qualification report for actual passing paths, retained failures and release blockers.
+
 ## Unreleased — ecosystem integration increment (release blocked)
 
 Phase B continuation wires native RunLedger lifecycle, CaseFile failure retention, Eval and selected ShipCheck gates into missions. Verified artifacts now require terminal accounting before local promotion; offline audit/recheck/export validate native gate bindings. Evidence code is served inertly by the observer.

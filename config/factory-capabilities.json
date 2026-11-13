@@ -95,6 +95,12 @@
         "url": "https://github.com/kujolang/software-factory/releases/tag/0.1.0",
         "assets": [],
         "qualification": "Release metadata inspected; assets not executed or certified by this audit"
+      },
+      "factoryIntegration": {
+        "status": "substantial-increment-release-blocked",
+        "acceptanceManifest": "config/release-acceptance.json",
+        "continuationLedger": "docs/IMPLEMENTATION-LEDGER.md",
+        "qualification": "docs/RELEASE-QUALIFICATION.md"
       }
     },
     {
@@ -365,6 +371,21 @@
           }
         ],
         "qualification": "Release metadata inspected; assets not executed or certified by this audit"
+      },
+      "factoryIntegration": {
+        "status": "implemented-native-orchestration-scoped-operations",
+        "sourceCommit": "18b5c737a73904ae942f0bd1c3baa1f77c2bfb40",
+        "implementation": [
+          "factory/dispatch.kujo",
+          "factory/operations.mjs",
+          "factory/spec-pipeline.mjs"
+        ],
+        "tests": [
+          "factory/test-dispatch.mjs",
+          "tests/operations.test.mjs",
+          "tests/spec-pipeline.test.mjs"
+        ],
+        "limits": "Native inspect/plan and fixture pause/resume only; fixed worker artifacts preclude automatic production resume. Full 20-workflow lifecycle qualification incomplete."
       }
     },
     {
@@ -488,6 +509,20 @@
           }
         ],
         "qualification": "Release metadata inspected; assets not executed or certified by this audit"
+      },
+      "factoryIntegration": {
+        "status": "integrated-native-local-with-readonly-extension",
+        "sourceCommit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+        "lock": "sources.lock.json",
+        "implementation": [
+          "factory/workcell.mjs",
+          "factory/compiled-export.mjs",
+          "factory/tracked-source-identity.mjs"
+        ],
+        "evidence": [
+          "docs/CLI-RUNTIME-QUALIFICATION.json"
+        ],
+        "decision": "Explicit readonly workspace for two-lease native CLI execution; default noexec isolation retained; remote backends not qualified."
       }
     },
     {
@@ -581,6 +616,19 @@
         "url": "https://github.com/kujolang/kujo-agents/releases/tag/v1.5.0",
         "assets": [],
         "qualification": "Release metadata inspected; assets not executed or certified by this audit"
+      },
+      "factoryIntegration": {
+        "status": "catalog-complete-selected-execution-partial",
+        "implementation": [
+          "factory/catalog.mjs",
+          "factory/role-runtime.mjs",
+          "factory/selection.mjs"
+        ],
+        "tests": [
+          "tests/catalog.test.mjs",
+          "tests/role-runtime.test.mjs"
+        ],
+        "limits": "85 canonical roles discoverable; selected consultations execute. All 28-role live semantic/handoff/performance qualification incomplete."
       }
     },
     {
@@ -1594,6 +1642,22 @@
         "url": "https://github.com/kujolang/lens/releases/tag/v1.1.1",
         "assets": [],
         "qualification": "Release metadata inspected; assets not executed or certified by this audit"
+      },
+      "factoryIntegration": {
+        "status": "implemented-workcell-path-qualification-recorded",
+        "lock": "config/lens-source.lock.json",
+        "implementation": [
+          "factory/lens.mjs",
+          "factory/workcell-image/lens-check.mjs",
+          "factory/evidence.mjs"
+        ],
+        "tests": [
+          "tests/lens.test.mjs",
+          "scripts/qualify-lens.mjs",
+          "tests/evidence.test.mjs"
+        ],
+        "documentation": "docs/LENS.md",
+        "limits": "Native reports and screenshot/accessibility evidence at explicit threshold; visual baselines and final-source broad mission matrix remain open."
       }
     },
     {
@@ -1712,6 +1776,19 @@
           }
         ],
         "qualification": "Release metadata inspected; assets not executed or certified by this audit"
+      },
+      "factoryIntegration": {
+        "status": "implemented-scoped-native-observations",
+        "sourceCommit": "7a0bd9a63d68421831ed66d6eed29805c48e1b24",
+        "lock": "config/telemetry.lock.json",
+        "implementation": [
+          "factory/telemetry.mjs",
+          "factory/telemetry-harness.kujo"
+        ],
+        "tests": [
+          "tests/telemetry.test.mjs"
+        ],
+        "decision": "Native normalization, validation and SQLite storage of content-free terminal mission observations; optional observational component, never approval authority. Live proxy/exporters and comprehensive tool-call timing remain unqualified."
       }
     },
     {
@@ -1782,6 +1859,19 @@
         "url": "https://github.com/kujolang/concord/releases/tag/v1.1.2",
         "assets": [],
         "qualification": "Release metadata inspected; assets not executed or certified by this audit"
+      },
+      "factoryIntegration": {
+        "status": "implemented-scoped-native-fixtures",
+        "sourceCommit": "f8812e7f00f55e4d1d3f46e70d902bce89ec7be7",
+        "lock": "config/change-tools.lock.json",
+        "implementation": [
+          "factory/change-tools.mjs"
+        ],
+        "tests": [
+          "tests/change-tools.test.mjs"
+        ],
+        "documentation": "docs/CHANGE-TOOLS.md",
+        "limits": "Advisory explicit before/after snapshots; no candidate execution. Kennel is pure manifest validation only; Concord remains experimental; Fence is import-boundary analysis, not Workcell isolation."
       }
     },
     {
@@ -2277,6 +2367,19 @@
         "url": "https://github.com/kujolang/scout/releases/tag/v1.1.0",
         "assets": [],
         "qualification": "Release metadata inspected; assets not executed or certified by this audit"
+      },
+      "factoryIntegration": {
+        "status": "implemented-scoped-native-fixtures",
+        "sourceCommit": "f3a874fa0e95e26c52ef9ec4d23b0f52d8372089",
+        "lock": "config/context.lock.json",
+        "implementation": [
+          "factory/context.mjs"
+        ],
+        "tests": [
+          "tests/context.test.mjs"
+        ],
+        "documentation": "docs/CONTEXT-PIPELINE.md",
+        "limits": "Explicit bounded source snapshots; sensitive intermediates; redaction not exhaustive; no automatic mission injection or durable retrieval; no authority granted."
       }
     },
     {
@@ -2354,6 +2457,19 @@
         "url": "https://github.com/kujolang/scent/releases/tag/v1.1.0",
         "assets": [],
         "qualification": "Release metadata inspected; assets not executed or certified by this audit"
+      },
+      "factoryIntegration": {
+        "status": "implemented-scoped-native-fixtures",
+        "sourceCommit": "d71da6cbb6f4a1fb9d438743a4ad9e00614da266",
+        "lock": "config/context.lock.json",
+        "implementation": [
+          "factory/context.mjs"
+        ],
+        "tests": [
+          "tests/context.test.mjs"
+        ],
+        "documentation": "docs/CONTEXT-PIPELINE.md",
+        "limits": "Explicit bounded source snapshots; sensitive intermediates; redaction not exhaustive; no automatic mission injection or durable retrieval; no authority granted."
       }
     },
     {
@@ -2462,6 +2578,19 @@
           }
         ],
         "qualification": "Release metadata inspected; assets not executed or certified by this audit"
+      },
+      "factoryIntegration": {
+        "status": "implemented-scoped-native-fixtures",
+        "sourceCommit": "d3173049b5365af975624fddd48e943d39738c75",
+        "lock": "config/change-tools.lock.json",
+        "implementation": [
+          "factory/change-tools.mjs"
+        ],
+        "tests": [
+          "tests/change-tools.test.mjs"
+        ],
+        "documentation": "docs/CHANGE-TOOLS.md",
+        "limits": "Advisory explicit before/after snapshots; no candidate execution. Kennel is pure manifest validation only; Concord remains experimental; Fence is import-boundary analysis, not Workcell isolation."
       }
     },
     {
@@ -2542,6 +2671,19 @@
         "url": "https://github.com/kujolang/changebucket/releases/tag/v1.1.0",
         "assets": [],
         "qualification": "Release metadata inspected; assets not executed or certified by this audit"
+      },
+      "factoryIntegration": {
+        "status": "implemented-scoped-native-fixtures",
+        "sourceCommit": "030eea63c60449f82c9ba2680227485d318fdb6d",
+        "lock": "config/change-tools.lock.json",
+        "implementation": [
+          "factory/change-tools.mjs"
+        ],
+        "tests": [
+          "tests/change-tools.test.mjs"
+        ],
+        "documentation": "docs/CHANGE-TOOLS.md",
+        "limits": "Advisory explicit before/after snapshots; no candidate execution. Kennel is pure manifest validation only; Concord remains experimental; Fence is import-boundary analysis, not Workcell isolation."
       }
     },
     {
@@ -2627,6 +2769,19 @@
         "url": "https://github.com/kujolang/patchbrief/releases/tag/v1.0.3",
         "assets": [],
         "qualification": "Release metadata inspected; assets not executed or certified by this audit"
+      },
+      "factoryIntegration": {
+        "status": "implemented-scoped-native-fixtures",
+        "sourceCommit": "92c5cc833730dc427b54a069e9a275bad5969ddc",
+        "lock": "config/change-tools.lock.json",
+        "implementation": [
+          "factory/change-tools.mjs"
+        ],
+        "tests": [
+          "tests/change-tools.test.mjs"
+        ],
+        "documentation": "docs/CHANGE-TOOLS.md",
+        "limits": "Advisory explicit before/after snapshots; no candidate execution. Kennel is pure manifest validation only; Concord remains experimental; Fence is import-boundary analysis, not Workcell isolation."
       }
     },
     {
@@ -2721,6 +2876,19 @@
         "url": "https://github.com/kujolang/kennel/releases/tag/v1.2.1",
         "assets": [],
         "qualification": "Release metadata inspected; assets not executed or certified by this audit"
+      },
+      "factoryIntegration": {
+        "status": "implemented-scoped-native-fixtures",
+        "sourceCommit": "3093c40039ddbaa10527f3121cae3b958cadc2b9",
+        "lock": "config/change-tools.lock.json",
+        "implementation": [
+          "factory/change-tools.mjs"
+        ],
+        "tests": [
+          "tests/change-tools.test.mjs"
+        ],
+        "documentation": "docs/CHANGE-TOOLS.md",
+        "limits": "Advisory explicit before/after snapshots; no candidate execution. Kennel is pure manifest validation only; Concord remains experimental; Fence is import-boundary analysis, not Workcell isolation."
       }
     },
     {
@@ -3084,6 +3252,19 @@
           }
         ],
         "qualification": "Release metadata inspected; assets not executed or certified by this audit"
+      },
+      "factoryIntegration": {
+        "status": "implemented-scoped-native-fixtures",
+        "sourceCommit": "8bb7a0c251a82044320b42654e22a5371b76a9f6",
+        "lock": "config/context.lock.json",
+        "implementation": [
+          "factory/context.mjs"
+        ],
+        "tests": [
+          "tests/context.test.mjs"
+        ],
+        "documentation": "docs/CONTEXT-PIPELINE.md",
+        "limits": "Explicit bounded source snapshots; sensitive intermediates; redaction not exhaustive; no automatic mission injection or durable retrieval; no authority granted."
       }
     },
     {
@@ -7012,5 +7193,7 @@
     "Named GitHub Evidence Checks package unresolved; do not invent its API.",
     "Source audit uses fetched defaults and is not execution qualification.",
     "Workflow catalog drift: README lists 45 packages while docs/audit/workflow-catalog.json has 44 active entries; publishing-house-operator is missing from the latter. Preserve all 45 packages and report drift."
-  ]
+  ],
+  "implementationUpdatedAt": "2026-11-13",
+  "implementationScope": "factoryIntegration fields record scoped current implementation; original classifications and source evidence remain the historical default-branch audit baseline, not certification."
 }

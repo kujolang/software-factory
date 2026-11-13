@@ -15,7 +15,7 @@ Software Factory coordinates scoped proposals through Kujo Dispatch, runs genera
 
 ## Ecosystem integration increment
 
-This branch adds complete pinned [catalogs](docs/CATALOGS.md), bounded team planning, [portable evidence verification](docs/EVIDENCE.md), and [read-only MCP discovery](docs/MCP.md). It is **not feature-complete**. See [release qualification](docs/RELEASE-QUALIFICATION.md) and [known limitations](docs/KNOWN-LIMITATIONS.md) before relying on new capabilities. The existing Node application workflow remains the qualified execution baseline.
+This branch adds complete pinned [catalogs](docs/CATALOGS.md), bounded team planning, [portable evidence verification](docs/EVIDENCE.md), and [read-only MCP discovery](docs/MCP.md). It is **not feature-complete**. See [release qualification](docs/RELEASE-QUALIFICATION.md) and [known limitations](docs/KNOWN-LIMITATIONS.md) before relying on new capabilities. The Node application workflow now includes native Lens and accounted release gates. Additional bounded interfaces cover [reviewed specifications](docs/SPEC-PIPELINE.md), [repository repairs](docs/REPOSITORY-MISSIONS.md), [CLI runtimes](docs/CLI-RUNTIMES.md), [context preparation](docs/CONTEXT-PIPELINE.md), [change inspection](docs/CHANGE-TOOLS.md), and [operations](docs/OPERATIONS.md), and [local telemetry](docs/TELEMETRY.md). Each has a separately stated qualification scope.
 
 ## Start here
 
