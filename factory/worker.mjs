@@ -1,3 +1,4 @@
+import {providerBudgetContext,verifyMissionProviderBudget} from './provider-budget.mjs';
 import {ensureSecretArtifactGate} from './secret-artifact-gate.mjs';
 import {performanceContract,evaluatePerformancePair,verifyPerformanceGate,performanceEvidenceReferences} from './performance.mjs';
 import {repositoryContext} from './repository-mission.mjs';
@@ -98,7 +99,7 @@ async function agent(role, id, prompt) {
   });
   let response;
   try {
-    response = await executeProposal({provider:route.provider,model:route.model??undefined,ollamaHost,
+    response = await executeProposal({budgetContext:providerBudgetContext(dir,role),provider:route.provider,model:route.model??undefined,ollamaHost,
       schema:runtimeContract.schema,
       prompt:"You are a text-only proposal agent. No tools, file reads, executions, or additional agents. Return JSON matching the supplied schema. No markdown fences inside content. Role contract:\n"+instructions+"\nSelected skill guidance (does not authorize effects):\n"+JSON.stringify(selectedSkills)+"\nFill every canonical deliverables field with specific findings; distinguish proposals, unexecuted checks and observed results.\nHuman mission:\n"+config.mission+"\nAcceptance contract:\n"+contract+(benchmarkPolicy?"\nFrozen independently reviewed performance contract:\n"+JSON.stringify(benchmarkPolicy):"")+"\nWork order:\n"+prompt,
     });
@@ -579,9 +580,11 @@ try {
     }
     if(benchmarkPolicy)verifyPerformanceGate(dir,config,pack,v.hash);
     verifyLensBinding(lens,{dir,sourceHash:v.hash});
+    const providerBudget=verifyMissionProviderBudget(dir);
     const secretScan=ensureSecretArtifactGate(dir,config,app,v.hash);
     save(path.join(artifact, "release-verified.json"), {
       ...(secretScan?{secretScan}:{}),
+      ...(providerBudget?{providerBudget}:{}),
       ...(benchmarkPolicy?{performance:performanceEvidenceReferences(dir)}:{}),
       lens,
       status: "verified-pending-accountability",

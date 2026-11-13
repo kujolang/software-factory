@@ -1,3 +1,4 @@
+import {initializeMissionProviderBudget,verifyMissionProviderBudget} from './provider-budget.mjs';
 import {ensureSecretArtifactGate} from './secret-artifact-gate.mjs';
 import {hashMissionArtifacts} from './mission-bindings.mjs';
 import {acquireMissionAdmission} from './operations-policy.mjs';
@@ -18,7 +19,7 @@ export function validateCLIMission(input){
 }
 export function cliMissionSpec(input){validateCLIMission(input);return {name:input.profile+' construction',goal:input.mission,version:'1.0.0',priority:'medium',status:'review',acceptance_criteria:input.cases.map((c,i)=>'case-'+i+': arguments '+JSON.stringify(c.args)+' yield exact stdout '+JSON.stringify(c.stdout)+' and exit '+c.exitCode),non_goals:['No external packages, network, services, deployment or arbitrary host execution'],review_expectations:['Independent contract and source review; finite CLI examples are not universal behavior proof'],metadata:{runtime:input.profile,inputSha256:specHash(JSON.stringify(input)),traceability:input.cases.map((_,i)=>({requirement:'case-'+i,tests:['case-'+i]}))}};}
 const record=(dir,name)=>readSpecRecord(dir,'artifacts/'+name+'.json');
-export function verifyCLIMission(dir){
+export function verifyCLIMission(dir){verifyMissionProviderBudget(dir);
  const config=readSpecRecord(dir,'run.json'),input=validateCLIMission(readSpecRecord(dir,'input.json'));
  if(config.schema!=='kujo.factory.cli-mission/v1'||config.inputSha256!==specHash(JSON.stringify(input))||config.runtimeProfileSha256!==specHash(JSON.stringify(cliProfiles.profiles[input.profile])))throw Error('CLI immutable input changed');
  if(config.evidenceContract!=='kujo.factory.cli-evidence/v1'||specHash(JSON.stringify(record(dir,'runtime-profile')))!==config.runtimeProfileSha256||specHash(fs.readFileSync(specPlain(path.join(dir,'artifacts/runtime-source-lock.json'))))!==config.runtimeSourceLockSha256)throw Error('CLI frozen runtime identity changed');
@@ -36,7 +37,7 @@ export function verifyCLIMission(dir){
   const result=record(dir,step);if(!result.ok||result.sourceHash!==sourceHash||result.sourceLockSha256!==config.runtimeSourceLockSha256||result.profile!==input.profile||result.casesHash!==specHash(JSON.stringify(input.cases))||result.qualification!=='qualified-cli-fixtures-linux-amd64'||result.results.length!==input.cases.length)throw Error('CLI real acceptance missing or changed');
   for(const [i,item] of result.results.entries())if(item.index!==i||!item.ok||item.observed.reason||item.observed.code!==input.cases[i].exitCode||item.observed.out!==input.cases[i].stdout||item.imageId!==cliProfiles.profiles[input.profile].qualifiedImage)throw Error('CLI acceptance observation invalid');
  }
- const secretScan=ensureSecretArtifactGate(dir,config,path.join(dir,'application'),sourceHash);return {schema:'kujo.factory.cli-candidate/v1',...(secretScan?{secretScan}:{}),sourceHash,inputSha256:config.inputSha256,profile:input.profile,fixture:config.fixture,softwareReleaseApproval:!config.fixture,scope:'Single-file standard-library CLI with exact reviewed finite cases',humanApproval:false,deploymentAuthorized:false};
+ const secretScan=ensureSecretArtifactGate(dir,config,path.join(dir,'application'),sourceHash);return {schema:'kujo.factory.cli-candidate/v1',...(verifyMissionProviderBudget(dir)?{providerBudget:verifyMissionProviderBudget(dir)}:{}),...(secretScan?{secretScan}:{}),sourceHash,inputSha256:config.inputSha256,profile:input.profile,fixture:config.fixture,softwareReleaseApproval:!config.fixture,scope:'Single-file standard-library CLI with exact reviewed finite cases',humanApproval:false,deploymentAuthorized:false};
 }
 /** Explicit provider fixture seam is never exposed through CLI and never approves a release. */
 export async function runCLIMission({input,provider=defaultProvider,model=defaultModel,parent=path.join(root,'.runtime/cli-missions'),fixtureOutputs}={}){
@@ -46,7 +47,7 @@ export async function runCLIMission({input,provider=defaultProvider,model=defaul
  const dir=fs.mkdtempSync(path.join(parent,'cli-')),id=path.basename(dir);for(const name of ['artifacts','application'])fs.mkdirSync(path.join(dir,name),{mode:0o700});
  const runtimeSourceBytes=fs.readFileSync(path.join(root,'config/cli-runtime-sources.lock.json'));
  const config={schema:'kujo.factory.cli-mission/v1',evidenceContract:'kujo.factory.cli-evidence/v1',runtimeSourceLockSha256:specHash(runtimeSourceBytes),id,kind:'cli-construction',mission:input.mission,profile:input.profile,runtimeProfileSha256:specHash(JSON.stringify(cliProfiles.profiles[input.profile])),inputSha256:specHash(JSON.stringify(input)),provider,model:model??null,secretScanRequired:true,fixture:fixtureOutputs!==undefined,status:'running',startedAt:new Date().toISOString(),tasks:cliMissionSteps.map(s=>({id:s.id,agentId:s.role||'controller',dependencies:s.dependsOn})),deploymentAuthorized:false};
- const admission=acquireMissionAdmission(path.resolve(parent),dir,{runId:id,...(config.fixture?{poolDirectory:path.join(path.resolve(parent),'.fixture-admission')}:{})});config.operationsAdmission=admission.record;
+ const admission=acquireMissionAdmission(path.resolve(parent),dir,{runId:id,...(config.fixture?{poolDirectory:path.join(path.resolve(parent),'.fixture-admission')}:{})});config.operationsAdmission=admission.record;try{initializeMissionProviderBudget(dir,config);}catch(error){admission.close();throw error;}
  try {
  writeSpecRecord(dir,'run.json',config);writeSpecRecord(dir,'artifacts/mission-evidence-contract.json',{schema:config.evidenceContract});writeSpecRecord(dir,'input.json',input);writeSpecRecord(dir,'artifacts/runtime-profile.json',cliProfiles.profiles[input.profile]);fs.writeFileSync(path.join(dir,'artifacts/runtime-source-lock.json'),runtimeSourceBytes,{flag:'wx',mode:0o600});writeSpecRecord(dir,'artifacts/controller-provenance.json',controllerProvenance());if(config.fixture)writeSpecRecord(dir,'fixture-outputs.json',fixtureOutputs);
  writeSpecRecord(dir,'workflow.json',{id:'cli-construction',name:'Independently reviewed CLI construction',tasks:cliMissionSteps.map(s=>({id:s.id,name:s.id,agentId:s.role||'controller',dependsOn:s.dependsOn,timeoutMs:600000,parallelSafe:false}))});event(dir,'mission.created',{summary:'Construct single-file CLI with frozen independent cases'});

@@ -1,3 +1,4 @@
+import {initializeMissionProviderBudget} from './provider-budget.mjs';
 import {createHash} from 'node:crypto';
 import {validatePerformancePolicy} from './performance.mjs';
 import {prepareRepositoryMission} from './repository-mission.mjs';
@@ -147,6 +148,7 @@ async function executeAdmittedRun(dir, config, admission, recovery) {
   config.accountabilityRequired=true;
   config.lensRequired=true;
   config.secretScanRequired=true;
+  initializeMissionProviderBudget(dir,config);
   config.executionProvider={provider,model:model||null};
   save(path.join(dir,"run.json"),config);
   const provenance=controllerProvenance();

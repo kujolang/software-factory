@@ -1,3 +1,4 @@
+import {initializeMissionProviderBudget,verifyMissionProviderBudget} from './provider-budget.mjs';
 import {hashMissionArtifacts} from './mission-bindings.mjs';
 import {acquireMissionAdmission} from './operations-policy.mjs';
 /** Inert documentation artifacts: native Dispatch sequences independent canonical roles. */
@@ -26,7 +27,7 @@ export function snapshotDocumentationSource(source,files){
   return {path:name,sha256:specHash(bytes),content:new TextDecoder('utf-8',{fatal:true,ignoreBOM:true}).decode(bytes)};
  }).sort((a,b)=>a.path.localeCompare(b.path));
 }
-export function verifyDocumentationArtifact(dir){
+export function verifyDocumentationArtifact(dir){verifyMissionProviderBudget(dir);
  const config=readSpecRecord(dir,'run.json'),source=readSpecRecord(dir,'artifacts/source.json'),docs=readSpecRecord(dir,'artifacts/documentation.json'),review=readSpecRecord(dir,'artifacts/review-docs-proposal.json'),binding=readSpecRecord(dir,'artifacts/review-binding.json');
  if(typeof config.fixture!=='boolean'||config.kind!=='source-to-reviewed-documentation'||config.schema!=='kujo.factory.documentation-mission/v1'||!Array.isArray(source)||source.some(f=>specHash(f.content)!==f.sha256)||docs.schema!=='kujo.factory.documentation/v1'||docs.sourceSha256!==specHash(JSON.stringify(source))||binding.sourceSha256!==docs.sourceSha256||binding.documentationSha256!==specHash(JSON.stringify(docs))||review.verdict!=='pass'||review.files.length)throw Error('Documentation source or independent review binding mismatch');
  for(const step of documentationStepsFor(config).filter(s=>s.role)){
@@ -37,7 +38,7 @@ export function verifyDocumentationArtifact(dir){
  if(config.editorialReviewRequired===true){const editorial=readSpecRecord(dir,'artifacts/editorial-review-proposal.json'),e=readSpecRecord(dir,'artifacts/editorial-binding.json');if(editorial.verdict!=='pass'||editorial.files.length||e.sourceSha256!==docs.sourceSha256||e.documentationSha256!==binding.documentationSha256)throw Error('Editorial documentation review binding mismatch');editorialReviewSha256=specHash(fs.readFileSync(editorialFile));}
  else if(fs.existsSync(editorialFile)||fs.existsSync(path.join(dir,'artifacts/editorial-binding.json')))throw Error('Editorial review requirement marker missing');
  if(!Array.isArray(docs.files)||!docs.files.length||docs.files.length>10||new Set(docs.files.map(f=>f.path)).size!==docs.files.length||docs.files.some(f=>!/^docs\/[a-zA-Z0-9_-]+\.md$/.test(f.path)||typeof f.content!=='string'||f.content.length>100000))throw Error('Documentation output path or size invalid');
- return {schema:'kujo.factory.reviewed-documentation/v1',...(editorialReviewSha256?{editorialReviewSha256}:{}),sourceSha256:docs.sourceSha256,documentationSha256:binding.documentationSha256,reviewSha256:specHash(fs.readFileSync(path.join(dir,'artifacts/review-docs-proposal.json'))),fixture:config.fixture,modelReview:!config.fixture,implementationTestsExecuted:false,humanApproval:false,softwareReleaseApproval:false,deploymentAuthorized:false};
+ return {schema:'kujo.factory.reviewed-documentation/v1',...(verifyMissionProviderBudget(dir)?{providerBudget:verifyMissionProviderBudget(dir)}:{}),...(editorialReviewSha256?{editorialReviewSha256}:{}),sourceSha256:docs.sourceSha256,documentationSha256:binding.documentationSha256,reviewSha256:specHash(fs.readFileSync(path.join(dir,'artifacts/review-docs-proposal.json'))),fixture:config.fixture,modelReview:!config.fixture,implementationTestsExecuted:false,humanApproval:false,softwareReleaseApproval:false,deploymentAuthorized:false};
 }
 export async function runDocumentationPipeline({source,files,mission,provider=configuredProvider,model=configuredModel,parent=path.join(root,'.runtime/documentation'),fixtureOutputs}={}){
  if(typeof mission!=='string'||!mission.trim()||mission.length>12000||mission.includes('\0')||!['codex','ollama','openai','anthropic','gemini'].includes(provider))throw Error('Invalid documentation mission/provider');
@@ -46,7 +47,7 @@ export async function runDocumentationPipeline({source,files,mission,provider=co
  let ancestor=path.resolve(parent);while(!fs.existsSync(ancestor))ancestor=path.dirname(ancestor);specPlain(ancestor);fs.mkdirSync(parent,{recursive:true,mode:0o700});specPlain(parent);
  const dir=fs.mkdtempSync(path.join(parent,'docs-')),id=path.basename(dir);fs.mkdirSync(path.join(dir,'artifacts'),{mode:0o700});
  const config={editorialReviewRequired:true,evidenceContract:'kujo.factory.documentation-evidence/v1',schema:'kujo.factory.documentation-mission/v1',id,kind:'source-to-reviewed-documentation',mission,provider,model:model??null,fixture:fixtureOutputs!==undefined,status:'running',startedAt:new Date().toISOString()};
- const admission=acquireMissionAdmission(path.resolve(parent),dir,{runId:id,...(config.fixture?{poolDirectory:path.join(path.resolve(parent),'.fixture-admission')}:{})});config.operationsAdmission=admission.record;
+ const admission=acquireMissionAdmission(path.resolve(parent),dir,{runId:id,...(config.fixture?{poolDirectory:path.join(path.resolve(parent),'.fixture-admission')}:{})});config.operationsAdmission=admission.record;try{initializeMissionProviderBudget(dir,config);}catch(error){admission.close();throw error;}
  try {
  writeSpecRecord(dir,'run.json',config);writeSpecRecord(dir,'artifacts/mission-evidence-contract.json',{schema:config.evidenceContract});writeSpecRecord(dir,'artifacts/source.json',snapshot);writeSpecRecord(dir,'artifacts/controller-provenance.json',controllerProvenance());
  if(config.fixture)writeSpecRecord(dir,'fixture-outputs.json',fixtureOutputs);

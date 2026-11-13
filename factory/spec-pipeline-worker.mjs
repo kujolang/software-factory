@@ -1,3 +1,4 @@
+import {providerBudgetContext} from './provider-budget.mjs';
 import {assertMissionOperationsBudget} from './operations-policy.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -20,7 +21,7 @@ async function proposal(prompt){
  const request={provider:fixture?'mock':config.provider,model:fixture?undefined:config.model??undefined,prompt:'You are a text-only proposal agent with no tools. Produce canonical deliverables and the fixed output envelope. Never claim tests ran or grant human approval/deployment.\n'+contract.role.instructions+'\nIdea:\n'+config.mission+'\nRuntime constraint:\n'+runtimeContract+'\nPack data contract:\n'+language+'\nTask:\n'+prompt,schema:contract.schema,...(fixture?{mockOutput:readSpecRecord(dir,'fixture-outputs.json')[taskId]}:{})};
  validateRolePayload(contract.role,'input',Object.fromEntries(contract.role.manifest.inputs.map(field=>[field.name,request.prompt])));
  writeSpecRecord(dir,artifact(taskId+'-work-order.json'),{role:task.role,taskId,inputSha256:specHash(request.prompt),canonicalContractSha256:contract.identity,permission:'PROPOSE',tools:[]});
- let response;try{response=await executeProposal(request);}catch(error){if(error.receipt)writeSpecRecord(dir,artifact(taskId+'-receipt.json'),{...error.receipt,role:task.role,taskId});throw error;}
+ let response;try{response=await executeProposal({...request,budgetContext:providerBudgetContext(dir,task.role)});}catch(error){if(error.receipt)writeSpecRecord(dir,artifact(taskId+'-receipt.json'),{...error.receipt,role:task.role,taskId});throw error;}
  writeSpecRecord(dir,artifact(taskId+'-receipt.json'),{...response.receipt,role:task.role,taskId,canonicalContractSha256:contract.identity});
  const output=admitRoleProposal(contract,response.output,{allowedFiles:taskId==='write-spec'?p=>p==='pack.json':()=>false});writeSpecRecord(dir,artifact(taskId+'-proposal.json'),output);if(output.verdict==='fail'||(taskId==='review-spec'&&output.verdict!=='pass'))throw Error('Role '+task.role+' did not accept its bounded task: '+output.summary);return output;
 }

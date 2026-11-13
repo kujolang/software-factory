@@ -24,9 +24,10 @@ func factory_worker(input, context) {
     # A fixed executable and argv boundary. Workers own validation, isolated
     # candidate writes, provider usage, corrections, and release policy.
     kind := env_or("FACTORY_WORKFLOW_KIND", "application")
-    assert(kind == "application" || kind == "specification" || kind == "documentation" || kind == "cli-construction" || kind == "sqlite-migration" || kind == "node-package-upgrade" || kind == "webops-review", "Unknown trusted factory workflow kind")
+    assert(kind == "application" || kind == "specification" || kind == "documentation" || kind == "cli-construction" || kind == "sqlite-migration" || kind == "node-package-upgrade" || kind == "webops-review" || kind == "react-static-construction", "Unknown trusted factory workflow kind")
     worker := "/factory/worker.mjs"
     if kind == "specification" { worker = "/factory/spec-pipeline-worker.mjs" }
+    if kind == "react-static-construction" { worker = "/factory/react-mission-worker.mjs" }
     if kind == "webops-review" { worker = "/factory/webops-review-worker.mjs" }
     if kind == "documentation" { worker = "/factory/documentation-pipeline-worker.mjs" }
     if kind == "cli-construction" { worker = "/factory/cli-mission-worker.mjs" }
@@ -116,6 +117,7 @@ if env_or("FACTORY_WORKFLOW_KIND", "application") == "cli-construction" { releas
 if env_or("FACTORY_WORKFLOW_KIND", "application") == "sqlite-migration" { release_authority = "independent-sqlite-migration-gate" }
 if env_or("FACTORY_WORKFLOW_KIND", "application") == "node-package-upgrade" { release_authority = "independent-node-package-candidate-gate" }
 if env_or("FACTORY_WORKFLOW_KIND", "application") == "webops-review" { release_authority = "none-advisory-webops-review" }
+if env_or("FACTORY_WORKFLOW_KIND", "application") == "react-static-construction" { release_authority = "independent-react-static-candidate-gate" }
 summary := {"schema": "kujo.factory.dispatch-result/v1", "ok": result["ok"], "status": result["run_state"]["status"], "runId": result["run_state"]["run_id"], "runDir": result["run_state"]["run_dir"], "releaseAuthority": release_authority}
 write_file(summary_path, to_json(summary))
 print(to_json(summary))

@@ -1,3 +1,4 @@
+import {verifyMissionProviderBudget} from './provider-budget.mjs';
 import {ensureSecretArtifactGate} from './secret-artifact-gate.mjs';
 import {verifyPerformanceGate,performanceEvidenceReferences} from './performance.mjs';
 import {verifyLensBinding} from './lens.mjs';
@@ -113,9 +114,10 @@ export async function finishMissionAccounting(dir,config,{passed,reason}){
 }
 function artifactIdentity(dir,relative){return {path:relative,sha256:readRecord(dir,relative).sha256};}
 /** The controller promotes only verified bytes after the canonical ledger is terminal. */
-export function promoteAccountedRelease(dir,config){
+export function promoteAccountedRelease(dir,config){verifyMissionProviderBudget(dir);
  const account=readRecord(dir,'artifacts/mission-accountability.json').value;
  const verified=readRecord(dir,'artifacts/release-verified.json').value;
+ const budget=verifyMissionProviderBudget(dir);if(budget&&JSON.stringify(budget)!==JSON.stringify(verified.providerBudget))throw Error('Release provider budget changed');
  const policy=readRecord(dir,'artifacts/release-policy-final.json').value;
  const evaluation=readRecord(dir,'artifacts/evaluation.json').value;
  const ledger=readRecord(dir,account.ledgerRecord?.path).value;
