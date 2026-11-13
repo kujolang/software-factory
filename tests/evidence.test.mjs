@@ -215,10 +215,11 @@ function accountedFixture(t) {
  for(const name of ['execution.json','manifest-verification.json'])write(evalDir+'/'+name,{schema:'kujo.factory.eval-execution/v1',component:'eval',sourceCommit:evaluation.sourceCommit,code:0,reason:null});
  const verified={status:'verified-pending-accountability',hash:sourceHash,buildHash:sourceHash,reviewHash:sourceHash,checks:checked,deploymentAuthorized:false};write('artifacts/release-verified.json',verified);
  const gates=Object.fromEntries(['release-verified.json','verification.json','release-policy-final.json','evaluation.json'].map(name=>[name,ref('artifacts/'+name).sha256]));
- const observationsRef=write('artifacts/mission-observations.json',{gates,candidate:{hash:sourceHash},fixture:'synthetic records only'});
+ const tests=[{name:'synthetic rejected attempt',status:'fail',evidence:'synthetic failure retained'},{name:'synthetic later attempt',status:'pass',evidence:'synthetic pass only'}],usage={input_tokens:0};
+ const observationsRef=write('artifacts/mission-observations.json',{gates,tests,usage,cost:null,candidate:{hash:sourceHash},fixture:'synthetic records only'});
  const ledgerDir='artifacts/runledger/receipt-synthetic',ledgerId='synthetic-ledger';
- const ledger={id:ledgerId,status:'pass',task_name:id};const ledgerRef=write(ledgerDir+'/.runledger/runs/'+ledgerId+'.json',ledger);
- const metadataIdentity='sha256:'+'d'.repeat(64),intent={schema:'kujo.factory.accounting-finish/v1',metadataIdentity,summary:{status:'pass',evidence:'artifacts/mission-observations.json sha256:'+observationsRef.sha256}};write(ledgerDir+'/finish-intent.json',intent);
+ const ledger={id:ledgerId,status:'pass',task_name:id,verdict:'synthetic gate verdict',tests:tests.map(test=>({at:'2026-11-13T00:00:00Z',name:test.name,status:test.status,details:test.evidence})),usage:{input_tokens:0,output_tokens:null,cache_read_tokens:null,cache_write_tokens:null},cost:{currency:'USD',input_cost:null,output_cost:null,cache_cost:null,total_cost:null}};const ledgerRef=write(ledgerDir+'/.runledger/runs/'+ledgerId+'.json',ledger);
+ const metadataIdentity='sha256:'+'d'.repeat(64),intent={schema:'kujo.factory.accounting-finish/v1',metadataIdentity,summary:{status:'pass',verdict:ledger.verdict,tests,usage,evidence:'artifacts/mission-observations.json sha256:'+observationsRef.sha256}};write(ledgerDir+'/finish-intent.json',intent);
  const nativeBinding={schema:'kujo.factory.runledger-binding/v1',sourceCommit:'a'.repeat(40),id:ledgerId,record:ledger,lifecycleBinding:{metadataIdentity},finishIdentity:'sha256:'+h(canonical(intent))};const ledgerBindingRef=write(ledgerDir+'/binding.json',nativeBinding);
  const completion={schema:'kujo.factory.mission-accountability/v1',ok:true,status:'pass',runId:id,candidateHash:sourceHash,gates,observationsSha256:observationsRef.sha256,ledgerId,ledgerRecord:ledgerRef,ledgerBinding:ledgerBindingRef,deploymentAuthorized:false};
  write('artifacts/mission-accountability.json',completion);
@@ -266,5 +267,49 @@ test('new release records cannot downgrade verification by removing accounting m
   assert.throws(()=>exportEvidence(f.run,f.bundle),/requirement marker/);
   delete f.release.gateVersion;f.write('artifacts/release.json',f.release);
   assert.throws(()=>verifyRunReleaseRecords(f.run),/requirement marker/);
+ }
+});
+
+// Synthetic records use the pinned RunLedger test/usage/cost shapes; no execution claim.
+test('native ledger cannot erase failures, alter verdicts, or invent usage and cost',t=>{
+ for(const mutate of [
+  ledger=>ledger.tests.shift(),
+  ledger=>ledger.tests[0].status='pass',
+  ledger=>ledger.tests.reverse(),
+  ledger=>ledger.tests[0].details='different evidence',
+  ledger=>ledger.verdict='different verdict',
+  ledger=>ledger.usage.input_tokens=null,
+  ledger=>ledger.usage.output_tokens=0,
+  ledger=>ledger.usage.cache_read_tokens=1,
+  ledger=>ledger.cost.total_cost=0
+ ]){
+  const f=accountedFixture(t),binding=JSON.parse(fs.readFileSync(path.join(f.run,f.completion.ledgerBinding.path))),ledger=binding.record;
+  mutate(ledger);
+  f.completion.ledgerRecord=f.write(f.completion.ledgerRecord.path,ledger);
+  f.completion.ledgerBinding=f.write(f.completion.ledgerBinding.path,binding);
+  f.release.accountability=f.write('artifacts/mission-accountability.json',f.completion);f.write('artifacts/release.json',f.release);
+  assert.throws(()=>verifyRunReleaseRecords(f.run),/ledger (test history|verdict|usage|contains unsupported cost)/);
+  assert.throws(()=>exportEvidence(f.run,f.bundle));
+ }
+});
+
+test('controller observations must agree with ledger intent; entirely unknown usage remains null',t=>{
+ for(const mode of ['tests','usage','unknown']){
+  const f=accountedFixture(t),read=name=>JSON.parse(fs.readFileSync(path.join(f.run,name)));
+  const observations=read('artifacts/mission-observations.json'),binding=read(f.completion.ledgerBinding.path),intent=read(f.ledgerDir+'/finish-intent.json');
+  if(mode==='tests')observations.tests.shift();
+  if(mode==='usage')observations.usage={input_tokens:3};
+  if(mode==='unknown'){
+   observations.usage=null;intent.summary.usage=null;binding.record.usage.input_tokens=null;
+   f.completion.ledgerRecord=f.write(f.completion.ledgerRecord.path,binding.record);
+  }
+  const observationRef=f.write('artifacts/mission-observations.json',observations);
+  f.completion.observationsSha256=observationRef.sha256;
+  intent.summary.evidence='artifacts/mission-observations.json sha256:'+observationRef.sha256;
+  f.write(f.ledgerDir+'/finish-intent.json',intent);binding.finishIdentity='sha256:'+f.h(f.canonical(intent));
+  f.completion.ledgerBinding=f.write(f.completion.ledgerBinding.path,binding);
+  f.release.accountability=f.write('artifacts/mission-accountability.json',f.completion);f.write('artifacts/release.json',f.release);
+  if(mode==='unknown')assert.equal(verifyRunReleaseRecords(f.run).ok,true);
+  else assert.throws(()=>verifyRunReleaseRecords(f.run),/ledger (test history|usage intent)/);
  }
 });

@@ -125,6 +125,17 @@ function nativeGateConsistency(dir, names, run, release, verification, review) {
   const finish = namedArtifact(dir, names, ledgerDirectory + '/finish-intent.json', 'RunLedger finish intent');
   requireRecord(ledgerBinding.value.finishIdentity === 'sha256:' + sha(canonical(finish.value)) && finish.value.summary?.status === 'pass' && finish.value.metadataIdentity === ledgerBinding.value.lifecycleBinding?.metadataIdentity && finish.value.summary?.evidence === 'artifacts/mission-observations.json sha256:' + sha(observations.bytes), 'ledger finalization intent inconsistent');
 
+  // Compare native observations to the immutable controller intent, including
+  // failed attempts. Timestamps are RunLedger metadata, not controller facts.
+  const summary = finish.value.summary;
+  requireRecord(Array.isArray(summary.tests) && summary.tests.length <= 100 && summary.tests.every(test => object(test) && Object.keys(test).sort().join(',') === 'evidence,name,status' && typeof test.name === 'string' && test.name.length > 0 && test.name.length <= 200 && typeof test.evidence === 'string' && test.evidence.length > 0 && test.evidence.length <= 2000 && ['pass', 'fail', 'skip'].includes(test.status)), 'ledger test intent invalid');
+  requireRecord(Array.isArray(ledger.value.tests) && ledger.value.tests.every(test => object(test) && Object.keys(test).sort().join(',') === 'at,details,name,status' && typeof test.at === 'string') && same(ledger.value.tests.map(test => ({name: test.name, status: test.status, evidence: test.details})), summary.tests) && same(summary.tests, observations.value.tests), 'ledger test history differs from controller observations');
+  requireRecord(typeof summary.verdict === 'string' && summary.verdict.length > 0 && summary.verdict.length <= 16000 && ledger.value.verdict === summary.verdict, 'ledger verdict differs from controller intent');
+  const usage = summary.usage;
+  requireRecord((usage === null || (object(usage) && Object.entries(usage).every(([key, value]) => ['input_tokens', 'output_tokens'].includes(key) && Number.isSafeInteger(value) && value >= 0))) && same(usage, observations.value.usage), 'ledger usage intent differs from controller observations');
+  requireRecord(same(ledger.value.usage, {input_tokens: usage?.input_tokens ?? null, output_tokens: usage?.output_tokens ?? null, cache_read_tokens: null, cache_write_tokens: null}), 'ledger usage differs from controller intent');
+  requireRecord(observations.value.cost === null && same(ledger.value.cost, {currency: 'USD', input_cost: null, output_cost: null, cache_cost: null, total_cost: null}), 'ledger contains unsupported cost claims');
+
   const final = artifactReference(dir, names, release.policy, 'policy', 'artifacts/release-policy-final.json').value;
   const preflight = namedArtifact(dir, names, 'artifacts/release-policy-preflight.json', 'policy preflight');
   requireRecord(final.schema === 'kujo.factory.release-policy-decision/v1' && final.stage === 'after-independent-release-review' && final.passed === true && Array.isArray(final.blockers) && final.blockers.length === 0 && final.approvalGranted === false && final.deploymentAuthorized === false && final.sourceHash === release.hash && final.preflightSha256 === sha(preflight.bytes), 'policy finalization inconsistent');
