@@ -7,6 +7,13 @@ import assert from "node:assert/strict";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 import { json, save, events, digest } from "./core.mjs";
+export function implementationOverlap(run,list) {
+  if(run.sourceRun || run.kind==='repository-repair')return null;
+  const intervals=['backend','frontend'].map(id=>({id,start:list.find(e=>e.taskId===id&&e.type==='agent.started'),end:list.find(e=>e.taskId===id&&e.type==='agent.completed')}));
+  assert.ok(intervals.every(i=>run.tasks.some(t=>t.id===i.id)&&i.start&&i.end),'Missing planned implementation interval');
+  const overlap=Math.min(...intervals.map(i=>Date.parse(i.end.timestamp)))-Math.max(...intervals.map(i=>Date.parse(i.start.timestamp)));
+  assert.ok(Number.isFinite(overlap)&&overlap>0,'Implementation intervals did not overlap');return overlap;
+}
 export function audit(dir) {
   const run = json(path.join(dir, "run.json")),
     list = events(dir);
@@ -69,19 +76,10 @@ export function audit(dir) {
       }
     }
   });
-  const intervals = ["backend", "frontend"].map((id) => ({
-    id,
-    start: list.find((e) => e.taskId === id && e.type === "agent.started"),
-    end: list.find((e) => e.taskId === id && e.type === "agent.completed"),
-  }));
   let overlapMs = null;
-  if (!run.sourceRun) {
+  if (!run.sourceRun && run.kind !== 'repository-repair') {
     check("real concurrent implementation intervals", () => {
-      assert.ok(intervals.every((i) => i.start && i.end));
-      overlapMs =
-        Math.min(...intervals.map((i) => Date.parse(i.end.timestamp))) -
-        Math.max(...intervals.map((i) => Date.parse(i.start.timestamp)));
-      assert.ok(overlapMs > 0);
+      overlapMs = implementationOverlap(run, list);
     });
   }
   const schema = json(path.join(agentsRoot, "schemas/handoff.schema.json"));
