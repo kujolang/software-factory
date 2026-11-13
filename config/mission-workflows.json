@@ -429,16 +429,36 @@
     },
     {
       "id": "dependency-upgrade",
-      "route": "blocked",
-      "output": "none",
-      "runtime": null,
+      "route": "package",
+      "output": "reviewed-node-package-candidate",
+      "runtime": "node-semver-cli-v1",
       "skills": [
         "kujo-kennel-workflows"
       ],
-      "roles": [],
-      "effects": [],
+      "roles": [
+        "code-reviewer",
+        "core-developer",
+        "release-verifier"
+      ],
+      "effects": [
+        "trusted-registry-prefetch-separate-explicit-command",
+        "offline-workcell-install-no-lifecycle-scripts",
+        "isolated-cli-execution",
+        "local-evidence-writes"
+      ],
       "verification": [
-        "bounded-read-or-copy"
+        "native-spec",
+        "independent-contract-review",
+        "old-version-baseline",
+        "source-review",
+        "npm-audit-zero-known-vulnerabilities",
+        "offline-sri-install",
+        "finite-cli-cases",
+        "independent-release-review",
+        "fresh-revalidation",
+        "cleanup",
+        "native-runledger-terminal",
+        "portable-evidence-integrity"
       ],
       "approval": {
         "humanRequiredBeforePublication": true,
@@ -447,7 +467,7 @@
       },
       "recovery": {
         "automaticResume": false,
-        "retry": "new mission after failure evidence review; existing recheck creates fresh verification"
+        "retry": "Fresh mission only after inspecting original failed provider/Workcell/CaseFile evidence; no automatic resume"
       },
       "upstream": {
         "id": "codebase-cleanup",
@@ -456,19 +476,38 @@
         "entrypoint": "`bash codebase-cleanup/scripts/run-workflow.sh --repo /path/to/repo`",
         "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
       },
-      "blockedReason": "No qualified package-install execution and vulnerability gate; dependency-free source runtime cannot upgrade dependencies.",
+      "blockedReason": null,
       "input": {
         "schema": "kujo.factory.mission-input/v1",
-        "required": [],
+        "required": [
+          "packageInput",
+          "baselineCache",
+          "targetCache"
+        ],
         "unknownFields": "reject",
-        "pack": "Reviewed seal mandatory for application/repository routes; identity does not establish correctness",
-        "source": "Explicit local source directory; repository execution imports committed source only"
+        "packageInput": "kujo.factory.node-package-mission-input/v1; frozen old source/lock and independently reviewed sealed target contract",
+        "cache": "Explicit existing SRI/advisory cache directories; no network fetch on mission admission"
       },
-      "dependencies": [],
+      "dependencies": [
+        "spec",
+        "dispatch",
+        "workcell",
+        "runledger",
+        "casefile",
+        "npm-11.20.0",
+        "qualified-node-semver-cli-image"
+      ],
       "failure": {
         "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
         "promotion": "Blocked on nonzero child status or required gate failure",
         "externalEffects": "No push, merge, publication or deployment"
+      },
+      "qualification": {
+        "scope": "semver7.7.2 to7.7.3 single-file Node CLI only; no general npm graph, React or service support",
+        "actualMission": "package-cFPUOi",
+        "evidence": ".runtime/node-package-qualification/live-qualification.json",
+        "sha256": "7fbd720b5b712f824ec59e6762e71994742587c5fad890960de310a79448853b",
+        "offlineVerification": ".runtime/ledger-completion/node-package-live-offline-verify.json"
       }
     },
     {
