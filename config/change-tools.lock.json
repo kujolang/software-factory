@@ -299,10 +299,10 @@
     },
     "kennel": {
       "url": "https://github.com/kujolang/kennel.git",
-      "commit": "6e2fc20560037970df5202e1b1ca8f61c3395570",
+      "commit": "3093c40039ddbaa10527f3121cae3b958cadc2b9",
       "files": {
         "kennel.toml": {
-          "sha256": "3e7502b7a6060866d36a57c494839adb92a2b42c6a6db5c50e2358ef811875de",
+          "sha256": "306e79fb9ffc55bc7f14782b79d01ccc7e45bc2dc3208b58f5a1df5ac56abd2d",
           "bytes": 1274
         },
         "LICENSE": {
@@ -314,20 +314,20 @@
           "bytes": 861
         },
         "dependency_spec.kujo": {
-          "sha256": "8ced5561affb3fae8889e45f9b2169dfdc470094b02953b6b13db62a4dbb81f7",
-          "bytes": 320
+          "sha256": "6f6c5156fd15799035772443a925a65375880cfe0e14b059e8fa71024bf7f475",
+          "bytes": 449
         },
         "src/validator.kujo": {
-          "sha256": "7d71519d221d21007140a5b94f610328b4c062095075ce364721fd17760bf8ed",
-          "bytes": 1508
+          "sha256": "7866e286f746b7b95bd086c4a6482b25dc5c37d824a16d27cddb825a62465da4",
+          "bytes": 1964
         },
         "src/manifest.kujo": {
-          "sha256": "d9d2e22b13c5c97c5bf99862e8597ec253e9995b22c75eee8ef3da1844f7e69b",
-          "bytes": 6074
+          "sha256": "14dc9dee4e21c5169d2b6fec2d2a10439c594a44223001f15c1be8d26c387076",
+          "bytes": 6019
         },
         "src/dependency_spec.kujo": {
-          "sha256": "133cb4337d2f31a6dbc7f863559ec33efb8f138b466cfc2bb5471ff160b29986",
-          "bytes": 10115
+          "sha256": "57e71b1e36b350f40e2d0bfb52406d11c9f1d89864002659605d3773f15caf99",
+          "bytes": 11088
         },
         "src/utils.kujo": {
           "sha256": "9a132cc8a5f7f84ddf5227b6c3104489d0cba82f3db87cab1ccf9f4f0dc6b4a8",

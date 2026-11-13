@@ -22,3 +22,19 @@ test('selected snapshots support file to directory and directory to file transit
   assert.equal(fs.statSync(path.join(result.workspace,'snapshot/shape')).isDirectory(),after===f.after);
  }
 });
+
+
+test('native Kennel declarations do not resolve external directory, file, missing or relative references',t=>{
+ const f=fixture(t),outside=path.join(f.root,'outside-file');fs.writeFileSync(outside,'private synthetic fixture');
+ const references=[{path:f.root},{path:outside},{path:outside+'-missing'},{source:'file:'+outside},{source:'../missing-fixture'},{git:'file:'+outside+'-missing'}];
+ const declarations=references.map((entry,i)=>`[dependencies.local${i}]\n${Object.entries(entry).map(([key,value])=>`${key} = ${JSON.stringify(value)}`).join('\n')}`).join('\n');
+ fs.writeFileSync(path.join(f.after,'kennel.toml'),'[package]\nname = "fixture"\nversion = "1.0.0"\n'+declarations+'\n');
+ const result=inspectChanges(f.before,f.after,{files:['kennel.toml'],parent:f.parent});
+ assert.equal(result.kennel.ok,true);assert.deepEqual(result.kennel.errors,[]);
+ assert.equal(result.kennel.warnings.length,1);assert.match(result.kennel.warnings[0],/local5.*does not pin/);
+ assert.equal(result.tools.kennel,'3093c40039ddbaa10527f3121cae3b958cadc2b9');
+ assert.equal(fs.readFileSync(outside,'utf8'),'private synthetic fixture');
+ fs.writeFileSync(path.join(f.after,'kennel.toml'),'[package]\nname = "fixture"\nversion = "1.0.0"\n[dependencies.bad]\npath = ""\n');
+ const invalid=inspectChanges(f.before,f.after,{files:['kennel.toml'],parent:f.parent});
+ assert.equal(invalid.kennel.ok,false);assert.ok(invalid.kennel.errors.length>0);
+});

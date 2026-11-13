@@ -1,3 +1,3 @@
-from src.validator import validate_manifest
+from src.validator import validate_manifest_declarations
 let manifest = parse_toml(read_file(args()[0]))
-print(to_json(validate_manifest(manifest)))
+print(to_json(validate_manifest_declarations(manifest)))
