@@ -275,6 +275,7 @@ export function verifyEvidence(directory, {publicKey, signature} = {}) {
 function gitProvenance(sourceRoot) {
   const git = args => execFileSync('git', ['-C', sourceRoot, '-c', 'core.fsmonitor=false', ...args], {encoding: 'utf8', timeout: 3000, maxBuffer: 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe']}).trim();
   try {
+    if(fs.realpathSync(git(['rev-parse','--show-toplevel']))!==fs.realpathSync(sourceRoot))throw Error('Source directory is not a repository root');
     return {commit: git(['rev-parse', 'HEAD']), tree: git(['rev-parse', 'HEAD^{tree}']), dirty: Boolean(git(['status', '--porcelain', '--ignore-submodules=all'])), timing: 'export-time; not an execution-time attestation'};
   } catch { return {commit: null, tree: null, dirty: null, timing: 'unavailable'}; }
 }

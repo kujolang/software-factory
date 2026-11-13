@@ -8,7 +8,7 @@ const schema={type:'object',properties:{answer:{type:'string'}},required:['answe
 const base={prompt:'Return an answer object.',schema};
 const temporary=()=>fs.mkdtempSync(path.join(os.tmpdir(),'factory-provider-test-'));
 function fakeCodex(dir,body) {
-  const file=path.join(dir,'codex');
+  const file=path.join(dir,'codex.cjs');
   fs.writeFileSync(file,`#!${process.execPath}\n${body}`,{mode:0o700});
   return file;
 }

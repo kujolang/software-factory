@@ -346,3 +346,9 @@ test('v3 Lens release records bind reports/screenshots and reject gate downgrade
   assert.throws(()=>verifyRunReleaseRecords(f.run));
  }
 });
+
+
+test('exporter identity does not inherit an unrelated ancestor repository', t => {
+ const {run,bundle}=fixture(t);const parent=new URL('../.runtime/',import.meta.url);fs.mkdirSync(parent,{recursive:true});const nested=fs.mkdtempSync(path.join(fs.realpathSync(parent),'exporter-identity-'));t.after(()=>fs.rmSync(nested,{recursive:true,force:true}));
+ exportEvidence(run,bundle,{sourceRoot:nested});const manifest=JSON.parse(fs.readFileSync(path.join(bundle,'manifest.json')));assert.equal(manifest.exporterSource.commit,null);assert.equal(manifest.exporterSource.tree,null);
+});
