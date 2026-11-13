@@ -17,3 +17,17 @@ Build the optional image with `node scripts/prepare-visual-baseline-image.mjs`. 
 `node scripts/qualify-visual-baseline.mjs` exercises actual native Lens browser capture and native pixel comparison. Its operator identity is a synthetic test fixture. The dimension mismatch negative directly invokes the pinned comparator on actual mobile and desktop PNGs inside Workcell; it never passes through baseline approval and is not valid baseline provenance. It does not claim that fixed-viewport Lens captures change dimensions when page content grows. All failed qualification attempts remain under `.runtime/visual-baseline-qualification`.
 
 Retain the baseline directory (including `origin/`) with comparison records when handing evidence to another operator. This optional API does not yet provide a standalone portable visual-verifier command or a binding release-policy gate.
+
+The public CLI keeps preparation and operator approval separate:
+
+```sh
+software-factory visual capture examples/issue-tracker ./visual-capture
+software-factory visual prepare ./visual-capture ./visual-baseline
+software-factory visual inspect ./visual-baseline
+software-factory visual approve ./visual-baseline EXACT_BASELINE_SHA256 --operator YOUR_ID --confirm
+software-factory visual compare ./visual-baseline ./candidate-source ./visual-comparison
+```
+
+Inspect the actual desktop/mobile PNGs before approval. `capture` and `compare` require fresh output directories, admit only the existing bounded Node server/static-source shape, and explicitly select the qualified optional image digest; no arbitrary image or shell option is accepted. `prepare` may also consume an existing run containing exactly one valid Lens attempt. `compare` captures the candidate independently and exits 1 for a visual difference. Inspection validates an existing approval if present. These commands grant no release authority and do not enable automatic baseline updates.
+
+Public-command qualification passed at `.runtime/visual-baseline-qualification/public-UC1JKW/qualification.json`: all seven commands above (including separate approved/unapproved inspections) used the public entrypoint, with actual independent positive and negative Workcell captures. Approval was explicitly a synthetic test identity. Current visual/Lens deterministic checks pass (15 tests); no model calls or production approval were made.
