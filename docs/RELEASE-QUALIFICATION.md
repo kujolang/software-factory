@@ -107,3 +107,11 @@ The aggregate exposed and fixed a real controller child-reaping race (`b045b56`)
 ## Current-source live revalidation
 
 `FACTORY_RUNS=.runtime/ledger-live node bin/software-factory.mjs recheck factory-2026-11-13T18-32-50-406Z` completed as `factory-recheck-2026-11-13T19-50-22-471Z` at clean controller source `cdf86862fa99d1564a35c7c48da12b530b7b2b89`. Independent Codex review, real Workcell API/browser/Lens checks, release review and native accounting passed in94.324seconds. Two calls reported33,533 input,11,776 cached input and2,220 output tokens; cost/model identity remain unknown. Automatic Watchdog collection recorded25 content-free native observations. Audit,233-file export and offline verification all passed. The unsigned bundle verifies integrity and stated bindings, not producer authentication or execution proof. No deployment was authorized. Exact records are in [qualification-results.json](qualification-results.json).
+
+## November 19 source and evidence verification
+
+[CI-QUALIFICATION.json](CI-QUALIFICATION.json) records fresh Ubuntu24.04 and macOS15 setup, offline doctor and 412+8 passing tests at `08c85267728378b4e47b03b4ce8f382b8a120d2a`. It does not qualify later commits or live runtime execution. The earlier `269c8da` jobs remain failed evidence; both exposed new-run budget initialization before artifact-directory creation.
+
+Later portable budget and React verifier suites exercise real retained runtime evidence plus explicitly synthetic adversarial records. SDK transport tests are protocol fixtures, not live cloud-provider qualification. A fresh root `npm audit --json` on November19 reported zero known vulnerabilities in the installed npm dependency closure; this does not cover runtime-image OS packages or prove absence of vulnerabilities. Local records are under `.runtime/ledger-completion/`.
+
+Current local offline doctor verifies all pinned catalogs and component closures but rejects low disk space. Full final-source execution remains blocked at the existing disk guard. Do not lower that guard, run candidates on the host, or convert historical successful receipts into a final-source release claim.
