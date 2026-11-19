@@ -124,8 +124,10 @@ export async function executeProposal(options = {}) {
       const credentialFile=options.credentialFile||process.env['FACTORY_'+provider.toUpperCase()+'_CREDENTIAL_FILE'];
       try {
         const response=await executeSDKProposal({budgetContext:options.budgetContext,provider,model,prompt,schema,credentialFile,signal,timeoutMs:Math.min(timeoutMs,300000),maxTokens:maxOutputTokens||8192});
+        // Retain the consumed reservation and native usage even if the outer output bound rejects.
+        Object.assign(receipt,{budgetReservation:response.receipt.budgetReservation,budgetReconciliation:response.receipt.budgetReconciliation,usage:response.receipt.usage,sourceCommits:response.receipt.sourceCommits,structuredOutput:response.receipt.structuredOutput,providerNativeSchema:false,executionEvidence:response.executionEvidence});
         if(Buffer.byteLength(JSON.stringify(response.output))>maxBytes)throw failure('output_limit');
-        output=response.output;Object.assign(receipt,{budgetReservation:response.receipt.budgetReservation,budgetReconciliation:response.receipt.budgetReconciliation,usage:response.receipt.usage,sourceCommits:response.receipt.sourceCommits,structuredOutput:response.receipt.structuredOutput,providerNativeSchema:false,executionEvidence:response.executionEvidence});
+        output=response.output;
       }catch(error){if(error.receipt)Object.assign(receipt,{budgetReservation:error.receipt.budgetReservation,budgetReconciliation:error.receipt.budgetReconciliation,usage:error.receipt.usage,retryable:error.receipt.retryable===true,sourceCommits:error.receipt.sourceCommits,executionEvidence:error.executionEvidence});throw error;}
     } else {
       temp=fs.mkdtempSync(path.join(os.tmpdir(),'factory-provider-'));
