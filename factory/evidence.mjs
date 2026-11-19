@@ -459,12 +459,57 @@ function secretSourceConsistency(dir,names,rows,run,final,sourceHash,single=fals
 }
 /** Subgate verification only; does not validate or grant a complete mission approval. */
 export function verifyRecordedSecretGate(directory){const dir=plainRoot(directory),rows=scan(dir,{selected:true}),names=new Set(rows.map(r=>r.path)),run=json(dir,'run.json');const finalPath=run.kind==='node-package-upgrade'?'reviewed-package.json':run.kind==='sqlite-migration'?'reviewed-migration.json':run.kind==='cli-construction'?'reviewed-cli.json':'artifacts/release.json',final=json(dir,finalPath);return secretSourceConsistency(dir,names,rows,run,final,final.sourceHash??final.hash,run.kind==='node-package-upgrade');}
+// Portable versioned accounting contract; never loads policy or code from the original host.
+function providerBudgetConsistency(dir,names,run){
+ const paths={policy:'artifacts/provider-budget/policy.json',state:'artifacts/provider-budget/state.json'},receiptNames=[...names].filter(n=>/^artifacts\/[^/]+-receipt\.json$/.test(n));
+ const receipts=receiptNames.map(n=>({name:n,value:json(dir,n)})).filter(r=>['kujo.factory.provider-receipt/v1','kujo.factory.sdk-provider-receipt/v1'].includes(r.value.schema)||r.value.budgetReservation!==undefined||r.value.budgetReconciliation!==undefined);
+ const finalNames=['artifacts/release.json','artifacts/release-verified.json','reviewed-cli.json','reviewed-migration.json','reviewed-package.json','reviewed-documentation.json','reviewed-webops.json','reviewed-react.json'];
+ const finals=finalNames.filter(n=>names.has(n)).map(n=>({name:n,value:json(dir,n)}));
+ const footprint=[...names].some(n=>n.startsWith('artifacts/provider-budget/'))||receipts.some(r=>r.value.budgetReservation!==undefined||r.value.budgetReconciliation!==undefined)||finals.some(r=>r.value.providerBudget!==undefined);
+ if(run.providerBudget===undefined){requireRecord(!footprint,'provider budget requirement marker removed');return null;}
+ const valid=(n,min,max)=>Number.isSafeInteger(n)&&n>=min&&n<=max,role=s=>typeof s==='string'&&/^[a-z][a-z0-9.-]{0,99}$/.test(s),keys=(v,list)=>object(v)&&same(Object.keys(v).sort(),list.split(',').sort());
+ const marker=run.providerBudget;requireRecord(keys(marker,'schema,required,policySha256')&&marker.schema==='kujo.factory.mission-provider-budget/v1'&&marker.required===true&&hex(marker.policySha256),'provider budget marker invalid');
+ requireRecord(names.has(paths.policy)&&names.has(paths.state),'provider budget records missing');
+ const config=json(dir,paths.policy),state=json(dir,paths.state),p=config.policy;
+ requireRecord(keys(p,'schema,maxCalls,maxPromptBytes,maxCostUsd,roles')&&p.schema==='kujo.factory.provider-budget-policy/v1'&&valid(p.maxCalls,1,1000)&&valid(p.maxPromptBytes,1,100000000)&&p.maxCostUsd===null&&object(p.roles)&&Object.keys(p.roles).length>0&&Object.keys(p.roles).length<=100,'provider budget policy invalid');
+ for(const [id,r]of Object.entries(p.roles))requireRecord(role(id)&&keys(r,'maxCalls,maxPromptBytes,maxOutputTokens')&&valid(r.maxCalls,1,p.maxCalls)&&valid(r.maxPromptBytes,1,p.maxPromptBytes)&&(r.maxOutputTokens===null||valid(r.maxOutputTokens,1,16000)),'provider budget role policy invalid');
+ requireRecord(config.schema==='kujo.factory.provider-budget/v1'&&config.missionId===run.id&&config.policySha256===marker.policySha256&&sha(JSON.stringify(p))===marker.policySha256&&state.schema==='kujo.factory.provider-budget-state/v1'&&state.missionId===run.id&&state.policySha256===marker.policySha256&&Array.isArray(state.reservations)&&state.reservations.length<=p.maxCalls&&Array.isArray(state.violations),'provider budget policy/state identity mismatch');
+ const ids=new Map(),roles=new Map();let bytes=0,reconciled=0;
+ for(const [i,r]of state.reservations.entries()){
+  requireRecord(object(r)&&typeof r.id==='string'&&/^[a-f0-9-]{36}$/.test(r.id)&&!ids.has(r.id)&&r.sequence===i+1&&role(r.role)&&Object.hasOwn(p.roles,r.role)&&['codex','ollama','openai','anthropic','gemini','mock'].includes(r.provider)&&valid(r.inputBytes,0,1000000)&&(r.model===null||typeof r.model==='string'&&r.model.length<=200)&&['reserved','completed','failed','cancelled','uncertain'].includes(r.status)&&(r.maxOutputTokens===null||valid(r.maxOutputTokens,1,16000))&&typeof r.reservedAt==='string'&&Number.isFinite(Date.parse(r.reservedAt)),'provider budget reservation invalid');
+  const rule=p.roles[r.role],used=roles.get(r.role)||{calls:0,bytes:0};used.calls++;used.bytes+=r.inputBytes;roles.set(r.role,used);bytes+=r.inputBytes;
+  requireRecord(used.calls<=rule.maxCalls&&used.bytes<=rule.maxPromptBytes&&bytes<=p.maxPromptBytes&&(rule.maxOutputTokens===null||r.maxOutputTokens!==null&&r.maxOutputTokens<=rule.maxOutputTokens)&&(r.provider!=='codex'||r.maxOutputTokens===null),'provider budget ceiling exceeded');
+  if(r.status==='reserved')requireRecord(r.usage===null&&r.reason===null&&r.reconciledAt===undefined,'provider budget reserved usage invalid');
+  else{reconciled++;requireRecord(keys(r.usage,'input_tokens,output_tokens')&&Object.values(r.usage).every(v=>v===null||valid(v,0,Number.MAX_SAFE_INTEGER))&&(r.reason===null||typeof r.reason==='string'&&/^[a-z0-9_-]{1,100}$/.test(r.reason))&&typeof r.reconciledAt==='string'&&Number.isFinite(Date.parse(r.reconciledAt)),'provider budget reconciliation invalid');}
+  ids.set(r.id,r);
+ }
+ requireRecord(state.revision===state.reservations.length+reconciled,'provider budget revision mismatch');
+ const overages=state.reservations.filter(r=>r.maxOutputTokens!==null&&r.usage?.output_tokens!==null&&r.usage?.output_tokens>r.maxOutputTokens).map(r=>({reservationId:r.id,reason:'reported_output_exceeded_requested_cap'}));
+ requireRecord(same([...state.violations].sort((a,b)=>String(a.reservationId).localeCompare(String(b.reservationId))),[...overages].sort((a,b)=>a.reservationId.localeCompare(b.reservationId))),'provider budget violation inventory mismatch');
+ const seen=new Set();for(const {value:r}of receipts){const q=r.budgetReservation,c=r.budgetReconciliation;if(q===undefined){requireRecord(c===undefined&&r.status!=='completed','provider budget successful receipt missing reservation');continue;}
+  const s=ids.get(q.id);requireRecord(object(q)&&s&&!seen.has(q.id)&&q.schema==='kujo.factory.provider-reservation/v1'&&q.missionId===run.id&&q.policySha256===marker.policySha256&&q.moneyGuaranteed===false&&q.directory===undefined&&q.status==='reserved'&&q.usage===null&&q.reason===null&&r.provider===s.provider&&typeof r.role==='string'&&(r.role.includes('.')?r.role:'chain.'+r.role)===s.role,'provider budget receipt reservation mismatch');seen.add(q.id);
+  for(const key of ['id','sequence','role','provider','model','inputBytes','maxOutputTokens','reservedAt'])requireRecord(same(q[key],s[key]),'provider budget receipt reservation differs from state');
+  if(r.secretScan)requireRecord(r.secretScan.inputBytes===s.inputBytes+1,'provider budget input bytes differ from credential scan');
+  if(c?.schema==='kujo.factory.provider-budget-reconciliation/v1'){
+   const usageRows=Array.isArray(r.usage)?r.usage:r.usage?[r.usage]:[],usage={};for(const key of ['input_tokens','output_tokens']){const values=usageRows.map(v=>v?.[key]),sum=values.reduce((a,b)=>a+(typeof b==='number'?b:0),0);usage[key]=values.length&&values.every(v=>valid(v,0,Number.MAX_SAFE_INTEGER))&&Number.isSafeInteger(sum)?sum:null;}
+   const overage=overages.some(v=>v.reservationId===s.id);requireRecord(c.id===s.id&&c.sequence===s.sequence&&c.policySha256===marker.policySha256&&c.status===s.status&&same(c.usage,s.usage)&&same(c.usage,usage)&&c.overage===overage&&c.reservationConsumed===true&&c.cost===null&&c.moneyGuaranteed===false&&(r.status!=='completed'||s.status==='completed'&&!overage),'provider budget receipt reconciliation differs from state');
+  }else requireRecord(run.status!=='completed'&&r.status!=='completed'&&(c===undefined||c.status==='uncertain'&&c.reservationConsumed===true),'provider budget receipt reconciliation missing');
+ }
+ if(run.status==='completed')requireRecord(!state.violations.length&&state.reservations.every(r=>r.status!=='reserved'&&seen.has(r.id)),'provider budget completed mission has unresolved calls');
+ const binding={schema:'kujo.factory.mission-provider-budget-result/v1',policySha256:marker.policySha256,reservations:state.reservations.length,stateSha256:sha(readPlain(path.join(dir,paths.state))),cost:null,moneyGuaranteed:false};
+ for(const final of finals){if(run.status==='completed'||final.value.providerBudget!==undefined)requireRecord(same(final.value.providerBudget,binding),'provider budget final artifact binding mismatch');}
+ return {reservations:state.reservations.length,unpairedReservations:state.reservations.filter(r=>!seen.has(r.id)).length,scope:'Recorded budget and usage consistency; no authenticated execution or monetary ceiling proof'};
+}
+/** Isolated subgate inspection, not mission approval. */
+export function verifyRecordedProviderBudget(directory){const dir=plainRoot(directory),rows=scan(dir,{selected:true});return providerBudgetConsistency(dir,new Set(rows.map(r=>r.path)),json(dir,'run.json'));}
+
 function consistency(dir, manifest, rows) {
   const names = new Set(rows.map(row => row.path));
   if (!names.has('run.json')) throw Error('Missing run.json');
   const run = json(dir, 'run.json');
   if (typeof run.id !== 'string' || !run.id || run.id.length > 200 || run.id !== manifest.runId) throw Error('Run identity mismatch');
   const checks = ['run identity'];
+  if(providerBudgetConsistency(dir,names,run))checks.push('recorded provider budget reservation/receipt consistency');
   const family = missionFamilyConsistency(dir, names, run, rows);if(family)checks.push(...family.checks);
   if (run.packHash !== undefined && (!hex(run.packHash) || !names.has('pack.json'))) throw Error('Missing or invalid frozen specification identity');
   if (names.has('pack.json') && run.packHash !== undefined) {
