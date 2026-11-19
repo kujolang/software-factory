@@ -12,7 +12,7 @@ test('simulated disk admission rejection records terminal failure without starti
  const preload=path.join(dir,'disk-fixture.mjs');fs.writeFileSync(preload,"import fs from 'node:fs';fs.statfsSync=()=>({bavail:0,bsize:4096});\n");
  const runs=path.join(dir,'runs');fs.mkdirSync(runs);
  const r=spawnSync(process.execPath,['--import',preload,path.resolve('factory/cli.mjs'),'run',mission],{encoding:'utf8',env:{...process.env,FACTORY_RUNS:runs},timeout:15000});
- assert.equal(r.status,1,r.stderr);const entries=fs.readdirSync(runs);assert.equal(entries.length,1);
+ assert.equal(r.status,1,r.stderr);const entries=fs.readdirSync(runs);assert.equal(entries.length,1,r.stderr);
  const run=path.join(runs,entries[0]),config=JSON.parse(fs.readFileSync(path.join(run,'run.json')));
  assert.equal(config.status,'failed');assert.ok(config.finishedAt);assert.equal(config.operationsAdmission,undefined);
  const failure=JSON.parse(fs.readFileSync(path.join(run,'artifacts/admission-failure.json')));
