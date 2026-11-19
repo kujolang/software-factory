@@ -8,6 +8,7 @@ import path from 'node:path';
 import {spawn} from 'node:child_process';
 import {once} from 'node:events';
 import {root} from '../factory/settings.mjs';
+import {callReadTool} from '../factory/mcp.mjs';
 test('standalone observer serves local assets and cannot mutate factory state',async t=>{
  const reservation=net.createServer();reservation.listen(0,'127.0.0.1');await once(reservation,'listening');const port=reservation.address().port;await new Promise(r=>reservation.close(r));
  const runs=fs.mkdtempSync(path.join(os.tmpdir(),'factory-observer-'));
@@ -15,6 +16,9 @@ test('standalone observer serves local assets and cannot mutate factory state',a
  const ended=once(child,'close');t.after(async()=>{child.kill('SIGTERM');await ended;fs.rmSync(runs,{recursive:true});});
  let ready='';for await(const chunk of child.stdout){ready+=chunk;if(ready.includes('Factory Floor'))break;}
  const url=`http://127.0.0.1:${port}`;
+ const reactRoot=path.join(root,'.runtime/react-missions');fs.mkdirSync(reactRoot,{recursive:true});const react=fs.mkdtempSync(path.join(reactRoot,'observer-fixture-')),reactId=path.basename(react);t.after(()=>fs.rmSync(react,{recursive:true,force:true}));fs.mkdirSync(path.join(react,'artifacts'));fs.writeFileSync(path.join(react,'run.json'),JSON.stringify({id:reactId,schema:'kujo.factory.react-mission/v1',kind:'react-static-construction',fixture:true,status:'failed',mission:'Synthetic persisted observer fixture'}));fs.writeFileSync(path.join(react,'result.json'),JSON.stringify({softwareReleaseApproval:false}));
+ const reactResponse=await fetch(url+'/api/missions/react/'+reactId);assert.equal(reactResponse.status,200);const reactView=await reactResponse.json();assert.equal(reactView.family,'react');assert.equal(reactView.status,'failed');assert.equal(reactView.softwareReleaseApproval,false);assert.equal(reactView.deploymentAuthorized,false);const mcpView=callReadTool('factory_read_mission',{family:'react',id:reactId});assert.equal(mcpView.status,'failed');assert.equal(mcpView.softwareReleaseApproval,false);assert.equal(mcpView.deploymentAuthorized,false);assert.equal((await fetch(url+'/api/missions/react/'+reactId,{method:'POST'})).status,405);
+
  const response=await fetch(url);assert.equal(response.status,200);assert.match(await response.text(),/Factory Floor/);
  assert.deepEqual(await(await fetch(url+'/api/runs')).json(),[]);
  assert.equal((await fetch(url+'/api/runs',{method:'POST',body:'{}'})).status,405);

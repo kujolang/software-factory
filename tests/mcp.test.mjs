@@ -31,3 +31,5 @@ test('MCP lifecycle discovery and status remain bounded without execution author
  assert.throws(()=>callReadTool('factory_validate_workflow',{mission:{schema:'kujo.factory.mission-input/v1',type:'database-migration'}}),/Missing required mission input/);
  const rejected=handleMcp({jsonrpc:'2.0',id:3,method:'tools/call',params:{name:'factory_validate_workflow',arguments:{mission:{schema:'kujo.factory.mission-input/v1',type:'database-migration'}}}});assert.equal(rejected.result.isError,true);
 });
+
+test('MCP React status discovery grants no construction or control action',()=>{const tool=handleMcp({jsonrpc:'2.0',id:11,method:'tools/list'}).result.tools.find(t=>t.name==='factory_read_mission');assert.ok(tool.inputSchema.properties.family.enum.includes('react'));assert.equal(tool.annotations.readOnlyHint,true);assert.throws(()=>callReadTool('factory_read_mission',{family:'react',id:'../outside'}));for(const name of['factory_run_react','react_mission','factory_submit_react'])assert.throws(()=>callReadTool(name,{}));});

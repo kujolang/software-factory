@@ -1,6 +1,6 @@
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
-let family=['application','specification','documentation','cli'].includes(params.get('family'))?params.get('family'):'application';
+let family=['application','specification','documentation','cli','sqlite','package','webops','react'].includes(params.get('family'))?params.get('family'):'application';
 let run, mode = 'live', cursor = 0, playing = false, clock = 0, lastFrame = 0, selected, lastOperatorSnapshot;
 const text = (tag, content, className) => { const el = document.createElement(tag); el.textContent = content ?? ''; if(className) el.className = className; return el; };
 const date = (value) => { const d = new Date(value); return Number.isFinite(d.getTime()) ? d.toISOString().replace('T',' ').replace('.000Z',' UTC') : 'Timestamp unavailable'; };
@@ -21,7 +21,7 @@ function render() {
  $('active').textContent=String(statuses.filter(s=>s==='running').length);$('event-count').textContent=visible.length;
  $('position').textContent=`${visible.length} / ${all.length}`;$('timestamp').textContent=visible.length?date(visible.at(-1).timestamp):'Awaiting first event';
  $('timeline').max=all.length;$('timeline').value=visible.length;
- const noRelease=['specification','documentation'].includes(run.family);
+ const noRelease=['specification','documentation','webops'].includes(run.family);
  const release=visible.filter(e=>/^release\./.test(e.type)).at(-1);$('release-state').textContent=release?`RELEASE / ${release.type.split('.').slice(1).join(' ').toUpperCase()}`:'RELEASE / AWAITING INDEPENDENT VERIFICATION';$('release-state').className=`release ${release?.type==='release.approved'?'passed':release?.type==='release.blocked'?'failed':''}`;
  if(noRelease){$('release-state').textContent='ARTIFACT REVIEW / NO SOFTWARE RELEASE AUTHORITY';$('release-state').className='release';}
  $('roles').replaceChildren();for(const role of run.roles||[]){const activity=visible.filter(e=>e.agentId===role.id);const state=statusFor(activity.filter(e=>/^(agent|task)\./.test(e.type)));const button=text('button','',`role ${role.parent?'child ':''}${state}`);let depth=0,parent=role.parent;const ancestry=new Set([role.id]);while(parent&&!ancestry.has(parent)){ancestry.add(parent);depth++;parent=(run.roles||[]).find(r=>r.id===parent)?.parent;}if(depth){button.style.marginLeft=`${depth*18}px`;button.style.width=`calc(100% - ${depth*18}px)`;}button.append(text('span','','dot'));const label=text('span',role.name||role.id,'role-name');label.append(text('small',role.parent?`Reports to ${role.parent}`:(role.layer||'COMMAND')));button.append(label,text('span',state==='running'?'ACTIVE':state==='completed'?'DONE':'','lane-status'));button.onclick=()=>detail(activity.at(-1));$('roles').append(button);}
