@@ -136,7 +136,19 @@ function requirePlainTree(dir) {
   }
 }
 async function executeRun(dir, config, recovery=null) {
-  const admission=recovery ? reclaimMissionAdmissionForResume(dir,recovery.prepared,{authorized:true,operator:recovery.operator})||acquireMissionAdmission(path.dirname(dir),dir,{runId:config.id,deadline:Date.parse(config.startedAt)+7200000}) : acquireMissionAdmission(path.dirname(dir),dir,{runId:config.id});
+  let admission;
+  try { admission=recovery ? reclaimMissionAdmissionForResume(dir,recovery.prepared,{authorized:true,operator:recovery.operator})||acquireMissionAdmission(path.dirname(dir),dir,{runId:config.id,deadline:Date.parse(config.startedAt)+7200000}) : acquireMissionAdmission(path.dirname(dir),dir,{runId:config.id});
+  } catch(error) {
+    // A rejected recovery must preserve the original mission and approval state.
+    if(recovery)throw error;
+    const reason=String(error.message).slice(0,16000);
+    config.status="failed";config.finishedAt=new Date().toISOString();
+    save(path.join(dir,"run.json"),config);
+    save(path.join(dir,"artifacts/admission-failure.json"),{schema:"kujo.factory.admission-failure/v1",admitted:false,reason,executionStarted:false});
+    event(dir,"mission.failed",{summary:"Admission rejected: "+reason,artifacts:["artifacts/admission-failure.json"]});
+    console.log(JSON.stringify({runId:config.id,directory:dir,status:"failed",admitted:false}));
+    process.exitCode=1;return;
+  }
   let reconciled=!recovery;
   try {
     if(!recovery)config.operationsAdmission=admission.record;
@@ -144,7 +156,10 @@ async function executeRun(dir, config, recovery=null) {
   }finally{if(reconciled)admission.close();}
 }
 async function executeAdmittedRun(dir, config, admission, recovery) {
+  let dispatchResult=null,passed=false,reason="Mission did not reach independent release";
+  try {
   if(!recovery){
+  fs.mkdirSync(path.join(dir,"artifacts"),{recursive:true,mode:0o700});
   config.accountabilityRequired=true;
   config.lensRequired=true;
   config.secretScanRequired=true;
@@ -155,8 +170,6 @@ async function executeAdmittedRun(dir, config, admission, recovery) {
   save(path.join(dir,"artifacts/controller-provenance.json"),provenance);
   }
   console.log(JSON.stringify({runId:config.id,directory:dir,kind:config.kind||"build",recovery:recovery?.prepared.attemptDirectory??null}));
-  let dispatchResult=null,passed=false,reason="Mission did not reach independent release";
-  try {
     if(!recovery){
     bindMissionRecovery(dir);
     await startMissionAccounting(dir,config,json(path.join(dir,"artifacts/controller-provenance.json")),{provider,model});
