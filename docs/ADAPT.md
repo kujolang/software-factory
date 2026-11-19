@@ -8,4 +8,6 @@ Review and seal each pack before running it. Candidate workers cannot change it.
 
 A new language, dependency model, external service or deployment target needs a trusted runtime extension. Update the image and isolation policy, add independent checks, run hostile-code probes and qualify the new path. A pack cannot grant those capabilities.
 
-VideoOps, WebOps and publishing workflows remain outside this software-runtime change.
+Additional bounded profiles cover Python, TypeScript, Go, Rust and Kujo CLIs, locked Node dependency upgrades and disposable SQLite migrations. Each has independent qualification and does not imply arbitrary framework or package compatibility. The React static runtime is separately qualified; model-backed React construction remains pending qualification.
+
+Documentation activates canonical Publishing House editorial review. WebOps can review retained Lens evidence as an advisory workflow. VideoOps stays discoverable and activates only for explicitly requested media; media production is not a software-runtime release claim.

@@ -40,3 +40,11 @@ The integration increment adds `catalog.mjs` for pinned complete packages and ca
 `operations.mjs` binds initial configuration, specification, controller and workflow identities before Dispatch and inspects native recovery plans. It cannot replay uncertain fixed-name worker effects. `control-mcp.mjs` offers separately granted owned-mission operations over local stdio; the observer remains read-only. `maintenance.mjs` observes upstream drift without installing or authorizing updates.
 
 `telemetry.mjs` projects bounded content-free terminal observations through pinned Watchdog normalization, validation and SQLite storage. The optional observer cannot change mission status or release authority; it does not run a proxy or external exporter.
+
+## Additional fixed mission graphs
+
+Specification, documentation, CLI construction, SQLite migration, locked Node package upgrades, WebOps evidence review and React construction select separate fixed graphs in the same native Dispatch engine. Each controller owns its input contract and output promotion. Documentation adds canonical Publishing House editorial review; WebOps reviews retained browser evidence without granting software approval. React construction remains pending live mission and portable-evidence qualification; its independently tested static runtime does not establish those claims.
+
+`provider-budget.mjs` reserves mission-wide and role-specific call counts and prompt bytes durably before transport. The policy is copied into the mission and bound to recovery identity. Cancellation and uncertain outcomes consume reservations. Requested output-token caps are provider-dependent; Codex rejects an unenforceable cap. Monetary ceilings fail closed rather than inventing billing guarantees. See [provider budgets](PROVIDER-BUDGETS.md).
+
+Fresh Node admission rejection records a terminal failure without claiming a provider call, Dispatch run or accounting session. Recovery admission rejection preserves the original mission state. Controller initialization failures enter the normal failure path; no incomplete initialization can promote a candidate.
