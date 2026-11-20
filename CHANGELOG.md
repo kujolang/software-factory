@@ -3,6 +3,8 @@
 
 ## Unreleased — lifecycle and qualification completion
 
+- Read-only Node reviewer and consultation output schemas now prohibit file proposals before generation; independent host permission checks still enforce every effect. Actual rejected Ollama evidence is retained.
+
 - Add executable typed SQLite migration, locked Node dependency-upgrade and performance-repair routes, with independent canonical review, real Workcell acceptance and standalone evidence verification.
 - Add Publishing House editorial review, bounded WebOps Lens-evidence review, optional independently approved visual baselines, and complete read-only mission-family views.
 - Require native Redact and selected credential checks before real provider calls and new candidate promotion; retain failed scans and prevent requirement-marker removal.

@@ -75,7 +75,8 @@ function handoff(from, to, id, scope, evidence = []) {
 }
 async function agent(role, id, prompt) {
   const rolePath = path.join(agentsRoot, "chain-of-command", role);
-  const runtimeContract = roleContract("chain." + role, {base: agentsRoot});
+  const fileEffects = task.kind !== "consultation" && ["backend-developer", "frontend-developer", "general-commander", "systems-architect"].includes(role);
+  const runtimeContract = roleContract("chain." + role, {base: agentsRoot, fileEffects});
   const canonicalRole = runtimeContract.role;
   const selectedSkills=skillContext(config.teamPlan?.skills.map(skill=>skill.id)||[]);
   const route=validateProviderRouting(config.providerRouting||{})[role]||config.executionProvider||{provider,model};

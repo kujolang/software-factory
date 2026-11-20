@@ -10,7 +10,8 @@ const sha=value=>createHash('sha256').update(value).digest('hex');
 const object=value=>value&&typeof value==='object'&&!Array.isArray(value);
 const bundle=JSON.parse(fs.readFileSync(path.join(root,'factory/bundle.schema.json')));
 
-export function roleContract(id,{base,verify=true}={}){
+export function roleContract(id,{base,verify=true,fileEffects=true}={}){
+ if(typeof fileEffects!=='boolean')throw Error('Invalid role file-effect constraint');
  const role=loadRole(id,{base,verify});
  const properties=role.output.schema.properties;
  if(!object(properties)||!role.manifest.outputs.length)throw Error('Role has no supported output contract');
@@ -18,7 +19,7 @@ export function roleContract(id,{base,verify=true}={}){
  const required=role.manifest.outputs.map(field=>field.name);
  if(required.some(name=>properties[name]?.type!=='string'))throw Error('Unsupported canonical role output type');
  const deliverables={type:'object',properties:Object.fromEntries(required.map(name=>[name,{...properties[name],minLength:1,maxLength:16000}])),required,additionalProperties:false};
- const schema={...bundle,properties:{...bundle.properties,deliverables},required:[...bundle.required,'deliverables']};
+ const schema={...bundle,properties:{...bundle.properties,...(!fileEffects?{files:{...bundle.properties.files,maxItems:0}}:{}),deliverables},required:[...bundle.required,'deliverables']};
  const validate=new Ajv2020({strict:false}).compile(schema);
  return {role,schema,validate,identity:sha(JSON.stringify({manifest:role.manifest,input:role.input.schema,output:role.output.schema,instructions:role.instructions}))};
 }

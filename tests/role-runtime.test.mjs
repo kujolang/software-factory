@@ -56,3 +56,16 @@ test('repository team plans implementation before independent verification and r
  for(const type of ['new-application','database-migration','dependency-upgrade','media-production'])assert.throws(()=>repositoryTeam({type},baseline));
  assert.throws(()=>repositoryTeam({type:'feature',risk:'high'},baseline),/human review/);
 });
+
+test('read-only provider schemas prohibit file proposals without changing host effect authority',()=>{
+ for(const role of ['chain.code-reviewer','chain.release-verifier','chain.backend-developer']){
+  const contract=roleContract(role,{verify:false,fileEffects:false});
+  const output={summary:'Fixture read-only finding',verdict:'pass',issues:[],files:[],deliverables:Object.fromEntries(contract.role.manifest.outputs.map(field=>[field.name,'Fixture observation']))};
+  assert.equal(contract.schema.properties.files.maxItems,0);
+  assert.equal(admitRoleProposal(contract,output),output);
+  assert.throws(()=>admitRoleProposal(contract,{...output,files:[{path:'review-results.txt',content:'not admitted'}]},{allowedFiles:()=>true}),/fixed-output/);
+ }
+ assert.throws(()=>roleContract('chain.code-reviewer',{verify:false,fileEffects:'false'}),/constraint/);
+ const writable=roleContract('chain.backend-developer',{verify:false,fileEffects:true});
+ assert.equal(writable.schema.properties.files.maxItems,undefined);
+});
