@@ -40,7 +40,8 @@ export function createControlSession({capabilityFile,allowActions=[],runner,logI
  const status=id=>{const {dir,prepared}=location(id);const submitted=fs.existsSync(path.join(dir,'submitted.json'));const terminal=fs.existsSync(path.join(dir,'terminal.json'))?JSON.parse(read(path.join(dir,'terminal.json'))):null;const runs=fs.existsSync(path.join(dir,'runs'))?fs.readdirSync(path.join(dir,'runs')).filter(name=>/^factory-[a-zA-Z0-9_-]+$/.test(name)).slice(0,20).map(runId=>{try{const value=JSON.parse(read(path.join(runLocation(id,runId),'run.json')));return {runId,status:typeof value.status==='string'?value.status:null};}catch{return {runId,status:'unavailable'};}}):[];return {submissionId:id,missionSha256:prepared.missionSha256,state:terminal?.state||(children.has(id)?'running':submitted?'uncertain-reconcile-manually':'prepared'),terminal,runs,deploymentAuthorized:false};};
  const cancel=(id,reason)=>{const entry=children.get(id);if(!entry||entry.child.exitCode!==null||entry.child.signalCode!==null)throw Error('No live child owned by this transport; stored PIDs are never signalled');let receiptPersisted=true;try{receipt(entry.dir,'cancellation-requested',{submissionId:id,reason});}catch{receiptPersisted=false;}entry.cancelled=true;entry.child.kill('SIGTERM');if(!entry.killTimer){entry.killTimer=setTimeout(()=>{if(children.get(id)===entry&&entry.child.exitCode===null&&entry.child.signalCode===null)entry.child.kill('SIGKILL');},3000);entry.killTimer.unref();}return {submissionId:id,state:'cancellation-requested',receiptPersisted,cleanupVerified:false,deploymentAuthorized:false};};
  async function call(name,args={}){
-  check(mutation[name]);const schema=schemas[name];if(!schema)throw Error('Unknown control tool');if(!plain(args)||Object.keys(args).sort().join()!==Object.keys(schema).sort().join()||Object.entries(args).some(([key,value])=>typeof value!=='string'||!value.length||value.length>schema[key].maxLength))throw Error('Invalid control arguments');
+  if(typeof name!=='string'||!Object.hasOwn(schemas,name))throw Error('Unknown control tool');
+  check(mutation[name]);const schema=schemas[name];if(!plain(args)||Object.keys(args).sort().join()!==Object.keys(schema).sort().join()||Object.entries(args).some(([key,value])=>typeof value!=='string'||!value.length||value.length>schema[key].maxLength))throw Error('Invalid control arguments');
   if(name==='factory_control_prepare'){
    const file=path.join(grant.missionRoot,safe(args.missionFile));const bytes=read(file);const mission=new TextDecoder('utf-8',{fatal:true}).decode(bytes);if(mission.length>12000)throw Error('Mission must be 1–12000 characters');if(!bytes.length||bytes.includes(0)||!bytes.toString('utf8').trim())throw Error('Mission must be bounded UTF-8 text');
    if(fs.readdirSync(grant.stateRoot).length>=grant.maxMissions)throw Error('Control preparation/storage ceiling reached');
@@ -98,12 +99,13 @@ export async function serveControlMcp({input=process.stdin,output=process.stdout
   for await(const {message,error} of readMcpFrames(input)){
    if(error){await writeMcpFrame(output,error);continue;}
    let reply;
+   const name=message?.params?.name;
    if(message?.jsonrpc==='2.0'&&Object.hasOwn(message,'id')&&
      (typeof message.id==='string'||Number.isSafeInteger(message.id))&&
-     message.method==='tools/call'&&String(message.params?.name).startsWith('factory_control_')){
+     message.method==='tools/call'&&typeof name==='string'&&name.startsWith('factory_control_')){
     let result;
     try{
-     result={content:[{type:'text',text:JSON.stringify(await session.call(message.params.name,message.params.arguments))}],isError:false};
+     result={content:[{type:'text',text:JSON.stringify(await session.call(name,message.params.arguments))}],isError:false};
     }catch(error){
      result={content:[{type:'text',text:error.code?'Local control operation failed':error.message}],isError:true};
     }
