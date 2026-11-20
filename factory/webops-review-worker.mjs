@@ -1,3 +1,4 @@
+import './worker-parent-watch.mjs';
 import {providerBudgetContext} from './provider-budget.mjs';
 import path from 'node:path';
 import {webopsSteps,verifyWebOpsArtifact,verifyWebOpsSnapshot,webopsEvidenceText} from './webops-review.mjs';

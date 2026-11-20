@@ -4,6 +4,22 @@ import path from "node:path";
 import crypto from "node:crypto";
 import { spawn } from "node:child_process";
 const activeChildren = new Set();
+export function trackOwnedChild(child) {
+  activeChildren.add(child);
+  child.once("close", () => activeChildren.delete(child));
+  return child;
+}
+// Native Dispatch starts detached workers. Losing their immediate parent must
+// stop the worker itself, without signalling any retained or reused parent PID.
+export function watchWorkerParent() {
+  const parent = process.ppid;
+  if (parent <= 1) throw Error("Native worker has no live parent");
+  const timer = setInterval(() => {
+    if (parent <= 1 || process.ppid !== parent) process.kill(process.pid, "SIGTERM");
+  }, 250);
+  timer.unref();
+  process.once("exit", () => clearInterval(timer));
+}
 function killActiveChildren() {
   for (const child of activeChildren) {
     try {

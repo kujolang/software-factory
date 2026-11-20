@@ -3,6 +3,8 @@
 
 ## Unreleased — lifecycle and qualification completion
 
+- Detached native workers now stop when their immediate parent disappears; provider children join the existing owned-process shutdown/reaping mechanism. Separate Workcell watchdog enforcement remains required.
+
 - Independent code/release reviewers now fail closed when a pass verdict contradicts nonempty unresolved issues; advisory findings remain distinct from release approval.
 
 - Read-only Node reviewer and consultation output schemas now prohibit file proposals before generation; independent host permission checks still enforce every effect. Actual rejected Ollama evidence is retained.

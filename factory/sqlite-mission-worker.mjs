@@ -1,3 +1,4 @@
+import './worker-parent-watch.mjs';
 import {providerBudgetContext} from './provider-budget.mjs';
 import fs from 'node:fs';import path from 'node:path';
 import {sqliteMissionSteps,validateSQLiteMission,sqliteMissionSpec} from './sqlite-mission.mjs';import {evaluateSQLiteMigration,readMigrationFile} from './sqlite-migration.mjs';

@@ -1,3 +1,4 @@
+import './worker-parent-watch.mjs';
 import {providerBudgetContext} from './provider-budget.mjs';
 import {assertMissionOperationsBudget} from './operations-policy.mjs';
 import fs from 'node:fs';import path from 'node:path';

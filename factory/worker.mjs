@@ -1,3 +1,4 @@
+import './worker-parent-watch.mjs';
 import {providerBudgetContext,verifyMissionProviderBudget} from './provider-budget.mjs';
 import {ensureSecretArtifactGate} from './secret-artifact-gate.mjs';
 import {performanceContract,evaluatePerformancePair,verifyPerformanceGate,performanceEvidenceReferences} from './performance.mjs';

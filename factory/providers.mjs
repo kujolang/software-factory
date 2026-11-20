@@ -1,4 +1,5 @@
 import {reserveProviderBudget,reconcileProviderBudget} from './provider-budget.mjs';
+import {trackOwnedChild} from './core.mjs';
 import {requireCredentialSafeInput} from './secret-egress.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -65,6 +66,7 @@ function verifySource(dir) {
 async function runProcess(binary,args,{cwd,env,input,timeoutMs,maxBytes,signal}) {
   if(signal?.aborted) throw failure('cancelled');
   const child=spawn(binary,args,{cwd,env,detached:true,stdio:['pipe','pipe','pipe']});
+  trackOwnedChild(child);
   active.add(child);
   let bytes=0, out='', reason=null;
   const stop=why=>{reason ||= why;kill(child);};

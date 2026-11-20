@@ -1,3 +1,4 @@
+import './worker-parent-watch.mjs';
 import {verifyTrackedSourceIdentity} from './tracked-source-identity.mjs';
 import fs from 'node:fs';import path from 'node:path';import {createHash} from 'node:crypto';
 import {startIsolatedApp} from './workcell.mjs';import {workcellBinary,root} from './settings.mjs';import {command,digest} from './core.mjs';import {validateCLICases,validateCLISource,readCLIFile} from './cli-runtime.mjs';
