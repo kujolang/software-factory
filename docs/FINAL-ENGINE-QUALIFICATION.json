@@ -1,0 +1,62 @@
+{
+  "schema": "kujo.factory.engine-qualification/v1",
+  "commit": "350a262a7368d19537ba6251802b6d03602a9f8f",
+  "directory": ".runtime/final-engine-qualification/qualification-lGXl0a",
+  "startedAt": "2026-11-20T01:17:30.076Z",
+  "steps": [
+    {
+      "id": "smoke",
+      "args": [
+        "run",
+        "smoke"
+      ],
+      "code": 0,
+      "error": null,
+      "durationMs": 29818,
+      "log": "smoke.log",
+      "sha256": "bb7f904f261da290242cf2e55dfad915f20ed3e939b370728af1ebe957b31708"
+    },
+    {
+      "id": "isolation",
+      "args": [
+        "run",
+        "test:isolation"
+      ],
+      "code": 0,
+      "error": null,
+      "durationMs": 28202,
+      "log": "isolation.log",
+      "sha256": "b085170d5a6de2f3d647bc03203e68f1763134d4fabcc834a8c82645d2520584"
+    },
+    {
+      "id": "controller-death",
+      "args": [
+        "run",
+        "test:controller-death"
+      ],
+      "code": 0,
+      "error": null,
+      "durationMs": 16467,
+      "log": "controller-death.log",
+      "sha256": "db7c963cdbf2b8f774a61204c97732f6163771f9dd42abf0d1fe2a5178ead0f8"
+    },
+    {
+      "id": "packs",
+      "args": [
+        "run",
+        "test:packs"
+      ],
+      "code": 0,
+      "error": null,
+      "durationMs": 51061,
+      "log": "packs.log",
+      "sha256": "42b6de1419701ad5db449260e1fc94bf9fac0a4143a9dff37928bf3841659816"
+    }
+  ],
+  "ok": true,
+  "finishedAt": "2026-11-20T01:19:35.633Z",
+  "date": "2026-11-19",
+  "runtimeImage": "sha256:c62fa7844cd38dd67d18421162af5016b2973a48d6db0a119982b2bf4b661383",
+  "workcellCommit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+  "scope": "Actual rootless/seccomp default Node runtime smoke, adversarial isolation, independent watchdog/controller SIGKILL and sealed-pack positive/negative execution; no new model calls or deployment authority."
+}
