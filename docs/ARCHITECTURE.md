@@ -43,7 +43,7 @@ The integration increment adds `catalog.mjs` for pinned complete packages and ca
 
 ## Additional fixed mission graphs
 
-Specification, documentation, CLI construction, SQLite migration, locked Node package upgrades, WebOps evidence review and React construction select separate fixed graphs in the same native Dispatch engine. Each controller owns its input contract and output promotion. Documentation adds canonical Publishing House editorial review; WebOps reviews retained browser evidence without granting software approval. React construction remains pending live mission and portable-evidence qualification; its independently tested static runtime does not establish those claims.
+Specification, documentation, CLI construction, SQLite migration, locked Node package upgrades, WebOps evidence review and React construction select separate fixed graphs in the same native Dispatch engine. Each controller owns its input contract and output promotion. Documentation adds canonical Publishing House editorial review; WebOps reviews retained browser evidence without granting software approval. React construction has separate live mission, portable-evidence and static-runtime qualification records. See [release qualification](RELEASE-QUALIFICATION.md).
 
 `provider-budget.mjs` reserves mission-wide and role-specific call counts and prompt bytes durably before transport. The policy is copied into the mission and bound to recovery identity. Cancellation and uncertain outcomes consume reservations. Requested output-token caps are provider-dependent; Codex rejects an unenforceable cap. Monetary ceilings fail closed rather than inventing billing guarantees. See [provider budgets](PROVIDER-BUDGETS.md).
 

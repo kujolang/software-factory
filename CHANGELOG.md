@@ -1,6 +1,12 @@
 # Changelog
 
 
+## Unreleased — repository hardening
+
+- Bound subprocess output and observer evidence reads. Factory Floor list requests read only run metadata.
+- Share bounded UTF-8 MCP framing between discovery and control, with output backpressure.
+- Preserve the newest converter result when several conversions complete out of order.
+
 ## Unreleased — lifecycle and qualification completion
 
 - Detached native workers now stop when their immediate parent disappears; provider children join the existing owned-process shutdown/reaping mechanism. Separate Workcell watchdog enforcement remains required.

@@ -30,6 +30,16 @@ test('standalone observer serves local assets and cannot mutate factory state',a
  const run=path.join(runs,'factory-fixture');fs.mkdirSync(path.join(run,'artifacts/verified-build'),{recursive:true});
  fs.writeFileSync(path.join(run,'artifacts/verified-build/index.html'),'<script>throw Error("untrusted")</script>');
  const candidate=await fetch(url+'/evidence/factory-fixture/artifacts/verified-build/index.html');assert.equal(candidate.status,200);assert.match(candidate.headers.get('content-type'),/^text\/plain/);assert.equal(candidate.headers.get('x-content-type-options'),'nosniff');
+ const metadata={id:'factory-fixture',mission:'Synthetic mission',status:'completed',startedAt:'2026-11-19T12:00:00Z',workspace:'/private/fixture'};
+ fs.writeFileSync(path.join(run,'run.json'),JSON.stringify(metadata));
+ fs.writeFileSync(path.join(run,'events.jsonl'),'{invalid journal\n');
+ fs.symlinkSync(run,path.join(runs,'factory-link'));
+ const listing=await(await fetch(url+'/api/runs')).json();
+ assert.deepEqual(listing,[{id:metadata.id,mission:metadata.mission,status:metadata.status,startedAt:metadata.startedAt}]);
+ const oversized=path.join(run,'artifacts/oversized.txt');
+ fs.closeSync(fs.openSync(oversized,'w'));
+ fs.truncateSync(oversized,32*1024*1024+1);
+ assert.equal((await fetch(url+'/evidence/factory-fixture/artifacts/oversized.txt')).status,413);
  fs.symlinkSync(path.join(root,'factory'),path.join(run,'artifacts/link'));
  assert.equal((await fetch(url+'/evidence/factory-fixture/artifacts/link/worker.mjs')).status,403);
 });

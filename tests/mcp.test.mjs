@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {spawnSync} from 'node:child_process';
-import {callReadTool,handleMcp} from '../factory/mcp.mjs';
+import {Readable,Writable} from 'node:stream';
+import {callReadTool,handleMcp,serveMcp} from '../factory/mcp.mjs';
 import {root} from '../factory/settings.mjs';
 test('MCP discovery advertises only bounded read tools',()=>{
  const response=handleMcp({jsonrpc:'2.0',id:1,method:'tools/list'});
@@ -33,3 +34,20 @@ test('MCP lifecycle discovery and status remain bounded without execution author
 });
 
 test('MCP React status discovery grants no construction or control action',()=>{const tool=handleMcp({jsonrpc:'2.0',id:11,method:'tools/list'}).result.tools.find(t=>t.name==='factory_read_mission');assert.ok(tool.inputSchema.properties.family.enum.includes('react'));assert.equal(tool.annotations.readOnlyHint,true);assert.throws(()=>callReadTool('factory_read_mission',{family:'react',id:'../outside'}));for(const name of['factory_run_react','react_mission','factory_submit_react'])assert.throws(()=>callReadTool(name,{}));});
+
+
+test('MCP enforces a frame limit independently of read chunks and waits for slow output',async()=>{
+ const padding='x'.repeat(600000);
+ const ping=(id)=>JSON.stringify({jsonrpc:'2.0',id,method:'ping',padding})+'\n';
+ const malformed=Buffer.from([0x22,0xff,0x22,0x0a]);
+ const input=Readable.from([Buffer.concat([Buffer.from(ping(1)+ping(2)),malformed])]);
+ const replies=[];
+ const output=new Writable({
+  highWaterMark:1,
+  write(chunk,encoding,done){
+   setImmediate(()=>{replies.push(JSON.parse(chunk));done();});
+  },
+ });
+ await serveMcp({input,output});
+ assert.deepEqual(replies.map(reply=>[reply.id,reply.error?.code]),[[1,undefined],[2,undefined],[null,-32700]]);
+});

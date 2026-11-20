@@ -10,6 +10,11 @@ const root = path.resolve(import.meta.dirname, ".."),
   );
 fs.mkdirSync(out, { recursive: true });
 const results = [];
+function mutateFixture(file, before, after) {
+  const source = fs.readFileSync(file, "utf8");
+  assert.equal(source.split(before).length, 2, "Expected exactly one fixture mutation target");
+  fs.writeFileSync(file, source.replace(before, after));
+}
 for (const name of ["converter", "notes"]) {
   const result = await checkPack(
     path.join(root, "examples", name),
@@ -27,10 +32,7 @@ for (const name of ["converter", "notes"]) {
 const broken = path.join(out, "broken");
 fs.cpSync(path.join(root, "examples/converter"), broken, { recursive: true });
 const file = path.join(broken, "server.mjs");
-fs.writeFileSync(
-  file,
-  fs.readFileSync(file, "utf8").replace("n*9/5+32", "n*9/5+99"),
-);
+mutateFixture(file, "n*9/5+32", "n*9/5+99");
 const rejected = await checkPack(
   broken,
   path.join(root, "packs/converter.json"),
@@ -43,12 +45,7 @@ fs.cpSync(path.join(root, "examples/converter"), brokenBrowser, {
   recursive: true,
 });
 const js = path.join(brokenBrowser, "public/app.js");
-fs.writeFileSync(
-  js,
-  fs
-    .readFileSync(js, "utf8")
-    .replace("data.fahrenheit+' °F'", "'Wrong result'"),
-);
+mutateFixture(js, "data.fahrenheit + ' °F'", "'Wrong result'");
 const browserRejected = await checkPack(
   brokenBrowser,
   path.join(root, "packs/converter.json"),

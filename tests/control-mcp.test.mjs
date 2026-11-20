@@ -46,3 +46,17 @@ test('operator grant selects only the sealed converter and binds its identity be
  assert.equal(invocation.args.at(-2),'--pack');
  assert.match(invocation.args.at(-1),/\/packs\/converter\.json$/);
 });
+
+
+test('a non-string control tool name is rejected without interrupting the session',async t=>{
+ const {options,grant}=fixture(t);
+ const invalid={jsonrpc:'2.0',id:1,method:'tools/call',params:{name:{toString:null}}};
+ const ping={jsonrpc:'2.0',id:2,method:'ping'};
+ const replies=[];
+ await serveControlMcp({...options,input:Readable.from([invalid,ping].map(message=>JSON.stringify(message)+'\n')),output:new Writable({
+  write(chunk,encoding,done){replies.push(JSON.parse(chunk));done();},
+ })});
+ assert.equal(replies[0].result.isError,true);
+ assert.deepEqual(replies[1],{jsonrpc:'2.0',id:2,result:{}});
+ assert.deepEqual(fs.readdirSync(grant.stateRoot),[]);
+});

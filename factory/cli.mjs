@@ -8,7 +8,7 @@ import {observeMissionTelemetry} from './telemetry.mjs';
 import {readOperatorModel} from './operator-model.mjs';
 import {listMissions,readMission} from './mission-observer.mjs';
 import {applicationTeam,repositoryTeam,validateProviderRouting} from './role-runtime.mjs';
-import {verifyRunReleaseRecords} from './evidence.mjs';
+import {limits as evidenceLimits,verifyRunReleaseRecords} from './evidence.mjs';
 import {startMissionAccounting,finishMissionAccounting,captureMissionFailure,blockUnaccountedRelease,promoteAccountedRelease} from './lifecycle.mjs';
 import {validatePackWithSpec,annotateRunAccounting} from './accountability.mjs';
 import {controllerProvenance} from './provenance.mjs';
@@ -94,14 +94,46 @@ function runPath(id) {
   if (!/^[a-zA-Z0-9_-]+$/.test(id)) throw Error("Invalid run ID");
   return path.join(runsRoot, id);
 }
+function readObserverFile(file, limit) {
+  const fd = fs.openSync(file, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW | fs.constants.O_NONBLOCK);
+  try {
+    const stat = fs.fstatSync(fd);
+    if (!stat.isFile() || stat.nlink !== 1) throw Error("Observer requires a regular file");
+    if (stat.size > limit) throw RangeError("Observer file exceeds read limit");
+    const data = Buffer.allocUnsafe(stat.size + 1);
+    let used = 0;
+    while (used < data.length) {
+      const count = fs.readSync(fd, data, used, data.length - used);
+      if (!count) break;
+      used += count;
+    }
+    const current = fs.fstatSync(fd);
+    if (used !== stat.size || current.size !== stat.size || current.mtimeMs !== stat.mtimeMs || current.ctimeMs !== stat.ctimeMs)
+      throw Error("Observer file changed while reading");
+    return data.subarray(0, used);
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+// Listing metadata does not read journals, receipts or artifact inventories.
+function readRunMetadata(dir) {
+  if (!fs.lstatSync(dir).isDirectory()) throw Error("Run path must be a directory");
+  return JSON.parse(readObserverFile(path.join(dir, "run.json"), 2_000_000));
+}
 function readRun(id) {
   const dir = runPath(id);
   const {
     workspace: privateWorkspace,
     agentsRoot: privateAgentsRoot,
     ...publicRun
-  } = json(path.join(dir, "run.json"));
-  const journal = events(dir);
+  } = readRunMetadata(dir);
+  let journal = [];
+  try {
+    journal = readObserverFile(path.join(dir, "events.jsonl"), 8_000_000)
+      .toString("utf8").trim().split("\n").filter(Boolean).map(JSON.parse);
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+  }
   const declared = publicRun.roles || [];
   const observed = roles
     .filter(
@@ -585,7 +617,8 @@ if(verb === "resume"){
               .filter((id) => /^factory-/.test(id))
               .flatMap((id) => {
                 try {
-                  const r = readRun(id);
+                  const r = readRunMetadata(runPath(id));
+                  if (r.id !== id) return [];
                   return [
                     {
                       id: r.id,
@@ -659,7 +692,7 @@ if(verb === "resume"){
           ".md": "text/plain; charset=utf-8",
           ".jsonl": "text/plain; charset=utf-8",
         }[ext] || "text/plain; charset=utf-8";
-      const body = fs.readFileSync(file);
+      const body = servingEvidence ? readObserverFile(file, evidenceLimits.fileBytes) : fs.readFileSync(file);
       if (mime === "application/json") {
         res.writeHead(200, {
           "Content-Type": mime,
@@ -670,7 +703,9 @@ if(verb === "resume"){
         return res.end(body);
       }
       return send(200, body, mime);
-    } catch {
+    } catch (error) {
+      if (error instanceof RangeError && error.message === "Observer file exceeds read limit")
+        return send(413, { error: error.message });
       return send(404, { error: "Not found" });
     }
   });

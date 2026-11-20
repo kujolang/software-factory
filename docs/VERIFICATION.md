@@ -36,3 +36,7 @@ On November 12, 2026 (America/Detroit), the converter and persistent-notes fixtu
 A fresh model-backed converter mission completed with independent review, syntax build, pack acceptance, separate release review and repeated acceptance. Audit and export passed. Backend and frontend work overlapped for 66.607 seconds. The run retained an earlier image-change rejection; it did not skip that failed gate.
 
 All 40 unit tests, eight native Dispatch tests, the original 30 API/16 browser smoke checks, 24 hostile-code probes and controller-death recovery passed. The final local regression run was sequential after overlapping qualification jobs caused failures. Linux and macOS CI also passed. See [pack-qualification.json](pack-qualification.json) for hashes, run IDs, failure history and scope. These results cover the supported Node/SQLite/browser runtime, not arbitrary languages or test completeness.
+
+## Converter response ordering
+
+Run `node scripts/qualify-converter-response-order.mjs` with the qualified Workcell engine. The supplemental browser fixture sends two requests, releases the newer response first, and confirms the older response cannot replace it. It loads the shipped converter client and retains the browser receipt and result in the directory printed by the command. The sealed converter pack is unchanged.
