@@ -113,7 +113,7 @@ export async function executeProposal(options = {}) {
       if(model!==hermesModel)throw failure('hermes_free_model_required');
       if(!options.budgetContext)throw failure('budget_context_required');
       maxOutputTokens??=1536;
-      if(maxOutputTokens>2048)throw failure('invalid_token_limit');
+      if(maxOutputTokens>4096)throw failure('invalid_token_limit');
     }
     if(signal?.aborted)throw failure('cancelled');
     if(provider!=='mock')receipt.secretScan=requireCredentialSafeInput(prompt,schema);

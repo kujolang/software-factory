@@ -148,7 +148,9 @@ HTTPS. Only the exact free model is eligible. Missing or nonzero live catalog
 pricing, a changed response model, missing or nonzero reported cost, unexpected
 tool requests and invalid JSON all fail closed. Requests disable reasoning,
 require a durable budget reservation, default to 1,536 output tokens and cap at
-2,048. There is no model fallback or retry inside the adapter.
+4,096. Native application workers request at most 4,096 for implementation
+roles and 2,048 for other roles. The operator’s budget can lower any request.
+There is no model fallback or retry inside the adapter.
 
 Use `--budget-policy POLICY.json` with a strict mission-level and per-role call
 limit for live qualification. Mission content is sent to Nous after Factory's

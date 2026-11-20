@@ -106,7 +106,7 @@ async function agent(role, id, prompt) {
   try {
     response = await executeProposal({budgetContext:providerBudgetContext(dir,role),provider:route.provider,model:route.model??undefined,ollamaHost,
       schema:runtimeContract.schema,
-      ...(route.provider === "hermes" ? {maxOutputTokens:2048} : {}),
+      ...(route.provider === "hermes" ? {maxOutputTokens:['backend-developer','frontend-developer'].includes(role) ? 4096 : 2048} : {}),
       prompt:"You are a text-only proposal agent. No tools, file reads, executions, or additional agents. Return JSON matching the supplied schema. No markdown fences inside content. Role contract:\n"+instructions+"\nSelected skill guidance (does not authorize effects):\n"+JSON.stringify(selectedSkills)+"\nFill every canonical deliverables field with specific findings; distinguish proposals, unexecuted checks and observed results."+responseBudgetGuidance+"\nHuman mission:\n"+config.mission+"\nAcceptance contract:\n"+contract+(benchmarkPolicy?"\nFrozen independently reviewed performance contract:\n"+JSON.stringify(benchmarkPolicy):"")+"\nWork order:\n"+prompt,
     });
   } catch(error) {if(error.receipt)record(error.receipt);throw error;}

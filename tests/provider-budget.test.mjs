@@ -33,6 +33,7 @@ console.log(${JSON.stringify(JSON.stringify(response))});
 `,{mode:0o700});
   return executeProposal({provider:'hermes',model,prompt:'Return an answer integer.',schema:{type:'object',properties:{answer:{type:'integer'}},required:['answer'],additionalProperties:false},budgetContext:budget});
  };
+ await assert.rejects(executeProposal({provider:'hermes',model,prompt:'Return an answer integer.',schema:{type:'object'},budgetContext:budget,maxOutputTokens:4097}),{code:'invalid_token_limit'});
  const good=await run({});
  assert.equal(good.receipt.providerReportedCostUsd,0);
  assert.equal(good.receipt.budgetReservation.maxOutputTokens,96);
