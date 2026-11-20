@@ -19,11 +19,11 @@
 
 These are actual observations, not universal compatibility or execution-authenticity claims. Private logs and exported evidence retain failures as well as successes. Provider-reported usage is preserved; unreported cost/model identity stays unknown. Export integrity and signature attestations do not authorize publication, deployment or production migration.
 
-## Active qualification gates
+## Current qualification results
 
 The [free Hermes Nous qualification](HERMES-QUALIFICATION.json) passed real converter revalidation with two calls and a network-denied standalone export verification.
 
-The [installed MCP qualification](INSTALLED-MCP-QUALIFICATION.json) passed real sealed converter construction, owned release record retrieval and network-denied build verification. [GitHub issue #1 qualification](GITHUB-ISSUE-QUALIFICATION.json) reached actual issue ingestion and sealed repair acceptance. The independent release gate remains blocked, and a PR packet has not been prepared. Historical evidence retains its original source scope.
+The [installed MCP qualification](INSTALLED-MCP-QUALIFICATION.json) passed real sealed converter construction, owned release record retrieval and network-denied build verification. [GitHub issue #1 qualification](GITHUB-ISSUE-QUALIFICATION.json) passed live issue ingestion, exact repair, independent release, offline verification and preparation of an unpublished PR packet. The prior failed attempts remain recorded. Historical evidence retains its original source scope.
 
 The VM/disk/authentication interruptions were environmental failures and remain retained; restored prerequisites do not retroactively qualify failed runs. WSL2 has an assessment, not a live execution result. Optional live cloud-provider paths require separately authorized credentials. Final acceptance must cite the exact successful runs and tested source/image identities rather than inheriting a historical pass.
 

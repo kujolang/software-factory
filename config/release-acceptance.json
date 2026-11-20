@@ -1,8 +1,8 @@
 {
   "schema": "kujo.factory.release-acceptance/v1",
   "date": "2026-11-20",
-  "releaseReady": false,
-  "releaseRecommendation": "blocked-incomplete",
+  "releaseReady": true,
+  "releaseRecommendation": "ready-for-scoped-release-review",
   "criteria": [
     {
       "id": "AC-01",
@@ -324,7 +324,7 @@
     {
       "id": "AC-11",
       "requirement": "Source-control workflows produce reviewable artifacts",
-      "status": "partial",
+      "status": "verified",
       "implementation": [
         "factory/git.mjs",
         "factory/repository-mission.mjs"
@@ -340,7 +340,7 @@
         "docs/PERFORMANCE-WORKFLOWS.md",
         "docs/GITHUB-ISSUE-QUALIFICATION.json"
       ],
-      "limits": "Live public issue #1 was ingested. Rootless Workcell reproduced the seeded failure; the one-line repair passed initial independent review and sealed API/browser checks. Local release was withheld and fresh review found an existing stale browser response race. Both failed bundles verify offline. No approved full-repository repair commit or unpublished PR packet is claimed for this issue."
+      "limits": "Actual GitHub issue #1 drove the isolated seeded converter repair. Its exact baseline failed in Workcell. The authorized two-file candidate passed response-order regression, unchanged sealed tests, independent release and offline evidence verification. Full repository repair commit and unpublished conflict-checked PR packet bind the seed and approved bytes. No fix branch push, PR publication, merge or deployment."
     },
     {
       "id": "AC-12",
@@ -498,12 +498,12 @@
   ],
   "continuation": "docs/IMPLEMENTATION-LEDGER.md",
   "rule": "No file, stub, mock or schema compilation alone establishes working capability.",
-  "continuationScope": "Current engine, clean CI, scoped live provider/recovery and installed MCP converter pass. Authorized GitHub issue-to-repair qualification remains open.",
+  "continuationScope": "All 18 scoped acceptance criteria have recorded evidence. Proceed through normal release review, with separate authorization for any publication.",
   "reconciliation": {
     "date": "2026-11-20",
-    "sourceCheckpoint": "0418dbe4bd4f073a97ef9276597388b4cc683e61",
-    "scope": "Current clean CI and actual default engine qualification plus source-specific live results; not full release approval",
-    "localResourceBlocker": "Approximately 1.4 GiB free after model unload; unchanged 2 GiB mission / 3 GiB clean-install floors. Requested 10 GiB headroom or alternate volume.",
-    "historicalEvidencePolicy": "Private .runtime records are retained source-scoped evidence references, not bundled public artifacts. Failed and interrupted attempts remain unqualified."
+    "sourceCheckpoint": "dd2488ddf350255d3ae66851f470fc675451c3a9",
+    "scope": "Source-specific live qualification, network-denied standalone verification and clean Linux/macOS CI. Ready for human release review within documented scopes.",
+    "historicalEvidencePolicy": "Private .runtime records are retained source-scoped evidence references, not bundled public artifacts. Failed and interrupted attempts remain unqualified.",
+    "latestQualifyingCI": "https://github.com/kujolang/software-factory/actions/runs/44671774919"
   }
 }

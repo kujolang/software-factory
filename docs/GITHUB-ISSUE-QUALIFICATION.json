@@ -1,6 +1,6 @@
 {
   "schema": "kujo.factory.github-issue-qualification/v1",
-  "ok": false,
+  "ok": true,
   "issue": "https://github.com/kujolang/software-factory/issues/1",
   "issueSnapshot": ".runtime/mission-workflows/mission-HJ3cZN/github-issue.json",
   "issueSnapshotSha256": "af7441232a7a93df493c59c0a8aa25c5ab184a379e25ce3c185ea602ff5e19c6",
@@ -57,10 +57,80 @@
       "offlineVerificationPassed": true
     }
   ],
-  "unpublishedPrPacketPrepared": false,
+  "unpublishedPrPacketPrepared": true,
   "qualificationFixBranchPushed": false,
   "prPublished": false,
   "deploymentAuthorized": false,
-  "callsConsumed": 11,
-  "scopeDecision": "Issue scope intentionally permits only the seeded Fahrenheit offset. The identified unchanged UI race is outside the one-line arithmetic change and absent as an explicit pack check. Independent rejection stands. Scope expansion or an operator-approved explicit interpretation and a fresh independent verdict are required before preparing a qualified PR packet."
+  "callsConsumed": 13,
+  "scopeDecision": "Operator explicitly approved the additional browser response-order fix. The sealed converter pack and controller gates were unchanged. The two previous failed attempts remain failed.",
+  "completedQualification": {
+    "runId": "factory-2026-11-20T04-05-59-574Z",
+    "source": {
+      "commit": "dd2488ddf350255d3ae66851f470fc675451c3a9",
+      "tree": "4191a10942ede1880919dd667550a93e53dc4361",
+      "dirty": false,
+      "identityScope": "Git HEAD; dirty working-tree bytes are separately hashed below"
+    },
+    "actualCalls": 2,
+    "usage": {
+      "input_tokens": 26658,
+      "output_tokens": 2392
+    },
+    "providerReportedCostUsd": null,
+    "workcellImage": "sha256:c62fa7844cd38dd67d18421162af5016b2973a48d6db0a119982b2bf4b661383",
+    "approvedSourceHash": "c11363d1f16e13459fd3a89666b97338c88ca5aa636b1f8c3ef0162b9c5f3016",
+    "packSha256": "f700cd0796f07c0e4ec1821294ccaff58ddb083ff51e109ddad8c6d1822d0e19",
+    "browserRegression": {
+      "record": ".runtime/github-issue-qualification/qualification-pbjey_12/browser-order-W9h3BK/result.json",
+      "sha256": "5ca1cece05da85baab326d8714ddfeeabdd6dc779c924b030abf303d1c43971d",
+      "baselineRejected": true,
+      "correctedChecks": [
+        "open",
+        "old-input",
+        "old-submit",
+        "new-input",
+        "new-submit",
+        "release-new",
+        "new-settled",
+        "release-old",
+        "latest-survives"
+      ]
+    },
+    "bundleId": "sha256:e3078dccd1be364aa44db10f1af841cee30e120d4a09d2e23b565d8cda6f2e5d",
+    "networkDeniedStandaloneVerificationPassed": true,
+    "unpublishedPrPacket": {
+      "path": ".runtime/github-issue-qualification/qualification-pbjey_12/unpublished-pr-packet.json",
+      "sha256": "32bd0d8c0f6fa69e05a573ad6196a4bb767e6b448ecab26c268b6c04335a9e8e",
+      "schema": "kujo.factory.qualification-pr-packet/v1",
+      "repository": "kujolang/software-factory",
+      "issue": "https://github.com/kujolang/software-factory/issues/1",
+      "title": "Repair and verify the converter on the qualification seed branch",
+      "body": "Qualification-only repair for issue #1. Restores the correct Celsius-to-Fahrenheit offset and, with operator authorization after independent review, prevents older responses from overwriting the latest result. The isolated browser regression reproduces the baseline failure and verifies the corrected client. The unchanged sealed contract passed independent review, Workcell API/browser checks, Lens and release verification. Offline evidence: sha256:e3078dccd1be364aa44db10f1af841cee30e120d4a09d2e23b565d8cda6f2e5d",
+      "baseBranch": "codex/qualification-converter-seed",
+      "baseCommit": "64c313ba2b10329018148a9c2bf34de32ae5f52a",
+      "headBranch": "codex/qualification-converter-fix",
+      "headCommit": "8e609801bac75e6859fd5fdb51840395969f2d8e",
+      "patchSha256": "ea7050c9ef762d649f885da9a63dfa5789c56f399cb30b7df5d28c5a0c7b9bf9",
+      "bundleId": "sha256:e3078dccd1be364aa44db10f1af841cee30e120d4a09d2e23b565d8cda6f2e5d",
+      "projectionCommit": "b0a3bf8176e7132f26a475e4cb83b5daa10a1241",
+      "repairedProjectionCommit": "d7accdcb487662d82a3be5d037d170efcc7891ac",
+      "originalIssueRun": "factory-2026-11-20T03-53-41-638Z",
+      "mapping": [
+        {
+          "path": "examples/converter/public/app.js",
+          "seedSha256": "48c233f7c83ea8924c92ce4ca55339107582e2f39527ee49701a12d39217a579",
+          "approvedSha256": "cf09dd40410ed220a67644c73dfeae0c5430104fc6bbdf402096258e21248447"
+        },
+        {
+          "path": "examples/converter/server.mjs",
+          "seedSha256": "d1a2b6cb046dd18baba9cf6078d26c598c7ba0efbeb3b271d87f03bef2aa9ff7",
+          "approvedSha256": "d6909fbf6c926c18e703f52bc166b8fe4af10c51af5a03c18cd693cd11d2bdab"
+        }
+      ],
+      "nativeConflictCheckPassed": true,
+      "published": false,
+      "pushed": false,
+      "deploymentAuthorized": false
+    }
+  }
 }

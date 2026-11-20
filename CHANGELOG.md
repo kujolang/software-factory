@@ -16,7 +16,7 @@
 - Qualify official MCP SDK interoperability, offline installation/rollback, production checkpoint recovery, and strengthened Go/Rust artifact-byte checks. Preserve historical failed attempts and distinguish them from later passing evidence.
 - Add a locked React static runtime with actual interactive/browser and hostile-input qualification. Model construction and final-source release acceptance remain tracked in the implementation ledger.
 
-No release publication, remote merge or deployment is authorized by these changes. Final acceptance is pending the frozen-source qualification matrix.
+The scoped release matrix passes, including free Hermes revalidation, installed MCP construction and live GitHub issue-to-repair. The verified fix and unpublished PR packet target the separate qualification seed branch. Release publication, merge and deployment require separate authorization.
 
 ## Unreleased — additional bounded ecosystem paths
 

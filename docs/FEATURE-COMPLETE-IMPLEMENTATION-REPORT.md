@@ -1,6 +1,6 @@
 # Feature-complete implementation report
 
-**Release recommendation: blocked by the remaining acceptance gates.** The filename is required by the implementation assignment; it is not a feature-completeness claim. The active status is in the [implementation ledger](IMPLEMENTATION-LEDGER.md) and [acceptance manifest](../config/release-acceptance.json). Version remains 0.1.0; no release tag, merge, public release or deployment has been performed.
+**Release recommendation: ready for review within the documented scopes.** All 18 criteria have recorded evidence. The active status is in the [implementation ledger](IMPLEMENTATION-LEDGER.md) and [acceptance manifest](../config/release-acceptance.json). Version remains 0.1.0; no release tag, merge, public release or deployment has been performed.
 
 ## Implemented and reused
 
@@ -34,7 +34,7 @@ Historical CLI, SQLite, package, performance, specification, documentation, all-
 
 Original failures remain retained: early isolation defects, rejected model proposals, missing-directory initialization, low disk admission, stale provider authentication and qualification-harness mistakes. Fixes are separately tested. No failed receipt became a passing receipt. The upstream VideoOps VM Stack-underflow observation remains separate from the passing canonical JSON-schema catalog validation.
 
-The [installed MCP qualification](INSTALLED-MCP-QUALIFICATION.json) passed real sealed converter construction, owned release record retrieval and network-denied build verification. [GitHub issue #1 qualification](GITHUB-ISSUE-QUALIFICATION.json) reached actual issue ingestion and sealed repair acceptance. The independent release gate remains blocked, and a PR packet has not been prepared. Historical evidence retains its original source scope.
+The [installed MCP qualification](INSTALLED-MCP-QUALIFICATION.json) passed real sealed converter construction, owned release record retrieval and network-denied build verification. [GitHub issue #1 qualification](GITHUB-ISSUE-QUALIFICATION.json) passed live issue ingestion, exact repair, independent release, offline verification and preparation of an unpublished PR packet. The prior failed attempts remain recorded. Historical evidence retains its original source scope.
 
 Foreman remains excluded. BZBY, Agent City and commercial services are not architectural dependencies. Missing/private Ward/Capsule interfaces and unqualified remote/enterprise capabilities remain explicit optional or unavailable entries; no adapter fabricates an API from a product name. Full limitations are in [KNOWN-LIMITATIONS.md](KNOWN-LIMITATIONS.md).
 
