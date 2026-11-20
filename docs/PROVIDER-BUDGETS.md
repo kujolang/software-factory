@@ -1,0 +1,42 @@
+# Durable provider call budgets
+
+New mission controllers copy a validated budget policy into `artifacts/provider-budget/policy.json`, bind its SHA-256 in `run.json`, and create a private durable state ledger. The default permits at most 100 provider attempts and 64,000,000 prompt/schema UTF-8 bytes across a mission; each installed canonical role permits at most 32 attempts and 16,000,000 such bytes. These are upper bounds, not targets. Unknown roles cannot reserve.
+
+An operator can supply a tighter policy through the leading global CLI option:
+
+```sh
+node bin/software-factory.mjs --budget-policy POLICY.json webops-review INPUT.json
+```
+
+Example policy for the two-role WebOps advisory path:
+
+```json
+{
+  "schema": "kujo.factory.provider-budget-policy/v1",
+  "maxCalls": 2,
+  "maxPromptBytes": 200000,
+  "maxCostUsd": null,
+  "roles": {
+    "webops.site-qa-operator": {"maxCalls": 1, "maxPromptBytes": 100000, "maxOutputTokens": null},
+    "chain.code-reviewer": {"maxCalls": 1, "maxPromptBytes": 100000, "maxOutputTokens": null}
+  }
+}
+```
+
+The operator file is read once during new-mission admission. Workers use its frozen copy, not a mutable external policy. The policy is not accepted from agent proposals or role instructions. Native recovery retains the original policy, consumed calls and deadline. New retry/revalidation missions receive their own explicitly new budget, never an automatic refund of prior calls.
+
+A filesystem lock serializes reserve/reconcile operations. Reservation state is fsynced and atomically replaced before transport. Every reserved attempt permanently consumes a call and its declared prompt/schema bytes, including failure, cancellation and timeout. A crashed caller leaves a reserved record; it cannot be replayed or silently refunded. A stale lock fails closed. Reported usage is reconciled once; missing input/output token counts remain null. An unreconciled reservation or reported output-cap violation blocks final promotion. A terminal timeout with unknown usage remains a consumed uncertain attempt; it does not imply a zero-cost request.
+
+Supported native SDK and Ollama paths receive the policy's requested output-token cap. Codex cannot enforce such a cap through the qualified CLI contract and rejects non-null caps. Provider response counts exceeding a requested cap are retained as a violation and block subsequent requests. This is a provider request limit plus observed-overage control, not a proof of provider-internal tokenization. Direct SDK calls use the same reservation mechanism; calls with an operator budget flag but no mission context reject before transport.
+
+**Monetary ceilings remain fail-closed:** any non-null `maxCostUsd` is rejected. The pinned SDK/driver contracts expose requested token maxima and reported counts but do not establish a complete mathematical billing bound for input encoding, hidden provider processing, price changes or missing usage. No price is invented, and no estimated cost is called actual billing. Prompt-byte limits cover `prompt` plus `JSON.stringify(schema)`; they are not full wire-byte or input-token limits.
+
+Evidence consists of policy/state identities and per-call reservation/reconciliation receipts. Counts are controller observations, not authenticated provider billing. Fixture tests exercise real locking, atomic persistence, concurrent processes, native SDK transport fixtures, cancellation, timeouts, unknown counts and overage rejection without paid cloud calls.
+
+Portable evidence verification checks frozen policy identity, permanent reservations, per-role call/prompt-byte ceilings, reconciled usage and final state hashes. Retained provider receipts must agree with their reservations; removing a marker while retaining budget evidence is rejected. Failed or interrupted bundles may retain unpaired or uncertain calls without turning them into success. These are integrity and internal-consistency checks, not authenticated execution or monetary guarantees.
+
+## Actual qualification
+
+[The live qualification record](PROVIDER-BUDGET-QUALIFICATION.json) binds clean source `3997bc0c9c288e433e8a9bef235dbf562284f80a` to two actual Codex WebOps missions. A two-call policy completed the canonical specialist and independent reviewer; a fresh one-call policy completed the specialist and rejected the reviewer before transport with `budget_call_limit`. The failed mission retains CaseFile and failed RunLedger evidence. Both bundles passed the copied standalone verifier. Three actual calls reported 46,229 input and 2,712 output tokens; monetary cost remains unknown. These results qualify call ceilings on this bounded path, not provider billing or general model quality.
+
+Reproduce explicitly with `node scripts/qualify-provider-budget.mjs --live REVIEWED_WEBOPS_INPUT.json`. The input references retained verified Lens evidence; this runs paid provider calls but no new browser/engine execution. Each attempt is preserved. No previous failed run acquires approval through this qualification.

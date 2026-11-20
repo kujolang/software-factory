@@ -1,0 +1,49 @@
+{
+  "schema": "kujo.factory.mcp-client-qualification/v1",
+  "sdk": {
+    "name": "@modelcontextprotocol/sdk",
+    "version": "1.32.2",
+    "lockSha256": "4a3913537d78dfd95cdc1fca4b924a059e0d890f497077e5e4d2552caac667fa"
+  },
+  "checks": [
+    {
+      "name": "read-only discovery",
+      "tools": 11
+    },
+    {
+      "name": "canonical catalogs",
+      "roles": 85,
+      "skills": 136,
+      "workflows": 45
+    },
+    {
+      "name": "read-only effect and traversal denial",
+      "passed": true
+    },
+    {
+      "name": "grant-scoped preparation, status and submission denial",
+      "submissionId": "e20471ed-2e33-43e4-af4b-ed23446f47a9",
+      "passed": true
+    }
+  ],
+  "ok": true,
+  "scope": "Actual official SDK local stdio initialization/discovery/read/prepare/denial; no model, submission, browser-host, remote authentication or software qualification",
+  "source": {
+    "commit": "111a9733538b3e05694644840eb3c926fb687f31",
+    "tree": "0ac1545657e630cf6a3454fa1e7e0abbc72cb367",
+    "dirty": true,
+    "identityScope": "Git HEAD; dirty working-tree bytes are separately hashed below"
+  },
+  "record": ".runtime/mcp-client-qualification/run-KzB4cn/qualification.json",
+  "recordSha256": "7a270792fe573385fcecb24087edce09684cc97bc1998470c6cb77b045848787",
+  "node": "v26.12.1",
+  "platform": "darwin",
+  "officialDocumentation": "https://ts.sdk.modelcontextprotocol.io/client",
+  "command": "node scripts/qualify-mcp-client.mjs",
+  "limitations": [
+    "Existing macOS host, not clean OS qualification",
+    "No model mission or Workcell execution",
+    "No editor-specific host certification or remote authentication",
+    "First harness run expected incorrect tool count; failure retained, assertions corrected to named required tools"
+  ]
+}

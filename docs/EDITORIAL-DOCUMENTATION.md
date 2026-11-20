@@ -1,0 +1,9 @@
+# Source-bound Publishing House review
+
+New documentation missions use the canonical Chain of Command Documentation Writer, Publishing House Standards & Evidence Editor, and a separate Chain Code Reviewer. Native Dispatch orders drafting, editorial review, final review and freezing. Canonical instructions, input/output schemas and complete skills remain pinned upstream packages. The Publishing House role receives its own skill guidance and exact source/draft identities.
+
+Both reviewers have no tools and cannot write files. Each must return a passing review; a proposed or failed review stops the workflow and preserves native accounting and CaseFile evidence. Only the writer may propose bounded inert Markdown. Final promotion binds the editorial proposal, source, draft and retained provider receipts. Removing the new-mission editorial requirement while leaving its artifacts is rejected. Historical documentation artifacts retain their original two-role scope.
+
+`mission execute` with type `documentation` uses this path automatically. Publication, deployment, executed tests and software-release approval are never implied. Team planning now includes relevant Publishing House roles for documentation/publication, WebOps roles for website operations, and VideoOps only for explicitly requested media. Missing capabilities remain blockers; a selected specialist is not a tool authorization or proof of supported media execution.
+
+Actual `docs-JdqoDN` completed three real canonical provider calls, native Dispatch and RunLedger, producing separately reviewed documentation for the converter's supplied source files. The source was inspected as text; no application or documentation example execution was claimed. Deterministic tests cover editorial rejection, immutable identities, prohibited file effects and removal of the editorial marker. Exported evidence qualification is recorded separately in the release report.

@@ -1,0 +1,120 @@
+{
+  "schema": "kujo.factory.installed-advisory-qualification/v1",
+  "ok": true,
+  "installCommit": "3997bc0c9c288e433e8a9bef235dbf562284f80a",
+  "installQualificationSha256": "3d108ff2e87daf5b6877d4c3aac3a1e2aca8bdbfecb16a33fec6fbc84f11a370",
+  "startedAt": "2026-11-20T00:52:19.336Z",
+  "scope": "Fresh published checkout on existing macOS host, newly installed dependencies and explicit private auth-only import; real canonical advisory mission over retained Lens evidence, no new browser/engine or software construction claim",
+  "cost": null,
+  "authentication": "Explicit current local factory auth.json copied alone into new mode0700 home/mode0600 file; no settings, hooks, tools or instructions imported",
+  "sourceUnchanged": true,
+  "runId": "webops-Uaz9w8",
+  "runDirectory": ".runtime/install-qualification/checkout-ZNFZdf/source/.runtime/webops/webops-Uaz9w8",
+  "bundleId": "sha256:b881f88b15e51e58e11c06362dc07afd47017324df10221e4192c8d9afd53fc4",
+  "offlineVerified": true,
+  "reservations": 2,
+  "usage": {
+    "input_tokens": 28752,
+    "output_tokens": 1392
+  },
+  "finishedAt": "2026-11-20T00:52:59.267Z",
+  "localDate": "2026-11-19",
+  "installation": {
+    "commit": "3997bc0c9c288e433e8a9bef235dbf562284f80a",
+    "platform": "darwin",
+    "architecture": "x64",
+    "node": "v26.12.1",
+    "ok": true,
+    "steps": [
+      {
+        "id": "git-init",
+        "exitCode": 0,
+        "durationMs": 21,
+        "log": "git-init.log",
+        "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "id": "git-fetch",
+        "exitCode": 0,
+        "durationMs": 3760,
+        "log": "git-fetch.log",
+        "logSha256": "2992492d7ec4496c494cf9b71a6fba9af064c3bb3e7e1066fb380033dfce62bd"
+      },
+      {
+        "id": "git-checkout",
+        "exitCode": 0,
+        "durationMs": 250,
+        "log": "git-checkout.log",
+        "logSha256": "7de42c2e1d7d6b93acecfe8416b1de3f2ee9b01391e79d9cdc204dd3bf33528a"
+      },
+      {
+        "id": "npm-ci",
+        "exitCode": 0,
+        "durationMs": 31293,
+        "log": "npm-ci.log",
+        "logSha256": "0119a5deff8a7b9d3ea9a6ea31d3ac25b9156c6f969c9ccf98b0dcc2f9aa3541"
+      },
+      {
+        "id": "setup",
+        "exitCode": 0,
+        "durationMs": 44371,
+        "log": "setup.log",
+        "logSha256": "4d403c7988287b6ae687e5c1bf52182b2c06bb6ed1331fc39ce63ca26a26c18d"
+      },
+      {
+        "id": "offline-doctor",
+        "exitCode": 0,
+        "durationMs": 4827,
+        "log": "offline-doctor.log",
+        "logSha256": "3ce69cdeb545e52b07d7d0ecd4b1fb1f8630c9fd4b4e2316a751fa86665e9bd3"
+      },
+      {
+        "id": "verify",
+        "exitCode": 0,
+        "durationMs": 91304,
+        "log": "verify.log",
+        "logSha256": "56a5bd0445e96513596e814158f6b8fc5ced25d91c6bcebf1154f75e9bfe715e"
+      }
+    ],
+    "tests": {
+      "discovered": 425,
+      "passed": 423,
+      "skipped": 2,
+      "skipReason": "Private retained React runtime fixtures not available in fresh checkout; separately passed on original host evidence",
+      "nativeDispatchPassed": 8,
+      "failures": 0
+    }
+  },
+  "evidence": [
+    {
+      "path": ".runtime/install-qualification/checkout-ZNFZdf/qualification.json",
+      "sha256": "3d108ff2e87daf5b6877d4c3aac3a1e2aca8bdbfecb16a33fec6fbc84f11a370"
+    },
+    {
+      "path": ".runtime/install-qualification/checkout-ZNFZdf/advisory-LDv3S9/qualification.json",
+      "sha256": "fd09caafdc90961c8e2cdb09e6868e9deae254e6ff2e50990e46f97e7c32d7c5"
+    },
+    {
+      "path": ".runtime/install-qualification/checkout-ZNFZdf/advisory-LDv3S9/mission-process.json",
+      "sha256": "64d8b640b7dfc85aa802e29ade50afff9d0321c845f6af425b31c435a7e1c9fb"
+    },
+    {
+      "path": ".runtime/install-qualification/checkout-ZNFZdf/advisory-LDv3S9/export-process.json",
+      "sha256": "1f917605c8cb955bd665c0eac1887807290c9d3d789be3d8f382c82f54c88731"
+    },
+    {
+      "path": ".runtime/install-qualification/checkout-ZNFZdf/advisory-LDv3S9/standalone-process.json",
+      "sha256": "0657c4906215303d07369515542b000b3f2be35d850517649e55820d93d0b15e"
+    },
+    {
+      "path": ".runtime/install-qualification/checkout-ZNFZdf/advisory-LDv3S9/evidence-verifier.mjs",
+      "sha256": "012d59befdb87256371bc1573230870e1e116166a7cae277043c15351bf8656b"
+    }
+  ],
+  "limitations": [
+    "Existing macOS host, not a newly provisioned OS; Linux/macOS CI installation is separate evidence",
+    "Explicit current account auth-only import occurred after installation verification; no authentication was bundled with source",
+    "Canonical WebOps advisory review of existing Lens records, not new browser or candidate execution",
+    "No installed application construction, merge, publication or deployment claim"
+  ]
+}

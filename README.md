@@ -13,17 +13,39 @@ Software Factory coordinates scoped proposals through Kujo Dispatch, runs genera
 
 **Standalone, local, early release.** Give your agent an idea and the [software-pack guide](docs/PACKS.md). It can define the product contract and tests without rewriting the controller. Packs support Node APIs, SQLite when needed, and static browser interfaces. The issue tracker remains the default; converter and notes packs show other products. Agent City is not required.
 
+## Ecosystem integration increment
+
+This branch adds complete pinned [catalogs](docs/CATALOGS.md), bounded team planning, [portable evidence verification](docs/EVIDENCE.md), and [read-only MCP discovery](docs/MCP.md). The scoped release candidate is ready for human review. See [release qualification](docs/RELEASE-QUALIFICATION.md) and [known limitations](docs/KNOWN-LIMITATIONS.md) before relying on new capabilities. The Node application workflow now includes native Lens and accounted release gates. Additional bounded interfaces cover [reviewed specifications](docs/SPEC-PIPELINE.md), [repository repairs](docs/REPOSITORY-MISSIONS.md), [CLI runtimes](docs/CLI-RUNTIMES.md), [context preparation](docs/CONTEXT-PIPELINE.md), [change inspection](docs/CHANGE-TOOLS.md), and [operations](docs/OPERATIONS.md), and [local telemetry](docs/TELEMETRY.md). Each has a separately stated qualification scope. Actual React construction, budget enforcement, fresh-checkout advisory execution, offline upgrade/rollback and default rootless isolation now have separate passing records; Provider and recovery qualification, installed MCP construction and the live GitHub issue-to-repair path also passed within their documented scopes. Current CI and rootless regression pass. See the [implementation ledger](docs/IMPLEMENTATION-LEDGER.md).
+
+The installed catalog contains 85 canonical roles, including all 28 Chain of Command roles, 136 complete skill packages and 45 upstream workflow kits. [Typed mission workflows](docs/MISSION-WORKFLOWS.md), [CLI construction](docs/CLI-MISSIONS.md), [documentation review](docs/MISSION-WORKFLOWS.md), [optional SDK providers](docs/SDK-PROVIDERS.md), [native quality evaluation](docs/QUALITY-EVALUATION.md), and [offline installation and rollback](docs/OFFLINE-INSTALL.md) share the existing authority boundaries. Optional or unqualified paths remain explicitly labeled; catalog availability does not grant permissions or establish release readiness.
+
+## Qualified, bounded development paths
+
+| Work | Interface and scope |
+| --- | --- |
+| Plan and construct | [Twenty lifecycle routes](docs/MISSION-WORKFLOWS.md), frozen Spec contracts, selected canonical roles and independent acceptance |
+| Repair or benchmark existing source | [Committed repository changes](docs/REPOSITORY-MISSIONS.md) and [fixed-request performance comparisons](docs/PERFORMANCE-WORKFLOWS.md) |
+| Build a React interface | [Locked React 18 static construction](docs/REACT-STATIC.md), repeated browser/API/Lens checks and [actual mission evidence](docs/REACT-MISSION-QUALIFICATION.json) |
+| Build CLI software | [Python, TypeScript, Go, Rust and Kujo construction](docs/CLI-MISSIONS.md) in separately qualified runtime profiles |
+| Upgrade dependencies or data | [Locked Node dependency upgrades](docs/node-package-runtime.md) and [disposable SQLite migrations](docs/SQLITE-MIGRATIONS.md) |
+| Review documentation and websites | [Publishing House editorial review](docs/EDITORIAL-DOCUMENTATION.md), [WebOps evidence review](docs/WEBOPS-REVIEW.md), and [optional native visual baselines](docs/VISUAL-BASELINES.md) |
+| Operate and verify | [Local notifications and recovery](docs/OPERATIONS.md), [portable evidence](docs/EVIDENCE.md), [official MCP SDK interoperability](docs/MCP.md), and [offline installation/rollback](docs/OFFLINE-INSTALL.md) |
+
+[Provider budgets](docs/PROVIDER-BUDGETS.md) reserve calls and prompt bytes before transport; unsupported monetary ceilings fail closed. Actual two-call success and one-call rejection both passed standalone evidence verification. Required source-secret checks and independent release gates remain controller-owned. A local candidate never grants publication, merge or deployment authority. Consult each profile's qualification and limitations before choosing it; optional capabilities do not silently activate.
+
 ## Start here
 
-Requirements: Git, Node **26.12.1 or later 26.x**, a Codex account, and a local **rootless Docker engine with seccomp**. npm installs the pinned Kujo and Codex CLIs locally. No global Kujo installation or sibling repositories are needed.
+Requirements: Git, Node **26.12.1 or later 26.x**, a Codex account or an installed local Ollama model, and a local **rootless Docker engine with seccomp**. npm installs the pinned Kujo and Codex CLIs locally. No global Kujo installation or sibling repositories are needed.
 
 ```sh
 git clone https://github.com/kujolang/software-factory.git
 cd software-factory
-npm ci
+npm ci --ignore-scripts
 npm run setup
 npm run login
 ```
+
+Codex is the default provider. For local Ollama, skip login and follow [provider selection](docs/PROVIDERS.md); no cloud alias is accepted by the local adapter.
 
 Select a rootless engine following [Engine setup](docs/ENGINE.md), then:
 
@@ -69,7 +91,8 @@ See the [pack guide](docs/PACKS.md) for the full workflow. Test the shipped conv
 2. Backend and frontend proposal workers run concurrently.
 3. The controller admits only their allowed files.
 4. Independent review, API checks and browser checks gate bounded corrections.
-5. A separate release review and repeated checks bind approval to the exact source hash.
+5. A separate release review, native Eval and selected ShipCheck controls repeat source-bound checks.
+6. Canonical accounting completes before verified files become an approved local candidate. Rejected attempts remain in CaseFile evidence.
 
 Workers propose text and files; they cannot run commands. Generated applications execute only inside Workcell. The observer is read-only. Model statements are never substituted for test results.
 

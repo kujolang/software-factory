@@ -44,3 +44,9 @@ Before updating: stop new runs, let active leases finish, record the current Git
 ## Remove
 
 Stop the observer and active factory commands first. Check owned Workcell resources as described in [recovery](TROUBLESHOOTING.md). Removing the checkout removes its local dependencies, configuration, run history and factory auth copy. It does not remove your account, system tools, images, Colima VM or original Codex authentication. Preserve outputs before removal. No uninstaller deletes shared Docker resources automatically.
+
+## Recorded clean-checkout qualification
+
+[The installed-mission record](INSTALLED-MISSION-QUALIFICATION.json) binds published source `3997bc0c9c288e433e8a9bef235dbf562284f80a` to an isolated fresh macOS checkout, new npm cache/HOME, locked dependency setup and passing offline doctor. Its verification discovered425 tests:423 passed and two private retained-runtime cases were explicitly skipped; eight native Dispatch tests passed.
+
+After installation, an explicitly authorized authentication-only import enabled an actual two-role WebOps advisory mission through the installed public CLI. Both calls completed within the frozen two-call budget, native accounting completed, source remained clean, and the installed exporter plus copied standalone verifier accepted its evidence bundle. Reported usage was28,752 input and1,392 output tokens; monetary cost remains unknown. This qualifies installed advisory execution on the existing host, not clean-OS provisioning, new browser execution or software construction.

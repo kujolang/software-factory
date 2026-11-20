@@ -1,3 +1,4 @@
+import {kujoBinary,dispatchRoot} from './settings.mjs';
 /** CLI import tests use a zero-exit transport fixture, never a live model. */
 import fs from "node:fs";
 import path from "node:path";
@@ -10,21 +11,21 @@ import { digest, events, json } from "./core.mjs";
 const cli = path.join(import.meta.dirname, "cli.mjs");
 function fixture(t) {
   const base = fs.mkdtempSync(
-    path.join(os.tmpdir(), "factory-recheck-contract-"),
+    path.join(fs.realpathSync(os.tmpdir()), "factory-recheck-contract-"),
   );
   t.after(() => fs.rmSync(base, { recursive: true, force: true }));
-  // CLI invokes KUJO_BIN run <adapter>. Using Node plus this `run` fixture
-  // exercises setup without a Kujo dependency or a provider/model request.
-  fs.writeFileSync(path.join(base, "run"), "process.exit(0);\n");
+  // Only Dispatch is a zero-exit transport fixture; accounting uses pinned Kujo.
+  const shim=path.join(base,"kujo-shim");
+  fs.writeFileSync(shim,`#!${process.execPath}\nimport {spawnSync} from 'node:child_process';const args=process.argv.slice(2);if(args.some(a=>a.endsWith('/factory/dispatch.kujo')))process.exit(0);const r=spawnSync(${JSON.stringify(kujoBinary())},args,{stdio:'inherit'});process.exit(r.status??1);\n`,{mode:0o700});
   function call(id, verb = "recheck") {
     return spawnSync(process.execPath, [cli, verb, id], {
       encoding: "utf8",
-      timeout: 10000,
+      timeout: 30000,
       env: {
         ...process.env,
         FACTORY_RUNS: base,
-        FACTORY_DISPATCH_ROOT: base,
-        KUJO_BIN: process.execPath,
+        FACTORY_DISPATCH_ROOT: dispatchRoot,
+        KUJO_BIN: shim,
       },
     });
   }
@@ -127,6 +128,7 @@ test("recheck imports exact approved source and cannot infer release from transp
     source = f.source(),
     result = f.call(source.name);
   assert.equal(result.status, 1, result.stderr);
+  assert.ok(result.stdout.trim(), "Expected controller output; stderr: " + result.stderr);
   const messages = result.stdout.trim().split("\n").map(JSON.parse);
   const dir = messages[0].directory,
     run = json(path.join(dir, "run.json"));
@@ -204,6 +206,7 @@ test("retry preserves failed source and imports unverified bytes without inherit
   const before = digest(source.dir);
   const result = f.call(source.name, "retry");
   assert.equal(result.status, 1, result.stderr);
+  assert.ok(result.stdout.trim(), "Expected controller output; stderr: " + result.stderr);
   const messages = result.stdout.trim().split("\n").map(JSON.parse);
   const dir = messages[0].directory,
     run = json(path.join(dir, "run.json"));
@@ -255,3 +258,13 @@ test("retry preserves failed source and imports unverified bytes without inherit
   ])
     assert.equal(fs.existsSync(path.join(dir, "artifacts", name)), false);
 });
+
+for (const verb of ["retry", "recheck"]) for (const marker of ["config", "performance-policy.json", "performance.json"]) {
+  test(`${verb} rejects performance evidence downgrade via ${marker} before allocation`, t => {
+    const f=fixture(t), source=f.source("factory-performance",verb==="retry"?"failed":"completed");
+    if(marker==="config") { const run=json(path.join(source.dir,"run.json"));run.performanceRequired=true;fs.writeFileSync(path.join(source.dir,"run.json"),JSON.stringify(run)); }
+    else fs.writeFileSync(path.join(source.dir,"artifacts",marker),"{}");
+    const before=fs.readdirSync(f.base), result=f.call(source.name,verb);
+    assert.notEqual(result.status,0);assert.match(result.stderr,/Performance missions require/);assert.deepEqual(fs.readdirSync(f.base),before);
+  });
+}

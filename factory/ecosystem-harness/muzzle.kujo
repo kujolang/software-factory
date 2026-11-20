@@ -1,0 +1,3 @@
+from src.redact import redact_text, error_excerpt
+value := parse_json(read_file(args()[0]))
+print(to_json({"redacted":redact_text(value["text"]),"excerpt":error_excerpt(value["text"],20)}))

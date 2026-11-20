@@ -1,0 +1,18 @@
+from src.snapshot import validate_snapshot_references
+from src.checks.cli_docs import check_cli_docs
+from src.checks.spec_eval import check_spec_eval
+from src.checks.manifest_docs import check_manifest_docs
+from src.checks.version_consistency import check_version_consistency
+from src.checks.example_validity import check_example_validity
+from src.checks.source_of_truth import check_source_of_truth
+from src.reporter import generate_json_report
+let dir = args()[0]
+let issues = validate_snapshot_references(dir)
+if len(issues) > 0 { print(to_json({"blocked":true,"issues":issues})); exit(2) }
+mut findings = check_cli_docs(dir, "disabled")
+findings = concat(findings, check_spec_eval(dir))
+findings = concat(findings, check_manifest_docs(dir))
+findings = concat(findings, check_version_consistency(dir))
+findings = concat(findings, check_example_validity(dir, "disabled"))
+findings = concat(findings, check_source_of_truth(dir))
+print(generate_json_report(dir, findings))

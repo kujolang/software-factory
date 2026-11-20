@@ -1,0 +1,43 @@
+from sdk.ai_sdk import create_client, create_message, chat_completion
+from sdk.providers import openai_provider
+from anthropic_driver import anthropic_provider
+from gemini_driver import gemini_provider
+func get(value,key,fallback) { if type(value)=="dict" && has_key(value,key) { return value[key] }; return fallback }
+input := parse_json(read_file(args()[0]))
+name := input["provider"]
+provider := openai_provider()
+host := "api.openai.com"
+if name=="anthropic" { provider = anthropic_provider({"model":input["model"]}); host = "api.anthropic.com" }
+if name=="gemini" { provider = gemini_provider({"model":input["model"]}); host = "generativelanguage.googleapis.com" }
+provider["default_model"] = input["model"]
+# Narrow the factory projection: native Gemini advertises embeddings without encode/decode hooks.
+provider["capabilities"] = {"streaming":false,"tool_calls":false,"structured_output":false,"embeddings":false}
+key := env("FACTORY_SDK_KEY")
+client := create_client(provider,key)
+options := {"model":input["model"],"max_tokens":input["maxTokens"],"max_output_tokens":input["maxTokens"],"max_retries":0,"retry_budget":0,"timeout":input["timeoutMs"]/1000.0,"connect_timeout":input["timeoutMs"]/1000.0,"read_timeout":input["timeoutMs"]/1000.0,"overall_timeout_ms":input["timeoutMs"],"endpoint_allowlist_enabled":true,"endpoint_allowlist_hosts":[host],"redirects":"none","max_raw_response_bytes":1000000,"stream":false}
+func fixture_transport(url,request) {
+ fixture_input := parse_json(read_file("input.json"))
+ fixture_host := "api.openai.com"
+ if fixture_input["provider"]=="anthropic" { fixture_host = "api.anthropic.com" }
+ if fixture_input["provider"]=="gemini" { fixture_host = "generativelanguage.googleapis.com" }
+ assert(starts_with(url,"https://"+fixture_host+"/"),"endpoint policy")
+ fixture_body := parse_json(request["_body"])
+ assert(has_key(fixture_body,"tools")==0,"tools forbidden")
+ return Ok({"_status":fixture_input["fixtureStatus"],"_headers":{},"_body":to_json(fixture_input["fixtureResponse"])})
+}
+if input["fixture"] { options["transport"] = fixture_transport }
+# A single user message is portable across these exact drivers. Controller instructions are immutable text.
+prompt := "Return exactly one JSON value matching this schema. Do not request tools or invoke external actions.\nSchema:\n"+to_json(input["schema"])+"\nTask:\n"+input["prompt"]
+result := chat_completion(client,[create_message("user",prompt)],options)
+if result["ok"]==false {
+ code := get(get(result,"error",{}),"code","provider_error")
+ print(to_json({"ok":false,"code":code,"statusCode":get(result,"status_code",null),"retryable":get(get(result,"error",{}),"retryable",false)}))
+} else {
+ raw := get(result,"raw",{})
+ raw_usage := get(raw,"usage",{})
+ usage := {"input_tokens":null,"output_tokens":null}
+ if name=="openai" { usage["input_tokens"] = get(raw_usage,"prompt_tokens",null); usage["output_tokens"] = get(raw_usage,"completion_tokens",null) }
+ if name=="anthropic" { usage["input_tokens"] = get(raw_usage,"input_tokens",null); usage["output_tokens"] = get(raw_usage,"output_tokens",null) }
+ if name=="gemini" { raw_usage = get(raw,"usageMetadata",{}); usage["input_tokens"] = get(raw_usage,"promptTokenCount",null); usage["output_tokens"] = get(raw_usage,"candidatesTokenCount",null) }
+ print(to_json({"ok":true,"outputText":result["output_text"],"finishReason":result["finish_reason"],"toolCalls":result["tool_calls"],"usage":usage}))
+}

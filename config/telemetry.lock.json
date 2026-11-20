@@ -1,0 +1,35 @@
+{
+  "schema": "kujo.factory.telemetry-lock/v1",
+  "repositories": {
+    "watchdog": {
+      "url": "https://github.com/kujolang/watchdog.git",
+      "commit": "7a0bd9a63d68421831ed66d6eed29805c48e1b24",
+      "files": {
+        "LICENSE": {
+          "sha256": "4b6449939f8dce26dc5fb87756740a5977da9085517af127d9e634e6a6492506",
+          "bytes": 1087
+        },
+        "VERSION": {
+          "sha256": "c62a5cc61ac4525935753f5ec284c0a052a4b1da4b3a3580dce2b7d77a2154ae",
+          "bytes": 6
+        },
+        "telemetry_native_adapter.kujo": {
+          "sha256": "5e794d993495a16f0d0307f5389ee48fbd8428be5f51ac95be1c1f0732acd858",
+          "bytes": 6885
+        },
+        "telemetry_v2.kujo": {
+          "sha256": "f3283cc8cde0e4f419ea8acbb6ba5c29ebfc0dde75a317776e91a604281fe884",
+          "bytes": 10706
+        },
+        "telemetry_repository.kujo": {
+          "sha256": "cee85818d2ea46fc29bbbb3f82d9bc79b657242d93ce8955eadc5a78231e5fd8",
+          "bytes": 28504
+        },
+        "watchdog_shared.kujo": {
+          "sha256": "0bad0d2bad511ce8733712e992799aa6df2da3fe3e4d243717a2fcea4cc53ddf",
+          "bytes": 40037
+        }
+      }
+    }
+  }
+}

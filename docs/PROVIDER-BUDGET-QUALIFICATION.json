@@ -1,0 +1,101 @@
+{
+  "schema": "kujo.factory.provider-budget-live-qualification/v1",
+  "startedAt": "2026-11-20T00:48:07.548Z",
+  "provider": "codex",
+  "cases": [
+    {
+      "label": "two-call-success",
+      "runId": "webops-R8j8RZ",
+      "runDirectory": ".runtime/webops/webops-R8j8RZ",
+      "status": "completed",
+      "reservations": 2,
+      "usage": {
+        "input_tokens": 32346,
+        "output_tokens": 1546
+      },
+      "cost": null,
+      "policySha256": "d06c1834aaba294294a54c7dd81413820c99e3c6f5e56dbee7ea64879053cb89",
+      "stateSha256": "10fa38656ed3fa13b2b43e8a863d6d84d91de2c838b40407fa1d09545ce6b73a",
+      "bundleId": "sha256:b098c6dd87e95e361de9ff5554c54eeb7f16bd688eb61a837b6c5c393cceee84",
+      "offlineVerified": true
+    },
+    {
+      "label": "one-call-rejection",
+      "runId": "webops-zjq1H1",
+      "runDirectory": ".runtime/webops/webops-zjq1H1",
+      "status": "failed",
+      "reservations": 1,
+      "usage": {
+        "input_tokens": 13883,
+        "output_tokens": 1166
+      },
+      "cost": null,
+      "policySha256": "dbc34b30d49f5dd005466b1249262511b182fb0094b245ed19c061560f474b5e",
+      "stateSha256": "83ccc8c219ca382257a361d038f585eb1a1b6f265f2ec7beef94f305ed2de236",
+      "bundleId": "sha256:73b905a905af61aa48373e038076720ecd494d3511ee9b6b7f44bae35f02b377",
+      "offlineVerified": true
+    }
+  ],
+  "ok": true,
+  "cost": null,
+  "scope": "Actual canonical WebOps advisory calls, controller call ceilings and standalone evidence consistency; no monetary guarantee, model-quality score, new browser execution or software approval",
+  "finishedAt": "2026-11-20T00:49:20.645Z",
+  "localDate": "2026-11-19",
+  "source": {
+    "commit": "3997bc0c9c288e433e8a9bef235dbf562284f80a",
+    "tree": "046ad1e5a38a82c7c68496003956440e1e9f19fe",
+    "dirty": false,
+    "identityScope": "Git HEAD; dirty working-tree bytes are separately hashed below"
+  },
+  "qualificationDirectory": ".runtime/provider-budget-qualification/qualification-ZBbr0Y",
+  "command": "node scripts/qualify-provider-budget.mjs --live REVIEWED_WEBOPS_INPUT.json",
+  "totalReportedUsage": {
+    "input_tokens": 46229,
+    "output_tokens": 2712,
+    "cost": null
+  },
+  "evidence": [
+    {
+      "path": ".runtime/provider-budget-qualification/qualification-ZBbr0Y/qualification.json",
+      "sha256": "ff00dd2fc4c20d376fe4178dea79b1df785cf8ce57295c27f7c2be91e8e00d01"
+    },
+    {
+      "path": ".runtime/provider-budget-qualification/qualification-ZBbr0Y/controller.json",
+      "sha256": "df0060c55587a00a1211f2981cb88f9b9708a55293faef5c1201c7b61a611dab"
+    },
+    {
+      "path": ".runtime/provider-budget-qualification/qualification-ZBbr0Y/evidence-verifier.mjs",
+      "sha256": "012d59befdb87256371bc1573230870e1e116166a7cae277043c15351bf8656b"
+    },
+    {
+      "path": ".runtime/provider-budget-qualification/qualification-ZBbr0Y/two-call-success-process.json",
+      "sha256": "ec6ada28b9d68b9e5970b18f6c0a5aeb75a4f505d6a28250b7789232c11a043f"
+    },
+    {
+      "path": ".runtime/provider-budget-qualification/qualification-ZBbr0Y/two-call-success-export-process.json",
+      "sha256": "18406c76e49374bfedb00daa657b16ab25c7c50dbd6858fc2aca80b2d8bcf4d0"
+    },
+    {
+      "path": ".runtime/provider-budget-qualification/qualification-ZBbr0Y/two-call-success-offline-process.json",
+      "sha256": "b518e7046af373e0521e711a9c40736124b87f68fbf684b87f0308618cd82143"
+    },
+    {
+      "path": ".runtime/provider-budget-qualification/qualification-ZBbr0Y/one-call-rejection-process.json",
+      "sha256": "af10cf3c48ab94a03ad7ff849aa3b381797a9876ecbfa25ef4a875a9f3749d61"
+    },
+    {
+      "path": ".runtime/provider-budget-qualification/qualification-ZBbr0Y/one-call-rejection-export-process.json",
+      "sha256": "f68a98417ba85ad1cc18c985c5b3da72fbc1bcde6799d3aee8aac79b8f00a620"
+    },
+    {
+      "path": ".runtime/provider-budget-qualification/qualification-ZBbr0Y/one-call-rejection-offline-process.json",
+      "sha256": "4dde8594fee29eb4de4e5d18aa4b2dd964e3e66ee59bdcef8d297949498d8eb5"
+    }
+  ],
+  "limitations": [
+    "Codex canonical WebOps advisory workflow only; no live SDK or monetary ceiling claim",
+    "Second mission fails intentionally before reviewer transport; failure is preserved, never software approval",
+    "Unsigned offline consistency does not authenticate execution or provider billing",
+    "Previously disk-blocked webops-MYzHve is retained and not reclassified"
+  ]
+}

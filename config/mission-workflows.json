@@ -1,0 +1,1600 @@
+{
+  "schema": "kujo.factory.mission-workflows/v1",
+  "workflows": [
+    {
+      "id": "idea-to-specification",
+      "route": "specification",
+      "output": "reviewed-specification",
+      "runtime": null,
+      "skills": [
+        "kujo-spec-workflows"
+      ],
+      "roles": [
+        "planner",
+        "spec-writer",
+        "code-reviewer"
+      ],
+      "effects": [
+        "private-local-artifacts"
+      ],
+      "verification": [
+        "native-spec",
+        "independent-model-review",
+        "accounting"
+      ],
+      "approval": {
+        "humanRequiredBeforePublication": true,
+        "publish": false,
+        "deploy": false
+      },
+      "recovery": {
+        "automaticResume": false,
+        "retry": "new mission after failure evidence review; existing recheck creates fresh verification"
+      },
+      "upstream": {
+        "id": "loop-engineering",
+        "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+        "maturity": "Ready",
+        "entrypoint": "`(cd loop-engineering && bash scripts/run-workflow.sh --demo)`",
+        "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
+      },
+      "blockedReason": null,
+      "input": {
+        "schema": "kujo.factory.mission-input/v1",
+        "required": [
+          "mission"
+        ],
+        "unknownFields": "reject",
+        "pack": "Reviewed seal mandatory for application/repository routes; identity does not establish correctness",
+        "source": "Explicit local source directory; repository execution imports committed source only"
+      },
+      "dependencies": [
+        "planner \u2192 spec-writer \u2192 native Spec \u2192 code-reviewer \u2192 freeze \u2192 RunLedger"
+      ],
+      "failure": {
+        "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
+        "promotion": "Blocked on nonzero child status or required gate failure",
+        "externalEffects": "No push, merge, publication or deployment"
+      }
+    },
+    {
+      "id": "new-application",
+      "route": "application",
+      "output": "verified-node-artifact",
+      "runtime": "dependency-free-node26-static-sqlite",
+      "skills": [
+        "kujo-way-development"
+      ],
+      "roles": [
+        "core-developer",
+        "code-reviewer",
+        "release-verifier"
+      ],
+      "effects": [
+        "private-local-artifacts"
+      ],
+      "verification": [
+        "sealed-pack",
+        "native-spec",
+        "workcell-api-browser",
+        "lens",
+        "independent-review",
+        "shipcheck-policy",
+        "eval",
+        "accounting",
+        "source-bound-release"
+      ],
+      "approval": {
+        "humanRequiredBeforePublication": true,
+        "publish": false,
+        "deploy": false
+      },
+      "recovery": {
+        "automaticResume": false,
+        "retry": "new mission after failure evidence review; existing recheck creates fresh verification"
+      },
+      "upstream": {
+        "id": "loop-engineering",
+        "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+        "maturity": "Ready",
+        "entrypoint": "`(cd loop-engineering && bash scripts/run-workflow.sh --demo)`",
+        "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
+      },
+      "blockedReason": null,
+      "input": {
+        "schema": "kujo.factory.mission-input/v1",
+        "required": [
+          "mission",
+          "pack"
+        ],
+        "unknownFields": "reject",
+        "pack": "Reviewed seal mandatory for application/repository routes; identity does not establish correctness",
+        "source": "Explicit local source directory; repository execution imports committed source only"
+      },
+      "dependencies": [
+        "native Dispatch application graph; backend/frontend independent; trusted tests and independent review before release"
+      ],
+      "failure": {
+        "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
+        "promotion": "Blocked on nonzero child status or required gate failure",
+        "externalEffects": "No push, merge, publication or deployment"
+      }
+    },
+    {
+      "id": "repository-onboarding",
+      "route": "onboarding",
+      "output": "isolated-repository",
+      "runtime": null,
+      "skills": [
+        "kujo-scout-workflows"
+      ],
+      "roles": [],
+      "effects": [
+        "private-local-artifacts"
+      ],
+      "verification": [
+        "bounded-read-or-copy"
+      ],
+      "approval": {
+        "humanRequiredBeforePublication": true,
+        "publish": false,
+        "deploy": false
+      },
+      "recovery": {
+        "automaticResume": false,
+        "retry": "new mission after failure evidence review; existing recheck creates fresh verification"
+      },
+      "upstream": {
+        "id": "feature-card-workflow",
+        "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+        "maturity": "Limited",
+        "entrypoint": "`feature-card-workflow/muzzle-template/workflows/feature-card-full.sh --help`",
+        "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
+      },
+      "blockedReason": null,
+      "input": {
+        "schema": "kujo.factory.mission-input/v1",
+        "required": [
+          "source"
+        ],
+        "unknownFields": "reject",
+        "pack": "Reviewed seal mandatory for application/repository routes; identity does not establish correctness",
+        "source": "Explicit local source directory; repository execution imports committed source only"
+      },
+      "dependencies": [
+        "safe Git object copy only; no agent workflow"
+      ],
+      "failure": {
+        "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
+        "promotion": "Blocked on nonzero child status or required gate failure",
+        "externalEffects": "No push, merge, publication or deployment"
+      }
+    },
+    {
+      "id": "github-issue",
+      "route": "repository",
+      "output": "verified-node-change",
+      "runtime": "dependency-free-node26-static-sqlite",
+      "skills": [
+        "kujo-spec-workflows"
+      ],
+      "roles": [
+        "core-developer",
+        "code-reviewer",
+        "release-verifier"
+      ],
+      "effects": [
+        "private-local-artifacts"
+      ],
+      "verification": [
+        "sealed-pack",
+        "native-spec",
+        "workcell-api-browser",
+        "lens",
+        "independent-review",
+        "shipcheck-policy",
+        "eval",
+        "accounting",
+        "source-bound-release"
+      ],
+      "approval": {
+        "humanRequiredBeforePublication": true,
+        "publish": false,
+        "deploy": false
+      },
+      "recovery": {
+        "automaticResume": false,
+        "retry": "new mission after failure evidence review; existing recheck creates fresh verification"
+      },
+      "upstream": {
+        "id": "agency-verified-fix-loop",
+        "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+        "maturity": "Limited",
+        "entrypoint": "`(cd agency-verified-fix-loop && STRICT=1 bash scripts/run-loop.sh)`",
+        "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
+      },
+      "blockedReason": null,
+      "input": {
+        "schema": "kujo.factory.mission-input/v1",
+        "required": [
+          "mission",
+          "pack",
+          "source",
+          "issue"
+        ],
+        "unknownFields": "reject",
+        "pack": "Reviewed seal mandatory for application/repository routes; identity does not establish correctness",
+        "source": "Explicit local source directory; repository execution imports committed source only"
+      },
+      "dependencies": [
+        "committed source admission \u2192 native Dispatch verify/repair \u2192 independent release"
+      ],
+      "failure": {
+        "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
+        "promotion": "Blocked on nonzero child status or required gate failure",
+        "externalEffects": "No push, merge, publication or deployment"
+      }
+    },
+    {
+      "id": "bug-repair",
+      "route": "repository",
+      "output": "verified-node-change",
+      "runtime": "dependency-free-node26-static-sqlite",
+      "skills": [
+        "kujo-spec-workflows"
+      ],
+      "roles": [
+        "core-developer",
+        "code-reviewer",
+        "release-verifier"
+      ],
+      "effects": [
+        "private-local-artifacts"
+      ],
+      "verification": [
+        "sealed-pack",
+        "native-spec",
+        "workcell-api-browser",
+        "lens",
+        "independent-review",
+        "shipcheck-policy",
+        "eval",
+        "accounting",
+        "source-bound-release"
+      ],
+      "approval": {
+        "humanRequiredBeforePublication": true,
+        "publish": false,
+        "deploy": false
+      },
+      "recovery": {
+        "automaticResume": false,
+        "retry": "new mission after failure evidence review; existing recheck creates fresh verification"
+      },
+      "upstream": {
+        "id": "agency-verified-fix-loop",
+        "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+        "maturity": "Limited",
+        "entrypoint": "`(cd agency-verified-fix-loop && STRICT=1 bash scripts/run-loop.sh)`",
+        "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
+      },
+      "blockedReason": null,
+      "input": {
+        "schema": "kujo.factory.mission-input/v1",
+        "required": [
+          "mission",
+          "pack",
+          "source"
+        ],
+        "unknownFields": "reject",
+        "pack": "Reviewed seal mandatory for application/repository routes; identity does not establish correctness",
+        "source": "Explicit local source directory; repository execution imports committed source only"
+      },
+      "dependencies": [
+        "committed source admission \u2192 native Dispatch verify/repair \u2192 independent release"
+      ],
+      "failure": {
+        "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
+        "promotion": "Blocked on nonzero child status or required gate failure",
+        "externalEffects": "No push, merge, publication or deployment"
+      }
+    },
+    {
+      "id": "feature",
+      "route": "repository",
+      "output": "verified-node-change",
+      "runtime": "dependency-free-node26-static-sqlite",
+      "skills": [
+        "kujo-way-development"
+      ],
+      "roles": [
+        "core-developer",
+        "code-reviewer",
+        "release-verifier"
+      ],
+      "effects": [
+        "private-local-artifacts"
+      ],
+      "verification": [
+        "sealed-pack",
+        "native-spec",
+        "workcell-api-browser",
+        "lens",
+        "independent-review",
+        "shipcheck-policy",
+        "eval",
+        "accounting",
+        "source-bound-release"
+      ],
+      "approval": {
+        "humanRequiredBeforePublication": true,
+        "publish": false,
+        "deploy": false
+      },
+      "recovery": {
+        "automaticResume": false,
+        "retry": "new mission after failure evidence review; existing recheck creates fresh verification"
+      },
+      "upstream": {
+        "id": "feature-card-workflow",
+        "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+        "maturity": "Limited",
+        "entrypoint": "`feature-card-workflow/muzzle-template/workflows/feature-card-full.sh --help`",
+        "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
+      },
+      "blockedReason": null,
+      "input": {
+        "schema": "kujo.factory.mission-input/v1",
+        "required": [
+          "mission",
+          "pack",
+          "source"
+        ],
+        "unknownFields": "reject",
+        "pack": "Reviewed seal mandatory for application/repository routes; identity does not establish correctness",
+        "source": "Explicit local source directory; repository execution imports committed source only"
+      },
+      "dependencies": [
+        "committed source admission \u2192 native Dispatch verify/repair \u2192 independent release"
+      ],
+      "failure": {
+        "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
+        "promotion": "Blocked on nonzero child status or required gate failure",
+        "externalEffects": "No push, merge, publication or deployment"
+      }
+    },
+    {
+      "id": "refactoring",
+      "route": "repository",
+      "output": "verified-node-change",
+      "runtime": "dependency-free-node26-static-sqlite",
+      "skills": [
+        "kujo-hardening"
+      ],
+      "roles": [
+        "core-developer",
+        "code-reviewer",
+        "release-verifier"
+      ],
+      "effects": [
+        "private-local-artifacts"
+      ],
+      "verification": [
+        "sealed-pack",
+        "native-spec",
+        "workcell-api-browser",
+        "lens",
+        "independent-review",
+        "shipcheck-policy",
+        "eval",
+        "accounting",
+        "source-bound-release"
+      ],
+      "approval": {
+        "humanRequiredBeforePublication": true,
+        "publish": false,
+        "deploy": false
+      },
+      "recovery": {
+        "automaticResume": false,
+        "retry": "new mission after failure evidence review; existing recheck creates fresh verification"
+      },
+      "upstream": {
+        "id": "codebase-cleanup",
+        "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+        "maturity": "Limited",
+        "entrypoint": "`bash codebase-cleanup/scripts/run-workflow.sh --repo /path/to/repo`",
+        "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
+      },
+      "blockedReason": null,
+      "input": {
+        "schema": "kujo.factory.mission-input/v1",
+        "required": [
+          "mission",
+          "pack",
+          "source"
+        ],
+        "unknownFields": "reject",
+        "pack": "Reviewed seal mandatory for application/repository routes; identity does not establish correctness",
+        "source": "Explicit local source directory; repository execution imports committed source only"
+      },
+      "dependencies": [
+        "committed source admission \u2192 native Dispatch verify/repair \u2192 independent release"
+      ],
+      "failure": {
+        "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
+        "promotion": "Blocked on nonzero child status or required gate failure",
+        "externalEffects": "No push, merge, publication or deployment"
+      }
+    },
+    {
+      "id": "dependency-upgrade",
+      "route": "package",
+      "output": "reviewed-node-package-candidate",
+      "runtime": "node-semver-cli-v1",
+      "skills": [
+        "kujo-kennel-workflows"
+      ],
+      "roles": [
+        "code-reviewer",
+        "core-developer",
+        "release-verifier"
+      ],
+      "effects": [
+        "trusted-registry-prefetch-separate-explicit-command",
+        "offline-workcell-install-no-lifecycle-scripts",
+        "isolated-cli-execution",
+        "local-evidence-writes"
+      ],
+      "verification": [
+        "native-spec",
+        "independent-contract-review",
+        "old-version-baseline",
+        "source-review",
+        "npm-audit-zero-known-vulnerabilities",
+        "offline-sri-install",
+        "finite-cli-cases",
+        "independent-release-review",
+        "fresh-revalidation",
+        "cleanup",
+        "native-runledger-terminal",
+        "portable-evidence-integrity"
+      ],
+      "approval": {
+        "humanRequiredBeforePublication": true,
+        "publish": false,
+        "deploy": false
+      },
+      "recovery": {
+        "automaticResume": false,
+        "retry": "Fresh mission only after inspecting original failed provider/Workcell/CaseFile evidence; no automatic resume"
+      },
+      "upstream": {
+        "id": "codebase-cleanup",
+        "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+        "maturity": "Limited",
+        "entrypoint": "`bash codebase-cleanup/scripts/run-workflow.sh --repo /path/to/repo`",
+        "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
+      },
+      "blockedReason": null,
+      "input": {
+        "schema": "kujo.factory.mission-input/v1",
+        "required": [
+          "packageInput",
+          "baselineCache",
+          "targetCache"
+        ],
+        "unknownFields": "reject",
+        "packageInput": "kujo.factory.node-package-mission-input/v1; frozen old source/lock and independently reviewed sealed target contract",
+        "cache": "Explicit existing SRI/advisory cache directories; no network fetch on mission admission"
+      },
+      "dependencies": [
+        "spec",
+        "dispatch",
+        "workcell",
+        "runledger",
+        "casefile",
+        "npm-11.20.0",
+        "qualified-node-semver-cli-image"
+      ],
+      "failure": {
+        "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
+        "promotion": "Blocked on nonzero child status or required gate failure",
+        "externalEffects": "No push, merge, publication or deployment"
+      },
+      "qualification": {
+        "scope": "semver7.7.2 to7.7.3 single-file Node CLI only; no general npm graph, React or service support",
+        "actualMission": "package-cFPUOi",
+        "evidence": ".runtime/node-package-qualification/live-qualification.json",
+        "sha256": "7fbd720b5b712f824ec59e6762e71994742587c5fad890960de310a79448853b",
+        "offlineVerification": ".runtime/ledger-completion/node-package-live-offline-verify.json"
+      }
+    },
+    {
+      "id": "security-remediation",
+      "route": "repository",
+      "output": "verified-node-change",
+      "runtime": "dependency-free-node26-static-sqlite",
+      "skills": [
+        "kujo-security-hardening"
+      ],
+      "roles": [
+        "core-developer",
+        "code-reviewer",
+        "release-verifier"
+      ],
+      "effects": [
+        "private-local-artifacts"
+      ],
+      "verification": [
+        "sealed-pack",
+        "native-spec",
+        "workcell-api-browser",
+        "lens",
+        "independent-review",
+        "shipcheck-policy",
+        "eval",
+        "accounting",
+        "source-bound-release"
+      ],
+      "approval": {
+        "humanRequiredBeforePublication": true,
+        "publish": false,
+        "deploy": false
+      },
+      "recovery": {
+        "automaticResume": false,
+        "retry": "new mission after failure evidence review; existing recheck creates fresh verification"
+      },
+      "upstream": {
+        "id": "agency-verified-fix-loop",
+        "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+        "maturity": "Limited",
+        "entrypoint": "`(cd agency-verified-fix-loop && STRICT=1 bash scripts/run-loop.sh)`",
+        "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
+      },
+      "blockedReason": null,
+      "input": {
+        "schema": "kujo.factory.mission-input/v1",
+        "required": [
+          "mission",
+          "pack",
+          "source"
+        ],
+        "unknownFields": "reject",
+        "pack": "Reviewed seal mandatory for application/repository routes; identity does not establish correctness",
+        "source": "Explicit local source directory; repository execution imports committed source only"
+      },
+      "dependencies": [
+        "committed source admission \u2192 native Dispatch verify/repair \u2192 independent release"
+      ],
+      "failure": {
+        "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
+        "promotion": "Blocked on nonzero child status or required gate failure",
+        "externalEffects": "No push, merge, publication or deployment"
+      }
+    },
+    {
+      "id": "api",
+      "route": "application",
+      "output": "verified-node-artifact",
+      "runtime": "dependency-free-node26-static-sqlite",
+      "skills": [
+        "kujo-way-development"
+      ],
+      "roles": [
+        "core-developer",
+        "code-reviewer",
+        "release-verifier"
+      ],
+      "effects": [
+        "private-local-artifacts"
+      ],
+      "verification": [
+        "sealed-pack",
+        "native-spec",
+        "workcell-api-browser",
+        "lens",
+        "independent-review",
+        "shipcheck-policy",
+        "eval",
+        "accounting",
+        "source-bound-release"
+      ],
+      "approval": {
+        "humanRequiredBeforePublication": true,
+        "publish": false,
+        "deploy": false
+      },
+      "recovery": {
+        "automaticResume": false,
+        "retry": "new mission after failure evidence review; existing recheck creates fresh verification"
+      },
+      "upstream": {
+        "id": "feature-card-workflow",
+        "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+        "maturity": "Limited",
+        "entrypoint": "`feature-card-workflow/muzzle-template/workflows/feature-card-full.sh --help`",
+        "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
+      },
+      "blockedReason": null,
+      "input": {
+        "schema": "kujo.factory.mission-input/v1",
+        "required": [
+          "mission",
+          "pack"
+        ],
+        "unknownFields": "reject",
+        "pack": "Reviewed seal mandatory for application/repository routes; identity does not establish correctness",
+        "source": "Explicit local source directory; repository execution imports committed source only"
+      },
+      "dependencies": [
+        "native Dispatch application graph; backend/frontend independent; trusted tests and independent review before release"
+      ],
+      "failure": {
+        "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
+        "promotion": "Blocked on nonzero child status or required gate failure",
+        "externalEffects": "No push, merge, publication or deployment"
+      }
+    },
+    {
+      "id": "frontend",
+      "route": "application",
+      "output": "verified-node-artifact",
+      "runtime": "dependency-free-node26-static-sqlite",
+      "skills": [
+        "kujo-lens-workflows"
+      ],
+      "roles": [
+        "core-developer",
+        "code-reviewer",
+        "release-verifier"
+      ],
+      "effects": [
+        "private-local-artifacts"
+      ],
+      "verification": [
+        "sealed-pack",
+        "native-spec",
+        "workcell-api-browser",
+        "lens",
+        "independent-review",
+        "shipcheck-policy",
+        "eval",
+        "accounting",
+        "source-bound-release"
+      ],
+      "approval": {
+        "humanRequiredBeforePublication": true,
+        "publish": false,
+        "deploy": false
+      },
+      "recovery": {
+        "automaticResume": false,
+        "retry": "new mission after failure evidence review; existing recheck creates fresh verification"
+      },
+      "upstream": {
+        "id": "feature-card-workflow",
+        "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+        "maturity": "Limited",
+        "entrypoint": "`feature-card-workflow/muzzle-template/workflows/feature-card-full.sh --help`",
+        "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
+      },
+      "blockedReason": null,
+      "input": {
+        "schema": "kujo.factory.mission-input/v1",
+        "required": [
+          "mission",
+          "pack"
+        ],
+        "unknownFields": "reject",
+        "pack": "Reviewed seal mandatory for application/repository routes; identity does not establish correctness",
+        "source": "Explicit local source directory; repository execution imports committed source only"
+      },
+      "dependencies": [
+        "native Dispatch application graph; backend/frontend independent; trusted tests and independent review before release"
+      ],
+      "failure": {
+        "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
+        "promotion": "Blocked on nonzero child status or required gate failure",
+        "externalEffects": "No push, merge, publication or deployment"
+      }
+    },
+    {
+      "id": "database-migration",
+      "route": "sqlite",
+      "output": "reviewed-sqlite-migration-artifact",
+      "runtime": "sqlite-sql-v1",
+      "skills": [
+        "kujo-spec-workflows",
+        "kujo-workcell-workflows",
+        "kujo-security-hardening"
+      ],
+      "roles": [
+        "code-reviewer",
+        "backend-developer",
+        "security-reviewer",
+        "release-verifier"
+      ],
+      "effects": [
+        "private-local-artifacts",
+        "bounded-sql-in-disposable-rootless-workcell"
+      ],
+      "verification": [
+        "native-spec",
+        "independent-contract-review",
+        "independent-security-review",
+        "exact-old-and-new-schema-and-rows",
+        "candidate-specific-forced-transaction-rollback",
+        "forward-reopen-restart-integrity",
+        "independent-release-review",
+        "fresh-repeated-acceptance",
+        "native-runledger",
+        "offline-evidence-consistency"
+      ],
+      "approval": {
+        "humanRequiredBeforePublication": true,
+        "publish": false,
+        "deploy": false
+      },
+      "recovery": {
+        "automaticResume": false,
+        "retry": "new mission after failure evidence review; existing recheck creates fresh verification"
+      },
+      "upstream": {
+        "id": "workcell-execution-gate",
+        "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+        "maturity": "Limited",
+        "entrypoint": "`bash workcell-execution-gate/scripts/run.sh`",
+        "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
+      },
+      "input": {
+        "schema": "kujo.factory.mission-input/v1",
+        "required": [
+          "mission",
+          "contract"
+        ],
+        "unknownFields": "reject",
+        "contract": "Sealed kujo.factory.sqlite-migration/v1; independently reviewed before SQL generation; seal establishes identity only"
+      },
+      "dependencies": [
+        "Spec",
+        "Dispatch",
+        "Workcell",
+        "RunLedger",
+        "CaseFile",
+        "qualified-node26-sqlite-image"
+      ],
+      "failure": {
+        "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
+        "promotion": "Blocked on nonzero child status or required gate failure",
+        "externalEffects": "No push, merge, publication or deployment"
+      },
+      "qualification": {
+        "scope": "Disposable SQLite SQL forward migration with finite reviewed old-data/schema assertions; transaction failure rollback, not reverse migration or production database authorization",
+        "runtimeCases": 9,
+        "actualMission": "sqlite-8fUBdG",
+        "offlineEvidence": "passed; standalone verifier and exact five-call receipt agreement"
+      }
+    },
+    {
+      "id": "integration",
+      "route": "application",
+      "output": "verified-node-artifact",
+      "runtime": "dependency-free-node26-static-sqlite",
+      "skills": [
+        "kujo-way-development"
+      ],
+      "roles": [
+        "core-developer",
+        "code-reviewer",
+        "release-verifier"
+      ],
+      "effects": [
+        "private-local-artifacts"
+      ],
+      "verification": [
+        "sealed-pack",
+        "native-spec",
+        "workcell-api-browser",
+        "lens",
+        "independent-review",
+        "shipcheck-policy",
+        "eval",
+        "accounting",
+        "source-bound-release"
+      ],
+      "approval": {
+        "humanRequiredBeforePublication": true,
+        "publish": false,
+        "deploy": false
+      },
+      "recovery": {
+        "automaticResume": false,
+        "retry": "new mission after failure evidence review; existing recheck creates fresh verification"
+      },
+      "upstream": {
+        "id": "feature-card-workflow",
+        "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+        "maturity": "Limited",
+        "entrypoint": "`feature-card-workflow/muzzle-template/workflows/feature-card-full.sh --help`",
+        "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
+      },
+      "blockedReason": null,
+      "input": {
+        "schema": "kujo.factory.mission-input/v1",
+        "required": [
+          "mission",
+          "pack"
+        ],
+        "unknownFields": "reject",
+        "pack": "Reviewed seal mandatory for application/repository routes; identity does not establish correctness",
+        "source": "Explicit local source directory; repository execution imports committed source only"
+      },
+      "dependencies": [
+        "native Dispatch application graph; backend/frontend independent; trusted tests and independent review before release"
+      ],
+      "failure": {
+        "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
+        "promotion": "Blocked on nonzero child status or required gate failure",
+        "externalEffects": "No push, merge, publication or deployment"
+      }
+    },
+    {
+      "id": "documentation",
+      "route": "documentation",
+      "output": "reviewed-markdown",
+      "runtime": "inert-markdown",
+      "skills": [
+        "kujo-docgen-agent-readable",
+        "kujo-publishing-house-workflows"
+      ],
+      "roles": [
+        "documentation-writer",
+        "publishing-house.standards-evidence-editor",
+        "code-reviewer"
+      ],
+      "effects": [
+        "private-local-artifacts"
+      ],
+      "verification": [
+        "source-identity",
+        "independent-model-review",
+        "accounting"
+      ],
+      "approval": {
+        "humanRequiredBeforePublication": true,
+        "publish": false,
+        "deploy": false
+      },
+      "recovery": {
+        "automaticResume": false,
+        "retry": "new mission after failure evidence review; existing recheck creates fresh verification"
+      },
+      "upstream": {
+        "id": "docsgen-repo-contract-runner",
+        "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+        "maturity": "Limited",
+        "entrypoint": "`(cd docsgen-repo-contract-runner && TARGET_REPO=/path/to/repo bash scripts/run-workflow.sh)`",
+        "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
+      },
+      "blockedReason": null,
+      "input": {
+        "schema": "kujo.factory.mission-input/v1",
+        "required": [
+          "source",
+          "files",
+          "mission"
+        ],
+        "unknownFields": "reject",
+        "pack": "Reviewed seal mandatory for application/repository routes; identity does not establish correctness",
+        "source": "Explicit local source directory; repository execution imports committed source only"
+      },
+      "dependencies": [
+        "documentation-writer \u2192 code-reviewer \u2192 freeze \u2192 RunLedger"
+      ],
+      "failure": {
+        "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
+        "promotion": "Blocked on nonzero child status or required gate failure",
+        "externalEffects": "No push, merge, publication or deployment"
+      }
+    },
+    {
+      "id": "test-coverage",
+      "route": "repository",
+      "output": "verified-node-change",
+      "runtime": "dependency-free-node26-static-sqlite",
+      "skills": [
+        "kujo-spec-workflows"
+      ],
+      "roles": [
+        "core-developer",
+        "code-reviewer",
+        "release-verifier"
+      ],
+      "effects": [
+        "private-local-artifacts"
+      ],
+      "verification": [
+        "sealed-pack",
+        "native-spec",
+        "workcell-api-browser",
+        "lens",
+        "independent-review",
+        "shipcheck-policy",
+        "eval",
+        "accounting",
+        "source-bound-release"
+      ],
+      "approval": {
+        "humanRequiredBeforePublication": true,
+        "publish": false,
+        "deploy": false
+      },
+      "recovery": {
+        "automaticResume": false,
+        "retry": "new mission after failure evidence review; existing recheck creates fresh verification"
+      },
+      "upstream": {
+        "id": "workcell-execution-gate",
+        "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+        "maturity": "Limited",
+        "entrypoint": "`bash workcell-execution-gate/scripts/run.sh`",
+        "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
+      },
+      "blockedReason": null,
+      "input": {
+        "schema": "kujo.factory.mission-input/v1",
+        "required": [
+          "mission",
+          "pack",
+          "source"
+        ],
+        "unknownFields": "reject",
+        "pack": "Reviewed seal mandatory for application/repository routes; identity does not establish correctness",
+        "source": "Explicit local source directory; repository execution imports committed source only"
+      },
+      "dependencies": [
+        "committed source admission \u2192 native Dispatch verify/repair \u2192 independent release"
+      ],
+      "failure": {
+        "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
+        "promotion": "Blocked on nonzero child status or required gate failure",
+        "externalEffects": "No push, merge, publication or deployment"
+      }
+    },
+    {
+      "id": "performance",
+      "route": "repository",
+      "output": "independently-reviewed-performance-change",
+      "runtime": "node-http",
+      "skills": [
+        "kujo-eval-workflows"
+      ],
+      "roles": [
+        "planner",
+        "research-analyst",
+        "core-developer",
+        "general-commander",
+        "systems-architect",
+        "backend-developer",
+        "frontend-developer",
+        "test-runner",
+        "code-reviewer",
+        "release-verifier"
+      ],
+      "effects": [
+        "private-committed-source-copy",
+        "restricted-provider-proposals",
+        "rootless-workcell-execution",
+        "private-local-artifacts"
+      ],
+      "verification": [
+        "frozen-benchmark-review",
+        "trusted-acceptance",
+        "workcell-baseline-candidate-comparison",
+        "independent-release",
+        "accounting"
+      ],
+      "approval": {
+        "humanRequiredBeforePublication": true,
+        "publish": false,
+        "deploy": false
+      },
+      "recovery": {
+        "automaticResume": false,
+        "retry": "New source-bound performance mission with original reviewed policy and baseline; generic retry/recheck rejects benchmark downgrade"
+      },
+      "upstream": {
+        "id": "loop-engineering",
+        "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+        "maturity": "Ready",
+        "entrypoint": "`(cd loop-engineering && bash scripts/run-workflow.sh --demo)`",
+        "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
+      },
+      "input": {
+        "schema": "kujo.factory.mission-input/v1",
+        "required": [
+          "mission",
+          "pack",
+          "source",
+          "performance"
+        ],
+        "unknownFields": "reject",
+        "pack": "Reviewed seal mandatory for application/repository routes; identity does not establish correctness",
+        "source": "Explicit local source directory; repository execution imports committed source only"
+      },
+      "dependencies": [
+        "spec",
+        "dispatch",
+        "workcell",
+        "eval",
+        "shipcheck",
+        "runledger",
+        "casefile",
+        "lens"
+      ],
+      "failure": {
+        "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
+        "promotion": "Blocked on nonzero child status or required gate failure",
+        "externalEffects": "No push, merge, publication or deployment"
+      },
+      "qualification": "Actual source-bound converter latency repair with7samples2warmups, functional/browser acceptance, independent release and standalone evidence verification; one fixed GET workload only"
+    },
+    {
+      "id": "release-candidate",
+      "route": "revalidation",
+      "output": "revalidated-node-artifact",
+      "runtime": "dependency-free-node26-static-sqlite",
+      "skills": [
+        "kujo-shipcheck-workflows"
+      ],
+      "roles": [
+        "core-developer",
+        "code-reviewer",
+        "release-verifier"
+      ],
+      "effects": [
+        "private-local-artifacts"
+      ],
+      "verification": [
+        "sealed-pack",
+        "native-spec",
+        "workcell-api-browser",
+        "lens",
+        "independent-review",
+        "shipcheck-policy",
+        "eval",
+        "accounting",
+        "source-bound-release"
+      ],
+      "approval": {
+        "humanRequiredBeforePublication": true,
+        "publish": false,
+        "deploy": false
+      },
+      "recovery": {
+        "automaticResume": false,
+        "retry": "new mission after failure evidence review; existing recheck creates fresh verification"
+      },
+      "upstream": {
+        "id": "workcell-execution-gate",
+        "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+        "maturity": "Limited",
+        "entrypoint": "`bash workcell-execution-gate/scripts/run.sh`",
+        "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
+      },
+      "blockedReason": null,
+      "input": {
+        "schema": "kujo.factory.mission-input/v1",
+        "required": [
+          "runId"
+        ],
+        "unknownFields": "reject",
+        "pack": "Reviewed seal mandatory for application/repository routes; identity does not establish correctness",
+        "source": "Explicit local source directory; repository execution imports committed source only"
+      },
+      "dependencies": [
+        "original release/source validation \u2192 fresh native Dispatch tests/review \u2192 accounted release"
+      ],
+      "failure": {
+        "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
+        "promotion": "Blocked on nonzero child status or required gate failure",
+        "externalEffects": "No push, merge, publication or deployment"
+      }
+    },
+    {
+      "id": "failed-release",
+      "route": "investigation",
+      "output": "failure-observations",
+      "runtime": null,
+      "skills": [
+        "kujo-casefile-workflows"
+      ],
+      "roles": [],
+      "effects": [
+        "private-local-artifacts"
+      ],
+      "verification": [
+        "bounded-read-or-copy"
+      ],
+      "approval": {
+        "humanRequiredBeforePublication": true,
+        "publish": false,
+        "deploy": false
+      },
+      "recovery": {
+        "automaticResume": false,
+        "retry": "new mission after failure evidence review; existing recheck creates fresh verification"
+      },
+      "upstream": {
+        "id": "casefile-incident-evidence-packet",
+        "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+        "maturity": "Limited",
+        "entrypoint": "`(cd casefile-incident-evidence-packet && bash scripts/run-workflow.sh)`",
+        "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
+      },
+      "blockedReason": null,
+      "input": {
+        "schema": "kujo.factory.mission-input/v1",
+        "required": [
+          "runDirectory"
+        ],
+        "unknownFields": "reject",
+        "pack": "Reviewed seal mandatory for application/repository routes; identity does not establish correctness",
+        "source": "Explicit local source directory; repository execution imports committed source only"
+      },
+      "dependencies": [
+        "bounded persisted observation reads only"
+      ],
+      "failure": {
+        "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
+        "promotion": "Blocked on nonzero child status or required gate failure",
+        "externalEffects": "No push, merge, publication or deployment"
+      }
+    },
+    {
+      "id": "revalidation",
+      "route": "revalidation",
+      "output": "revalidated-node-artifact",
+      "runtime": "dependency-free-node26-static-sqlite",
+      "skills": [
+        "kujo-shipcheck-workflows"
+      ],
+      "roles": [
+        "core-developer",
+        "code-reviewer",
+        "release-verifier"
+      ],
+      "effects": [
+        "private-local-artifacts"
+      ],
+      "verification": [
+        "sealed-pack",
+        "native-spec",
+        "workcell-api-browser",
+        "lens",
+        "independent-review",
+        "shipcheck-policy",
+        "eval",
+        "accounting",
+        "source-bound-release"
+      ],
+      "approval": {
+        "humanRequiredBeforePublication": true,
+        "publish": false,
+        "deploy": false
+      },
+      "recovery": {
+        "automaticResume": false,
+        "retry": "new mission after failure evidence review; existing recheck creates fresh verification"
+      },
+      "upstream": {
+        "id": "workcell-execution-gate",
+        "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+        "maturity": "Limited",
+        "entrypoint": "`bash workcell-execution-gate/scripts/run.sh`",
+        "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
+      },
+      "blockedReason": null,
+      "input": {
+        "schema": "kujo.factory.mission-input/v1",
+        "required": [
+          "runId"
+        ],
+        "unknownFields": "reject",
+        "pack": "Reviewed seal mandatory for application/repository routes; identity does not establish correctness",
+        "source": "Explicit local source directory; repository execution imports committed source only"
+      },
+      "dependencies": [
+        "original release/source validation \u2192 fresh native Dispatch tests/review \u2192 accounted release"
+      ],
+      "failure": {
+        "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
+        "promotion": "Blocked on nonzero child status or required gate failure",
+        "externalEffects": "No push, merge, publication or deployment"
+      }
+    },
+    {
+      "id": "maintenance",
+      "route": "repository",
+      "output": "verified-node-change",
+      "runtime": "dependency-free-node26-static-sqlite",
+      "skills": [
+        "kujo-hardening"
+      ],
+      "roles": [
+        "core-developer",
+        "code-reviewer",
+        "release-verifier"
+      ],
+      "effects": [
+        "private-local-artifacts"
+      ],
+      "verification": [
+        "sealed-pack",
+        "native-spec",
+        "workcell-api-browser",
+        "lens",
+        "independent-review",
+        "shipcheck-policy",
+        "eval",
+        "accounting",
+        "source-bound-release"
+      ],
+      "approval": {
+        "humanRequiredBeforePublication": true,
+        "publish": false,
+        "deploy": false
+      },
+      "recovery": {
+        "automaticResume": false,
+        "retry": "new mission after failure evidence review; existing recheck creates fresh verification"
+      },
+      "upstream": {
+        "id": "agency-verified-fix-loop",
+        "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+        "maturity": "Limited",
+        "entrypoint": "`(cd agency-verified-fix-loop && STRICT=1 bash scripts/run-loop.sh)`",
+        "integration": "Contract pattern/reference only; upstream shell entrypoint is not executed or elevated to a mandatory gate"
+      },
+      "blockedReason": null,
+      "input": {
+        "schema": "kujo.factory.mission-input/v1",
+        "required": [
+          "mission",
+          "pack",
+          "source"
+        ],
+        "unknownFields": "reject",
+        "pack": "Reviewed seal mandatory for application/repository routes; identity does not establish correctness",
+        "source": "Explicit local source directory; repository execution imports committed source only"
+      },
+      "dependencies": [
+        "committed source admission \u2192 native Dispatch verify/repair \u2192 independent release"
+      ],
+      "failure": {
+        "preserve": "Original delegated run/CaseFile/provider and process evidence retained",
+        "promotion": "Blocked on nonzero child status or required gate failure",
+        "externalEffects": "No push, merge, publication or deployment"
+      }
+    }
+  ],
+  "upstreamCatalog": [
+    {
+      "id": "agency-runner",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Experimental",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`agency-runner/bin/agency-loop --help`"
+    },
+    {
+      "id": "agency-verified-fix-loop",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "referenced-contract-pattern",
+      "entrypoint": "`(cd agency-verified-fix-loop && STRICT=1 bash scripts/run-loop.sh)`"
+    },
+    {
+      "id": "ai-sdk-muzzle-benchmark",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd ai-sdk-muzzle-benchmark && bash scripts/run-benchmark.sh)`"
+    },
+    {
+      "id": "ai-sdk-watchdog-showcase",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd ai-sdk-watchdog-showcase && bash scripts/run-showcase.sh)`"
+    },
+    {
+      "id": "casefile-incident-evidence-packet",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "referenced-contract-pattern",
+      "entrypoint": "`(cd casefile-incident-evidence-packet && bash scripts/run-workflow.sh)`"
+    },
+    {
+      "id": "codebase-cleanup",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "referenced-contract-pattern",
+      "entrypoint": "`bash codebase-cleanup/scripts/run-workflow.sh --repo /path/to/repo`"
+    },
+    {
+      "id": "docsgen-repo-contract-runner",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "referenced-contract-pattern",
+      "entrypoint": "`(cd docsgen-repo-contract-runner && TARGET_REPO=/path/to/repo bash scripts/run-workflow.sh)`"
+    },
+    {
+      "id": "enterprise-dispatch-approval-router",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd enterprise-dispatch-approval-router && bash scripts/run-workflow.sh)`"
+    },
+    {
+      "id": "feature-card-workflow",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "referenced-contract-pattern",
+      "entrypoint": "`feature-card-workflow/muzzle-template/workflows/feature-card-full.sh --help`"
+    },
+    {
+      "id": "howl-content-factory",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd howl-content-factory && bash scripts/run-workflow.sh)`"
+    },
+    {
+      "id": "loop-engineering",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Ready",
+      "decision": "referenced-contract-pattern",
+      "entrypoint": "`(cd loop-engineering && bash scripts/run-workflow.sh --demo)`"
+    },
+    {
+      "id": "mcp-agent-gateway-review",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd mcp-agent-gateway-review && bash scripts/run-workflow.sh)`"
+    },
+    {
+      "id": "owned-agent-project",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd owned-agent-project && bash scripts/run.sh)`"
+    },
+    {
+      "id": "publishing-house-adaptation",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd publishing-house-adaptation && bash bin/run --request fixtures/request.fixture.json --json)`"
+    },
+    {
+      "id": "publishing-house-approval-publication",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd publishing-house-approval-publication && bash scripts/test.sh)`"
+    },
+    {
+      "id": "publishing-house-asset-production",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd publishing-house-asset-production && bash bin/run --request fixtures/request.fixture.json --json)`"
+    },
+    {
+      "id": "publishing-house-commissioning",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd publishing-house-commissioning && bash bin/run --request fixtures/request.fixture.json --json)`"
+    },
+    {
+      "id": "publishing-house-daily-desk",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd publishing-house-daily-desk && bash bin/run --request fixtures/request.fixture.json --json)`"
+    },
+    {
+      "id": "publishing-house-editorial-review",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd publishing-house-editorial-review && bash bin/run --request fixtures/request.fixture.json --json)`"
+    },
+    {
+      "id": "publishing-house-evidence-dossier",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd publishing-house-evidence-dossier && bash bin/run --request fixtures/request.fixture.json --json)`"
+    },
+    {
+      "id": "publishing-house-format-production",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd publishing-house-format-production && bash bin/run --request fixtures/request.fixture.json --json)`"
+    },
+    {
+      "id": "publishing-house-governance",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd publishing-house-governance && bash bin/run --request fixtures/request.fixture.json --json)`"
+    },
+    {
+      "id": "publishing-house-operator",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`publishing-house-operator/bin/publishing-house --json doctor`"
+    },
+    {
+      "id": "publishing-house-post-publication",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd publishing-house-post-publication && bash bin/run --request fixtures/request.fixture.json --json)`"
+    },
+    {
+      "id": "publishing-house-primary-piece",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd publishing-house-primary-piece && bash bin/run --request fixtures/request.fixture.json --json)`"
+    },
+    {
+      "id": "rag-enterprise-knowledge-gate",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd rag-enterprise-knowledge-gate && bash scripts/run-workflow.sh)`"
+    },
+    {
+      "id": "relay-lifecycle-handoff",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`bash relay-lifecycle-handoff/scripts/run.sh`"
+    },
+    {
+      "id": "tribunal-decision-gate",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`bash tribunal-decision-gate/scripts/run.sh`"
+    },
+    {
+      "id": "videoops-asset-resolution",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`videoops-asset-resolution/bin/run --fixture --workspace /absolute/project/path --run-id example`"
+    },
+    {
+      "id": "videoops-creative-planning",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`videoops-creative-planning/bin/run --fixture --workspace /absolute/project/path --run-id example`"
+    },
+    {
+      "id": "videoops-hyperframes-edit",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`videoops-hyperframes-edit/bin/run --fixture --workspace /absolute/project/path --run-id example`"
+    },
+    {
+      "id": "videoops-media-generation",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`videoops-media-generation/bin/run --fixture --workspace /absolute/project/path --run-id example`"
+    },
+    {
+      "id": "videoops-production",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`videoops-production/bin/run --workspace /absolute/project/path --request /absolute/MEGA_PROMPT.md --run-id example`"
+    },
+    {
+      "id": "videoops-quality-review",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`videoops-quality-review/bin/run --fixture --workspace /absolute/project/path --run-id example`"
+    },
+    {
+      "id": "webops-ai-visibility-benchmark",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Experimental",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd webops-ai-visibility-benchmark && bash scripts/run.sh --fixture)`"
+    },
+    {
+      "id": "webops-content-refresh",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd webops-content-refresh && bash scripts/run.sh --fixture)`"
+    },
+    {
+      "id": "webops-finding-to-fix",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd webops-finding-to-fix && bash scripts/run.sh --fixture)`"
+    },
+    {
+      "id": "webops-monthly-seo-review",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd webops-monthly-seo-review && bash scripts/run.sh --fixture)`"
+    },
+    {
+      "id": "webops-post-publish",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd webops-post-publish && bash scripts/run.sh --fixture)`"
+    },
+    {
+      "id": "webops-quarterly-content-portfolio",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd webops-quarterly-content-portfolio && bash scripts/run.sh --fixture)`"
+    },
+    {
+      "id": "webops-site-bootstrap",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd webops-site-bootstrap && bash scripts/run.sh --fixture)`"
+    },
+    {
+      "id": "webops-weekly-content-intelligence",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd webops-weekly-content-intelligence && bash scripts/run.sh --fixture)`"
+    },
+    {
+      "id": "webops-weekly-search-intelligence",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd webops-weekly-search-intelligence && bash scripts/run.sh --fixture)`"
+    },
+    {
+      "id": "webops-weekly-site-health",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "catalog-only; not an executable software mission adapter",
+      "entrypoint": "`(cd webops-weekly-site-health && bash scripts/run.sh --fixture)`"
+    },
+    {
+      "id": "workcell-execution-gate",
+      "commit": "d766eae4fd9a131e51c34796d029fd3bc6974689",
+      "maturity": "Limited",
+      "decision": "referenced-contract-pattern",
+      "entrypoint": "`bash workcell-execution-gate/scripts/run.sh`"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "schema": "kujo.factory.operations-policy/v1",
+  "maxConcurrentMissions": 2,
+  "missionTimeoutMs": 7200000,
+  "maxStoredBytes": 2147483648,
+  "maxMissionBytes": 536870912,
+  "maxInventoryFiles": 20000,
+  "minimumFreeBytes": 2147483648,
+  "retentionDays": 30
+}

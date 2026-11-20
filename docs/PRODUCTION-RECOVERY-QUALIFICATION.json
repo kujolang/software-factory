@@ -1,0 +1,62 @@
+{
+  "schema": "kujo.factory.production-recovery-qualification/v1",
+  "date": "2026-11-20",
+  "ok": true,
+  "commit": "a39b8a8a410ad6cab107ae44c91cd86d98b1f46d",
+  "sourceCleanAtStart": true,
+  "command": "node scripts/qualify-production-recovery.mjs --live",
+  "directory": ".runtime/production-recovery/qualification-aiRIRg",
+  "runId": "factory-2026-11-20T01-31-54-810Z",
+  "realProviderCalls": 6,
+  "usage": {
+    "input_tokens": 80800,
+    "output_tokens": 17639
+  },
+  "cost": null,
+  "checks": {
+    "completedCommandExactlyOnce": true,
+    "originalDeadlinePreserved": true,
+    "originalReceiptPreserved": true,
+    "originalCheckpointPreserved": true,
+    "controllerFilesUnchanged": true,
+    "independentReleasePassed": true,
+    "offlineStandaloneExportPassed": true
+  },
+  "bundleId": "sha256:e8cb31d4f49bb5db6b661fe7aa36cbf72b6d42b46d65343340ec8625477c9c04",
+  "imageId": "sha256:c62fa7844cd38dd67d18421162af5016b2973a48d6db0a119982b2bf4b661383",
+  "records": [
+    {
+      "path": ".runtime/production-recovery/qualification-aiRIRg/controller.json",
+      "sha256": "a2e7ac82aa6eea5779fe3cf870f05724dd88feb7b7b1864787d877a2a8a58150"
+    },
+    {
+      "path": ".runtime/production-recovery/qualification-aiRIRg/checkpoint-window.json",
+      "sha256": "fa33578fa84ef6b52b205bb8c7b1af50df8ce565cf984f0dff2e53fafd873c2e"
+    },
+    {
+      "path": ".runtime/production-recovery/qualification-aiRIRg/initial-process.json",
+      "sha256": "ab7ef95494b784a9e1bc84dc348e4475c1b9575cada6614e510da910265b4dc2"
+    },
+    {
+      "path": ".runtime/production-recovery/qualification-aiRIRg/resume-assessment.json",
+      "sha256": "b1988dc9622bf1cfdaad99a81b94f5bf2b05b7ccb68a3d288707c6e12934f8ee"
+    },
+    {
+      "path": ".runtime/production-recovery/qualification-aiRIRg/resumed-process.json",
+      "sha256": "6380f7ebf1263a94abaaef4f5a1323cf0f4fbc88e37d8f1792ae68f163e18807"
+    },
+    {
+      "path": ".runtime/production-recovery/qualification-aiRIRg/result.json",
+      "sha256": "80a6cd96e992be2a22a21345ec7f3dbc0fa5bd182e4773055f69ef62a372ef0a"
+    },
+    {
+      "path": ".runtime/production-recovery/qualification-aiRIRg/export-process.json",
+      "sha256": "58a8b4bebce0641faaf98f9f98704b87ea1d62aef65076bb75cd417787de09da"
+    },
+    {
+      "path": ".runtime/production-recovery/qualification-aiRIRg/offline-verification.json",
+      "sha256": "3bcca8a8b5362da0014ecfb0bb9c699f4d70b85301855036e8b968261ef7c86a"
+    }
+  ],
+  "scope": "Actual production interruption at the completed-command/pending-architecture boundary and explicitly authorized continuation. No uncertain external-effect replay, human approval, deployment authorization or universal crash-recovery claim."
+}

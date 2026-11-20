@@ -1,0 +1,11 @@
+// Public CLI path against the installed pinned Workcell; no source/provider overrides.
+import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';import {spawnSync} from 'node:child_process';import {createHash} from 'node:crypto';
+if(process.env.FACTORY_WORKCELL_BIN||process.env.FACTORY_WORKCELL_IMAGE)throw Error('Installed qualification rejects source/image overrides');
+const disk=fs.statfsSync('.');if(Number(disk.bavail)*Number(disk.bsize)<2*1024**3)throw Error('Runtime qualification requires 2 GiB free');
+const base=fs.mkdtempSync(path.resolve('.runtime/native-installed-qualification-'));const records=[];
+for(const [profile,entrypoint,source]of [['go-cli','main.go','package main\nimport "fmt"\nfunc main(){fmt.Println(18)}'],['rust-cli','main.rs','fn main(){println!("18");}']]){
+ const dir=path.join(base,profile);fs.mkdirSync(dir);const candidate=path.join(dir,'candidate');fs.mkdirSync(candidate);fs.writeFileSync(path.join(candidate,entrypoint),source);const cases=path.join(dir,'reviewed-cases.json');fs.writeFileSync(cases,JSON.stringify([{args:[],stdout:'18\n',exitCode:0}]));const evidence=path.join(dir,'evidence');
+ const started=Date.now();const run=spawnSync(process.execPath,['bin/software-factory.mjs','runtime','verify',profile,candidate,cases,evidence],{encoding:'utf8',timeout:300000,maxBuffer:1048576});fs.writeFileSync(path.join(dir,'stdout.log'),run.stdout||'');fs.writeFileSync(path.join(dir,'stderr.log'),run.stderr||'');assert.equal(run.status,0,run.stderr);const result=JSON.parse(run.stdout);assert.equal(result.ok,true);assert.equal(result.workcellSource.clean,true);assert.equal(result.workcellSource.commit,result.workcellSource.expectedCommit);assert.equal(result.qualification,'qualified-cli-fixtures-linux-amd64');
+ records.push({profile,elapsedMs:Date.now()-started,sourceHash:result.sourceHash,workcellSource:result.workcellSource,imageId:result.results[0].imageId,stdoutSha256:createHash('sha256').update(run.stdout).digest('hex'),evidence:path.relative(base,evidence)});
+}
+const result={ok:true,base,records,scope:'Installed public CLI standard-library positives; no full application/runtime compatibility claim'};fs.writeFileSync(path.join(base,'qualification.json'),JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));

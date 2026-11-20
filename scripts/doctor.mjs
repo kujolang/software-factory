@@ -1,7 +1,8 @@
+import {verifyTrackedSourceIdentity} from '../factory/tracked-source-identity.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import {spawnSync} from 'node:child_process';
-import {root,kujoBinary,dependency,codexBinary,providerHome,agentsRoot,dispatchRoot,workcellBinary} from '../factory/settings.mjs';
+import {root,kujoBinary,dependency,codexBinary,providerHome,agentsRoot,dispatchRoot,workcellBinary,provider,model,ollamaHost,hermesPython,hermesModel} from '../factory/settings.mjs';
 const args=process.argv.slice(2);
 if(args.some(a=>!['--offline','--json'].includes(a)))throw Error('Usage: npm run doctor -- [--offline] [--json]');
 const offline=args.includes('--offline'),checks=[];
@@ -12,11 +13,28 @@ check('node',()=>{const [major,minor,patch]=process.versions.node.split('.').map
 check('git',()=>run('git',['--version']),'Install Git.');
 check('kujo',()=>{const v=run(kujoBinary(),['--version']);if(v!=='kujo 1.9.0')throw Error('Expected kujo 1.9.0; got '+v);return v;},'Run npm ci; retain optional platform dependencies; remove an incompatible KUJO_BIN override.');
 const lock=JSON.parse(fs.readFileSync(path.join(root,'sources.lock.json'),'utf8'));
-for(const[name,source]of Object.entries(lock.repositories))check(name,()=>{const dest=({dispatch:dispatchRoot,'kujo-agents':agentsRoot,workcell:path.dirname(path.dirname(workcellBinary))})[name]||dependency(name);if(fs.lstatSync(dest).isSymbolicLink())throw Error('Dependency directory is a symlink');const sha=run('git',['rev-parse','HEAD'],dest);if(sha!==source.commit)throw Error('Dependency revision mismatch');if(run('git',['status','--porcelain'],dest))throw Error('Dependency checkout modified');return sha;},'Run npm run setup. Preserve modified dependencies before moving them aside.');
-check('codex',()=>{const v=run(codexBinary,['--version']);if(!v.includes('0.144.4'))throw Error('Expected Codex CLI 0.144.4');return v;},'Run npm ci, or select the tested CLI with FACTORY_CODEX_BIN.');
+for(const[name,source]of Object.entries(lock.repositories))check(name,()=>{const dest=({dispatch:dispatchRoot,'kujo-agents':agentsRoot,workcell:path.dirname(path.dirname(workcellBinary))})[name]||dependency(name);if(name==='workcell')return verifyTrackedSourceIdentity(dest,source.commit).commit;if(fs.lstatSync(dest).isSymbolicLink())throw Error('Dependency directory is a symlink');const sha=run('git',['rev-parse','HEAD'],dest);if(sha!==source.commit)throw Error('Dependency revision mismatch');if(run('git',['-c','core.fsmonitor=false','status','--porcelain','--ignore-submodules=all'],dest))throw Error('Dependency checkout modified');return sha;},'Run npm run setup. Preserve modified dependencies before moving them aside.');
+if(provider==='codex')check('codex',()=>{const v=run(codexBinary,['--version']);if(!v.includes('0.144.4'))throw Error('Expected Codex CLI 0.144.4');return v;},'Run npm ci, or select the tested CLI with FACTORY_CODEX_BIN.');
+const {catalogDoctor}=await import('../factory/catalog.mjs');check('catalogs',()=>{const result=catalogDoctor();if(!result.ok)throw Error('Catalog integrity or contracts failed');return result.counts;},'Run npm run setup and preserve modified packages.');
+const {verifyAccountabilityDependency}=await import('../factory/accountability.mjs');for(const name of ['spec','runledger','casefile','shipcheck'])check(name,()=>verifyAccountabilityDependency(name).commit,'Run npm run setup.');
+const {verifyChangeDependency}=await import('../factory/change-tools.mjs');for(const name of ['fence','concord','changebucket','patchbrief','kennel'])check(name,()=>verifyChangeDependency(name).commit,'Run npm run setup.');
+const {verifyContextDependency}=await import('../factory/context.mjs');for(const name of ['scout','scent','redact'])check(name,()=>verifyContextDependency(name).commit,'Run npm run setup.');
+const {verifyLensDependency}=await import('../factory/lens.mjs');check('lens',()=>verifyLensDependency(),'Run npm run setup and npm run image:build.');
+const {verifySDKDependency}=await import('../factory/provider-sdk.mjs');for(const name of ['ai-sdk','anthropic','gemini'])check(name,()=>verifySDKDependency(name).commit,'Run npm run setup.');
+const {verifyEcosystemDependency}=await import('../factory/ecosystem-tools.mjs');for(const name of ['ability','relay','packwrite','muzzle','rag','tribunal'])check(name,()=>verifyEcosystemDependency(name).commit,'Run npm run setup.');
+const {verifyTelemetryDependency}=await import('../factory/telemetry.mjs');check('watchdog',()=>verifyTelemetryDependency().commit,'Run npm run setup.');
+const {verifyEvalDependency}=await import('../factory/evaluation.mjs');check('eval',()=>verifyEvalDependency(),'Run npm run setup.');
+const {validateReleasePolicy}=await import('../factory/release-policy.mjs');check('release-policy',()=>validateReleasePolicy(JSON.parse(fs.readFileSync(path.join(root,'config/release-policy.json')))).id,'Restore the reviewed controller release policy.');
 check('disk',()=>{const s=fs.statfsSync(root);const available=s.bavail*s.bsize;if(available<2*1024**3)throw Error('Less than 2 GiB free');return {availableGiB:Math.round(available/1024**3)};},'Free disk space before creating images or run receipts; initial image build should have at least 10 GiB available.');
+if(provider==='ollama')check('ollama-configuration',()=>{const u=new URL(ollamaHost);if(!model||u.protocol!=='http:'||u.hostname!=='127.0.0.1'||u.username||u.password||u.pathname!=='/'||u.search||u.hash||ollamaHost!==u.origin)throw Error('Ollama requires FACTORY_MODEL and canonical loopback HTTP origin');return {model,endpoint:ollamaHost,qualification:'local model execution requires separate qualification'};},'Set FACTORY_MODEL and optional FACTORY_OLLAMA_HOST=http://127.0.0.1:11434.');
+if(provider==='hermes')check('hermes-configuration',()=>{
+  if(model!==hermesModel)throw Error('Only the pinned free Tencent model is supported');
+  hermesPython();
+  return {model,qualification:'Runtime verifies live catalog pricing and model identity before accepting output'};
+},'Connect the default local Hermes profile using hermes auth add nous --type oauth.');
+if(['openai','anthropic','gemini'].includes(provider))check('sdk-provider-credentials',()=>{const file=process.env['FACTORY_'+provider.toUpperCase()+'_CREDENTIAL_FILE'];if(!model||!file)throw Error('Explicit model and owner-only credential file required');let cursor=path.resolve(file);while(true){if(fs.lstatSync(cursor).isSymbolicLink())throw Error('Credential path symlink refused');if(path.dirname(cursor)===cursor)break;cursor=path.dirname(cursor);}const st=fs.lstatSync(file);if(!st.isFile()||st.nlink!==1||(st.mode&0o777)!==0o600||st.uid!==process.getuid()||st.size<1||st.size>16000)throw Error('Credential file permissions/type invalid');return {provider,model,qualification:'Optional API path; live qualification not established by credential presence'};},'Set FACTORY_MODEL and FACTORY_'+provider.toUpperCase()+'_CREDENTIAL_FILE to an existing owner-only key file; never paste keys into mission input.');
 if(!offline){
- check('codex-authentication',()=>{run(codexBinary,['login','status']);return 'Signed in; credential values are not inspected or saved';},'Run npm run login and complete provider sign-in.');
+ if(provider==='codex')check('codex-authentication',()=>{run(codexBinary,['login','status']);return 'Signed in; credential values are not inspected or saved';},'Run npm run login and complete provider sign-in.');
  try{const {workcellPreflight}=await import('../factory/workcell.mjs');const p=await workcellPreflight();checks.push({name:'workcell-execution',ok:true,detail:{imageId:p.imageId,securityOptions:p.securityOptions}});}catch(e){checks.push({name:'workcell-execution',ok:false,error:e.message,fix:'Configure a local rootless Docker engine with seccomp, then npm run image:build. See docs/ENGINE.md. No rootful or host fallback.'});}
 }
 const result={schema:'kujo.software-factory.doctor/v1',ok:checks.every(c=>c.ok),mode:offline?'offline-dependencies-only':'live-preflight',checks};

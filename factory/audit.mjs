@@ -1,3 +1,4 @@
+import {verifyRunReleaseRecords} from './evidence.mjs';
 import { runPack } from "./pack.mjs";
 import { agentsRoot } from "./settings.mjs";
 import fs from "node:fs";
@@ -6,6 +7,13 @@ import assert from "node:assert/strict";
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 import { json, save, events, digest } from "./core.mjs";
+export function implementationOverlap(run,list) {
+  if(run.sourceRun || run.kind==='repository-repair')return null;
+  const intervals=['backend','frontend'].map(id=>({id,start:list.find(e=>e.taskId===id&&e.type==='agent.started'),end:list.find(e=>e.taskId===id&&e.type==='agent.completed')}));
+  assert.ok(intervals.every(i=>run.tasks.some(t=>t.id===i.id)&&i.start&&i.end),'Missing planned implementation interval');
+  const overlap=Math.min(...intervals.map(i=>Date.parse(i.end.timestamp)))-Math.max(...intervals.map(i=>Date.parse(i.start.timestamp)));
+  assert.ok(Number.isFinite(overlap)&&overlap>0,'Implementation intervals did not overlap');return overlap;
+}
 export function audit(dir) {
   const run = json(path.join(dir, "run.json")),
     list = events(dir);
@@ -19,6 +27,13 @@ export function audit(dir) {
     assert.equal(r.checks.packHash, run.packHash);
   }
   const checks = [];
+  if(run.accountabilityRequired){
+    verifyRunReleaseRecords(dir);
+    const account=json(path.join(dir,'artifacts/mission-accountability.json'));
+    assert.equal(account.ok,true);assert.equal(account.status,'pass');assert.equal(account.runId,run.id);
+    assert.equal(account.candidateHash,digest(path.join(dir,'application')));
+    assert.equal(run.status,'completed');
+  }
   const check = (name, fn) => {
     fn();
     checks.push(name);
@@ -61,19 +76,10 @@ export function audit(dir) {
       }
     }
   });
-  const intervals = ["backend", "frontend"].map((id) => ({
-    id,
-    start: list.find((e) => e.taskId === id && e.type === "agent.started"),
-    end: list.find((e) => e.taskId === id && e.type === "agent.completed"),
-  }));
   let overlapMs = null;
-  if (!run.sourceRun) {
+  if (!run.sourceRun && run.kind !== 'repository-repair') {
     check("real concurrent implementation intervals", () => {
-      assert.ok(intervals.every((i) => i.start && i.end));
-      overlapMs =
-        Math.min(...intervals.map((i) => Date.parse(i.end.timestamp))) -
-        Math.max(...intervals.map((i) => Date.parse(i.start.timestamp)));
-      assert.ok(overlapMs > 0);
+      overlapMs = implementationOverlap(run, list);
     });
   }
   const schema = json(path.join(agentsRoot, "schemas/handoff.schema.json"));
@@ -102,7 +108,7 @@ export function audit(dir) {
     .map((p) => json(path.join(dir, "artifacts", p)));
   const usage = { input_tokens: 0, cached_input_tokens: 0, output_tokens: 0 };
   for (const r of receipts)
-    for (const u of r.usage)
+    for (const u of r.usage || [])
       for (const k of Object.keys(usage)) usage[k] += u[k] || 0;
   const failures = list.filter((e) => e.type === "verification.failed").length;
   const result = {
@@ -112,7 +118,8 @@ export function audit(dir) {
     events: list.length,
     overlapMs,
     providerCalls: receipts.length,
-    usage,
+    usage: receipts.some(r=>r.usageKnown===false||r.usage==null) ? null : Object.fromEntries(Object.entries(usage).map(([key,total])=>[key,receipts.some(r=>(r.usage||[]).some(u=>!Number.isFinite(u[key])))?null:total])),
+    observedUsageSubtotal: usage,
     cost: null,
     verificationFailures: failures,
     corrections: list.filter((e) => e.type === "correction.requested").length,

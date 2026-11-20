@@ -1,0 +1,90 @@
+{
+  "schema": "kujo.factory.hermes-qualification/v1",
+  "date": "2026-11-20",
+  "ok": true,
+  "model": "tencent/hy4-flash:free",
+  "adapter": "Hermes OAuth resolver and official Nous HTTPS inference",
+  "sourceCandidate": "factory-recheck-2026-11-13T19-50-22-471Z",
+  "scope": "Real bounded local release revalidation of the existing converter candidate; successful Workcell API/browser, Lens, independent review, local release, accounting and copied offline verifier. No new construction or deployment.",
+  "budget": {
+    "maxCallsPerSuccessfulMission": 2,
+    "maxCallsPerRole": 1,
+    "maxOutputTokensPerCall": 1536,
+    "totalCallsAcrossAttempts": 3,
+    "providerReportedTotalCostUsd": 0
+  },
+  "imageId": "sha256:c62fa7844cd38dd67d18421162af5016b2973a48d6db0a119982b2bf4b661383",
+  "evidenceDirectory": ".runtime/ledger-completion/hermes-qualification",
+  "attempts": [
+    {
+      "runId": "factory-recheck-2026-11-20T03-11-51-972Z",
+      "source": {
+        "commit": "7b653cd72d9a1500e223bba5893e801815075e89",
+        "tree": "203ec373bf0bcac5e17d01932c3371468adc36e5",
+        "dirty": false,
+        "identityScope": "Git HEAD; dirty working-tree bytes are separately hashed below"
+      },
+      "recordedStatus": "failed",
+      "bundleId": "sha256:ebfdd1a88d884ef7b6c42a18f4bddbe69ab63edbb13726e2d7f167d747d93623",
+      "offlineVerified": true,
+      "receipts": [
+        {
+          "role": "code-reviewer",
+          "status": "failed",
+          "reason": "output_token_limit",
+          "usage": [
+            {
+              "input_tokens": 7733,
+              "output_tokens": 512,
+              "cached_input_tokens": null
+            }
+          ],
+          "providerReportedCostUsd": 0,
+          "maxOutputTokens": 512
+        }
+      ]
+    },
+    {
+      "runId": "factory-recheck-2026-11-20T03-12-54-443Z",
+      "source": {
+        "commit": "b140936386ce84882f2a180de35ebdc24ee7cebf",
+        "tree": "8b7120ebd61a95609177007dbdca3e35de0bd062",
+        "dirty": false,
+        "identityScope": "Git HEAD; dirty working-tree bytes are separately hashed below"
+      },
+      "recordedStatus": "completed",
+      "bundleId": "sha256:8ac8d3377882931fbf9539cfc20ebe8ab8a74b514ba3f4d236ea9c9ea15a2ca6",
+      "offlineVerified": true,
+      "receipts": [
+        {
+          "role": "release-verifier",
+          "status": "completed",
+          "reason": null,
+          "usage": [
+            {
+              "input_tokens": 5573,
+              "output_tokens": 714,
+              "cached_input_tokens": null
+            }
+          ],
+          "providerReportedCostUsd": 0,
+          "maxOutputTokens": 1536
+        },
+        {
+          "role": "code-reviewer",
+          "status": "completed",
+          "reason": null,
+          "usage": [
+            {
+              "input_tokens": 7733,
+              "output_tokens": 1103,
+              "cached_input_tokens": null
+            }
+          ],
+          "providerReportedCostUsd": 0,
+          "maxOutputTokens": 1536
+        }
+      ]
+    }
+  ]
+}

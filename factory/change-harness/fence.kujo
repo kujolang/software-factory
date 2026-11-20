@@ -1,0 +1,12 @@
+from src.config import normalize_config
+from src.validate import validate_config, count_errors
+from src.walk import select_inventory_files
+from src.analyze import analyze_snapshot
+from src.reports import summarize, render_json
+let input = parse_json(read_file(args()[0]))
+let cfg = normalize_config(input["policy"])
+if count_errors(validate_config(cfg)) > 0 { throw("Invalid reviewed Fence policy") }
+let files = select_inventory_files(input["inventory"], cfg["source_roots"], cfg["include"], cfg["exclude"])
+let result = analyze_snapshot(files, cfg, input["inventory"])
+let summary = summarize(result, cfg)
+print(render_json(result, summary, "controller-reviewed-policy"))

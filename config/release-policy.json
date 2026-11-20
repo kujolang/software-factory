@@ -1,0 +1,9 @@
+{
+  "schema": "kujo.factory.release-policy/v1",
+  "id": "local-node-independent-release",
+  "version": 1,
+  "scope": "local-candidate-only",
+  "requiredShipcheckChecks": ["readme", "version-metadata", "changelog"],
+  "requiredControls": ["source-binding", "frozen-harnesses", "independent-review", "api-acceptance", "browser-acceptance", "trusted-syntax-build", "dependency-free-runtime", "no-deployment"],
+  "deploymentAuthorized": false
+}

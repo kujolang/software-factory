@@ -1,0 +1,268 @@
+{
+  "schema": "kujo.factory.react-mission-qualification/v1",
+  "date": "2026-11-19",
+  "ok": true,
+  "missionId": "react-YfDO6E",
+  "missionDirectory": ".runtime/react-missions/react-YfDO6E",
+  "startedAt": "2026-11-20T01:13:59.125Z",
+  "finishedAt": "2026-11-20T01:16:25.104Z",
+  "durationMs": 146212,
+  "controllerSource": {
+    "commit": "350a262a7368d19537ba6251802b6d03602a9f8f",
+    "tree": "1b37ba44b44e1ecd81de8b978f82c63895fb53bb",
+    "dirty": false,
+    "identityScope": "Git HEAD; dirty working-tree bytes are separately hashed below"
+  },
+  "host": {
+    "platform": "darwin",
+    "node": "v26.12.1"
+  },
+  "profile": {
+    "id": "react18-static-v1",
+    "scope": "React18.3.1 client-only static component with React.createElement; no JSX, SSR, arbitrary npm graph or lifecycle commands",
+    "dependencies": {
+      "react": "18.3.1",
+      "react-dom": "18.3.1"
+    },
+    "lockSha256": "6339cb802a81f85ffe697c715d10591c6d005783881bc4c826076c663d4e4c63",
+    "imageId": "sha256:c62fa7844cd38dd67d18421162af5016b2973a48d6db0a119982b2bf4b661383",
+    "qualification": "qualified-react18-static-linux-amd64"
+  },
+  "inputSha256": "ce33dc0f80545f80dc0f7770547f2920430932a3aa9173f74be56d67b2f6a0f9",
+  "sourceHash": "3797d53372d0f5cc77df4942ade91e0e81ebae9174e492ef5f40d5b3eb625b66",
+  "outputHash": "83655eca401d8eb450aa5e001a67c72099d73a10d39fb35bbd03bb3e1d534cc2",
+  "providerBudget": {
+    "schema": "kujo.factory.mission-provider-budget-result/v1",
+    "policySha256": "4b7d9a35e84c40c5b76270558df8a8079c27d5fbf2af827c581297b66ccaa385",
+    "reservations": 4,
+    "stateSha256": "7140689de0ec61d601ad429dcb13cd7fbbf88496ed4a35872170bb80a4d212ae",
+    "cost": null,
+    "moneyGuaranteed": false
+  },
+  "secretScan": {
+    "path": "artifacts/secret-source-scan.json",
+    "sha256": "216589744c0941044caa8df5f7245eb41782c9a42ca15620ffa006336c4b5bb9",
+    "candidateSourceHash": "3797d53372d0f5cc77df4942ade91e0e81ebae9174e492ef5f40d5b3eb625b66",
+    "required": true
+  },
+  "agents": [
+    {
+      "step": "review-contract",
+      "role": "code-reviewer",
+      "provider": "codex",
+      "model": null,
+      "usage": [
+        {
+          "input_tokens": 15699,
+          "cached_input_tokens": 0,
+          "output_tokens": 545
+        }
+      ],
+      "cost": null,
+      "observedToolCalls": 0,
+      "fixture": false,
+      "durationMs": 16365,
+      "receiptSha256": "f8362ae6fe2828e94ff21f55b6c1516586d7342acd5b5f747f46a6a80bd7ab01"
+    },
+    {
+      "step": "implement",
+      "role": "frontend-developer",
+      "provider": "codex",
+      "model": null,
+      "usage": [
+        {
+          "input_tokens": 11033,
+          "cached_input_tokens": 0,
+          "output_tokens": 740
+        }
+      ],
+      "cost": null,
+      "observedToolCalls": 0,
+      "fixture": false,
+      "durationMs": 16982,
+      "receiptSha256": "9fded8cbadf36af41c0f26dda9274fff907df263af6b26c454cd670675382fc6"
+    },
+    {
+      "step": "review",
+      "role": "code-reviewer",
+      "provider": "codex",
+      "model": null,
+      "usage": [
+        {
+          "input_tokens": 11372,
+          "cached_input_tokens": 0,
+          "output_tokens": 548
+        }
+      ],
+      "cost": null,
+      "observedToolCalls": 0,
+      "fixture": false,
+      "durationMs": 13422,
+      "receiptSha256": "83ae50d053e9f333dc555069ad407b529cb6182f63dfc0bce4035ada23f1863a"
+    },
+    {
+      "step": "release",
+      "role": "release-verifier",
+      "provider": "codex",
+      "model": null,
+      "usage": [
+        {
+          "input_tokens": 17865,
+          "cached_input_tokens": 0,
+          "output_tokens": 1175
+        }
+      ],
+      "cost": null,
+      "observedToolCalls": 0,
+      "fixture": false,
+      "durationMs": 25474,
+      "receiptSha256": "21b8e269367f02a79a770e1dbb5af2e569c7b0f033ec145868927e052c34ca5d"
+    }
+  ],
+  "usage": {
+    "input_tokens": 55969,
+    "cached_input_tokens": 0,
+    "output_tokens": 3008
+  },
+  "cost": null,
+  "costProvenance": "Provider receipts contain no verified monetary total; model identity unreported by CLI remains null",
+  "verification": [
+    {
+      "step": "verify",
+      "ok": true,
+      "checks": [
+        "health",
+        "unknown",
+        "restart",
+        "open",
+        "initial",
+        "initial-exact",
+        "increment",
+        "incremented",
+        "incremented-exact",
+        "enter",
+        "echo",
+        "inert",
+        "reload",
+        "reset"
+      ],
+      "imageId": "sha256:c62fa7844cd38dd67d18421162af5016b2973a48d6db0a119982b2bf4b661383",
+      "outputHash": "83655eca401d8eb450aa5e001a67c72099d73a10d39fb35bbd03bb3e1d534cc2",
+      "workcellSource": {
+        "commit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+        "expectedCommit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+        "clean": true,
+        "trackedFiles": 270,
+        "trackedBytes": 1820045,
+        "trackedInventorySha256": "8d3fce926a99fdab023288284d7d9fe22cab7c3b6644825a0392529fa9ff8175",
+        "scope": "Pinned tracked Git blob bytes and executable modes; ignored files and generated caches are not authenticated"
+      },
+      "cleanup": true,
+      "lens": true
+    },
+    {
+      "step": "reverify",
+      "ok": true,
+      "checks": [
+        "health",
+        "unknown",
+        "restart",
+        "open",
+        "initial",
+        "initial-exact",
+        "increment",
+        "incremented",
+        "incremented-exact",
+        "enter",
+        "echo",
+        "inert",
+        "reload",
+        "reset"
+      ],
+      "imageId": "sha256:c62fa7844cd38dd67d18421162af5016b2973a48d6db0a119982b2bf4b661383",
+      "outputHash": "83655eca401d8eb450aa5e001a67c72099d73a10d39fb35bbd03bb3e1d534cc2",
+      "workcellSource": {
+        "commit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+        "expectedCommit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+        "clean": true,
+        "trackedFiles": 270,
+        "trackedBytes": 1820045,
+        "trackedInventorySha256": "8d3fce926a99fdab023288284d7d9fe22cab7c3b6644825a0392529fa9ff8175",
+        "scope": "Pinned tracked Git blob bytes and executable modes; ignored files and generated caches are not authenticated"
+      },
+      "cleanup": true,
+      "lens": true
+    }
+  ],
+  "offline": {
+    "ok": true,
+    "bundleId": "sha256:2463053f3c82fb534ff22ee4fdf777db8b44f1ec7a7e188d9108a1c8a33109d4",
+    "verifierSha256": "012d59befdb87256371bc1573230870e1e116166a7cae277043c15351bf8656b",
+    "networkDenied": true,
+    "claims": {
+      "checks": [
+        "run identity",
+        "recorded provider budget reservation/receipt consistency",
+        "React mission footprint",
+        "React source/lock/cache/roles/Spec/offline build/browser/Lens/Workcell/accounting agree"
+      ],
+      "recordedStatus": "completed",
+      "missionFamily": "react",
+      "missionEvidence": "Recorded independent finite React static candidate approval; integrity and internal consistency only, no authenticated execution, human approval or deployment authority",
+      "softwareReleaseApproval": false
+    }
+  },
+  "evidence": [
+    {
+      "path": ".runtime/react-missions/react-YfDO6E/artifacts/controller-provenance.json",
+      "sha256": "87ce8ca4360b04058042f34987b8eb1ba630c44cb2fbf2ce9d363de91f5dae0c"
+    },
+    {
+      "path": ".runtime/react-missions/react-YfDO6E/run.json",
+      "sha256": "71b79f04acf95320748ac3efb7ace445cb396dc9d793249ffc921a4db2b9ce24"
+    },
+    {
+      "path": ".runtime/react-missions/react-YfDO6E/result.json",
+      "sha256": "512f1fce6db6c0b4e6e410d07b3475c0d1abe82e4d538a31dd2bc829bceab27a"
+    },
+    {
+      "path": ".runtime/react-missions/react-YfDO6E/reviewed-react.json",
+      "sha256": "85708a95f37406d1f511a03c53613b981882ec319bf194b38c3b3ffe6c41f96b"
+    },
+    {
+      "path": ".runtime/react-missions/react-YfDO6E/artifacts/accounting-terminal.json",
+      "sha256": "a935dfe690122f1daf0d4bb7d459a0b88270030284f972538420dd9f63cd8a2d"
+    },
+    {
+      "path": ".runtime/react-missions/react-YfDO6E/artifacts/verify.json",
+      "sha256": "53957cdb573c08d5832694f1fd5a0b679ff5d23c4c70a3e74b441dbbca4e7b12"
+    },
+    {
+      "path": ".runtime/react-missions/react-YfDO6E/artifacts/reverify.json",
+      "sha256": "a107961970986aaec51b643e1049254585e9109c463eda1d9732dda5a6f96dcf"
+    },
+    {
+      "path": ".runtime/ledger-completion/react-live-restored-vm-final.log",
+      "sha256": "c781075da08c420c7c34c99c9b26e3d50a32f9813239118eb9b68628a426ba06"
+    },
+    {
+      "path": ".runtime/ledger-completion/react-live-final-export.json",
+      "sha256": "b142c1098a0b33bb000058b224415d3174a8e704436ea94e98e653bc9b9ecba3"
+    },
+    {
+      "path": ".runtime/ledger-completion/react-live-final-offline-verify.json",
+      "sha256": "331c492952181761d6bd11e56a0030cb6e476ba77ae76fc68cd1594af76cd2c0"
+    }
+  ],
+  "retainedFailures": [
+    {
+      "missionId": "react-8esZse",
+      "reason": "Stale private provider authentication rejected first review; preserved as failed before restored connection"
+    },
+    {
+      "missionId": "react-MIukDL",
+      "reason": "Earlier disk admission rejection; no model or engine success claimed"
+    }
+  ],
+  "scope": "Actual finite React18 client-only construction with canonical role proposals, native Dispatch/Spec/RunLedger, required provider/source-secret and budget gates, repeated rootless offline build/API/browser/Lens verification and local candidate promotion. No JSX, SSR, arbitrary package scripts, universal framework compatibility, authenticated execution, human approval or deployment authorization."
+}

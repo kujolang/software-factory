@@ -1,0 +1,67 @@
+{
+  "schema": "kujo.factory.provider-sdk-lock/v1",
+  "repositories": {
+    "ai-sdk": {
+      "url": "https://github.com/kujolang/ai-sdk.git",
+      "commit": "9083c0a8dd827dabdc840ac79a8fc07844d4888b",
+      "files": {
+        "LICENSE": {
+          "sha256": "4b6449939f8dce26dc5fb87756740a5977da9085517af127d9e634e6a6492506",
+          "bytes": 1087
+        },
+        "src/ai_sdk.kujo": {
+          "sha256": "6280e4ac5b1d348d2676a88a1988eaf15c1743b9292a1827a81858afcf6b4b48",
+          "bytes": 129369
+        },
+        "src/atomic_state.kujo": {
+          "sha256": "25a124bb2334eaaed1b934272a1f5b051fce7b78c98248df2bde98b136dfbfba",
+          "bytes": 1538
+        },
+        "src/memory_state.kujo": {
+          "sha256": "88b1733a94ef97dda9d6bb996640bd30f8dad7b6ad97de95f3e42c86f1fa7ae0",
+          "bytes": 1186
+        },
+        "src/openai_compatible_driver.kujo": {
+          "sha256": "b2b720f76499eac76d9edc99917015878427aaee86d031658dc6949cbcbf0d0e",
+          "bytes": 7902
+        },
+        "src/provider_driver.kujo": {
+          "sha256": "337389ef0318a812c05e58e816904b1a69ccf1101ac03358011a6fe2aa586353",
+          "bytes": 3856
+        },
+        "src/providers.kujo": {
+          "sha256": "76081e675f47cfb517ce44f892fc39d8f41c2be6eab6cec2b2f0c92ece506de2",
+          "bytes": 5985
+        }
+      }
+    },
+    "anthropic": {
+      "url": "https://github.com/kujolang/anthropic.git",
+      "commit": "eaad591b642b80aacca40db788403109c5eed2cd",
+      "files": {
+        "LICENSE": {
+          "sha256": "8ee6bb7efe66214ac88396c545448eeaed8e83bed89565a551ca77b6de34abb7",
+          "bytes": 1065
+        },
+        "src/provider.kujo": {
+          "sha256": "8fcc25945528e48cb9b99398476774204573898196921c6915f25a8333572da4",
+          "bytes": 10636
+        }
+      }
+    },
+    "gemini": {
+      "url": "https://github.com/kujolang/gemini.git",
+      "commit": "329942f2c2ee220141d08bf86ce1ac4bdfd417ff",
+      "files": {
+        "LICENSE": {
+          "sha256": "8960f05256c42a238d29793df3052a4392f45ff7cb496d274f31ae7a4254d61f",
+          "bytes": 339
+        },
+        "src/provider.kujo": {
+          "sha256": "fa1e640ab7e6c8b3a334e2f021aa190445f88268d5afc00214b9e87c34ce3a19",
+          "bytes": 3840
+        }
+      }
+    }
+  }
+}

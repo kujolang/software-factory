@@ -1,0 +1,101 @@
+{
+  "schema": "kujo.factory.sqlite-mission/v1",
+  "mission": "For the disposable reviewed fixture, migrate SQLite user_version1 to2 by adding a label TEXT NOT NULL column with default kept. Preserve both old ids and names exactly and populate label=kept. Scope is these two representative old rows plus recorded schema and restart/integrity checks; no claim of universal old-data coverage or production deployment. Controller owns transaction and user_version; produce SQL only.",
+  "contract": {
+    "schema": "kujo.factory.sqlite-migration/v1",
+    "id": "add-label",
+    "fromVersion": 1,
+    "toVersion": 2,
+    "seed": [
+      "CREATE TABLE items(id INTEGER PRIMARY KEY,name TEXT NOT NULL)",
+      "INSERT INTO items(id,name) VALUES(1,'alpha'),(2,'beta')"
+    ],
+    "before": [
+      {
+        "id": "old-data",
+        "query": "SELECT id,name FROM items ORDER BY id",
+        "rows": [
+          {
+            "id": 1,
+            "name": "alpha"
+          },
+          {
+            "id": 2,
+            "name": "beta"
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "id": "new-data",
+        "query": "SELECT id,name,label FROM items ORDER BY id",
+        "rows": [
+          {
+            "id": 1,
+            "name": "alpha",
+            "label": "kept"
+          },
+          {
+            "id": 2,
+            "name": "beta",
+            "label": "kept"
+          }
+        ]
+      }
+    ],
+    "beforeSchema": [
+      {
+        "table": "items",
+        "columns": [
+          {
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "default": null,
+            "pk": 1
+          },
+          {
+            "name": "name",
+            "type": "TEXT",
+            "notnull": 1,
+            "default": null,
+            "pk": 0
+          }
+        ]
+      }
+    ],
+    "afterSchema": [
+      {
+        "table": "items",
+        "columns": [
+          {
+            "name": "id",
+            "type": "INTEGER",
+            "notnull": 0,
+            "default": null,
+            "pk": 1
+          },
+          {
+            "name": "name",
+            "type": "TEXT",
+            "notnull": 1,
+            "default": null,
+            "pk": 0
+          },
+          {
+            "name": "label",
+            "type": "TEXT",
+            "notnull": 1,
+            "default": "'kept'",
+            "pk": 0
+          }
+        ]
+      }
+    ],
+    "rollback": "transaction-failure-only",
+    "seal": {
+      "sha256": "4f6e01bc3eb412571d17e878979b4c88282fadb3c65a00ee61d4b0ebaef483af"
+    }
+  }
+}

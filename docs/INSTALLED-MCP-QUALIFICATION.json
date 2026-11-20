@@ -1,0 +1,302 @@
+{
+  "schema": "kujo.factory.installed-mcp-attempt-summary/v1",
+  "ok": true,
+  "sourceCommit": "3997bc0c9c288e433e8a9bef235dbf562284f80a",
+  "recordedAt": "2026-11-20T02:02:44.356Z",
+  "successfulMcpConstruction": true,
+  "reasons": [
+    "First attempt exhausted independent browser correction gates",
+    "Second attempt stopped by free-space floor",
+    "Third attempt rejected backend README.md prohibited file effect",
+    "Fourth interrupted on owner instruction during bounded correction due disk exhaustion"
+  ],
+  "currentGuardQualification": false,
+  "currentGuardNote": "Old installed reviewer accepted pass with advisory issues; current c9c4bf4 guard requires zero issues. No latest guard pass claimed.",
+  "sourceRecord": {
+    "path": ".runtime/installed-mcp-qualification/attempt-summary.json",
+    "sha256": "1ac595dc0325dda7d523eaeef8b5d2299b813cbcce3a96d7f0060451c55e2486"
+  },
+  "attempts": [
+    {
+      "attempt": "De0nDR",
+      "submissionId": "a6690711-93ee-4d80-a3b3-3ddbbeb924c8",
+      "runId": "factory-2026-11-20T01-20-04-195Z",
+      "missionSha256": "b3da2c43efb49c61f31eff0d33b60a067df3b72b5a9eec7fdbe7801fcb85e2ad",
+      "terminal": {
+        "schema": "kujo.factory.control-terminal/v1",
+        "state": "controller-failed",
+        "code": 1,
+        "signal": null,
+        "loggingFailed": false,
+        "finishedAt": "2026-11-20T01:31:11.460Z",
+        "cleanupVerified": false,
+        "releaseAuthority": "Consult source-bound factory release evidence; exit status is not approval",
+        "deploymentAuthorized": false
+      },
+      "failedEvidence": {
+        "ok": true,
+        "bundleId": "sha256:e469ababae39830e615941af7bb3e8b38e6b169d864a01f0cf8dac8f167de57f",
+        "recordedStatus": "failed",
+        "runId": "factory-2026-11-20T01-20-04-195Z",
+        "scope": "Failed actual construction evidence; verification establishes integrity/internal consistency, not software approval",
+        "harnessCorrection": "Initial private assertion incorrectly expected a softwareReleaseApproval field in generic failed Node claims. Actual verifier returned recordedStatus:failed and no approval assertion; corrected assertion uses this contract."
+      }
+    },
+    {
+      "attempt": "QdvOk0",
+      "submissionId": "debc4baf-b0a1-4cef-8b29-edb03de7d534",
+      "runId": "factory-2026-11-20T01-33-33-010Z",
+      "missionSha256": "3799912fc95877eac31f8f418614a731d49a58fb347ca1bdc92b7bba4a488600",
+      "terminal": {
+        "schema": "kujo.factory.control-terminal/v1",
+        "state": "controller-failed",
+        "code": 1,
+        "signal": null,
+        "loggingFailed": false,
+        "finishedAt": "2026-11-20T01:39:31.338Z",
+        "cleanupVerified": false,
+        "releaseAuthority": "Consult source-bound factory release evidence; exit status is not approval",
+        "deploymentAuthorized": false
+      },
+      "failedEvidence": {
+        "ok": true,
+        "bundleId": "sha256:8ed1b25f7cbf36fdb03b42b5e8a5d384f442205631b2bf9513c2043874ea3d6e",
+        "files": 112,
+        "recordedStatus": "failed",
+        "runId": "factory-2026-11-20T01-33-33-010Z",
+        "scope": "Retained actual MCP submission stopped by operations free-space floor after implementation; integrity only, no release approval."
+      }
+    },
+    {
+      "attempt": "AXuKLJ",
+      "submissionId": "5c23e192-4ddc-449e-8e24-9f6c58abaef5",
+      "runId": "factory-2026-11-20T01-42-30-285Z",
+      "missionSha256": "3799912fc95877eac31f8f418614a731d49a58fb347ca1bdc92b7bba4a488600",
+      "terminal": {
+        "schema": "kujo.factory.control-terminal/v1",
+        "state": "controller-failed",
+        "code": 1,
+        "signal": null,
+        "loggingFailed": false,
+        "finishedAt": "2026-11-20T01:48:41.608Z",
+        "cleanupVerified": false,
+        "releaseAuthority": "Consult source-bound factory release evidence; exit status is not approval",
+        "deploymentAuthorized": false
+      },
+      "failedEvidence": {
+        "ok": true,
+        "bundleId": "sha256:6c793d89b27060b7e6f73c7fdcec1c75b48a91120d08cf1f0007736c93b867b9",
+        "files": 129,
+        "recordedStatus": "failed",
+        "runId": "factory-2026-11-20T01-42-30-285Z",
+        "scope": "Actual MCP submission rejected backend README.md file outside role permissions; integrity only, no approval."
+      }
+    },
+    {
+      "attempt": "NPvIHW",
+      "submissionId": "34503f71-68f5-4d33-94a8-5f280689f47f",
+      "runId": "factory-2026-11-20T01-50-31-081Z",
+      "missionSha256": "1614606360a89adc903c79eeba57db9217835c6f2aa5fc2b5379a33ee755343b",
+      "terminal": {
+        "schema": "kujo.factory.control-terminal/v1",
+        "state": "interrupted",
+        "code": 143,
+        "signal": null,
+        "loggingFailed": false,
+        "finishedAt": "2026-11-20T02:02:05.499Z",
+        "cleanupVerified": false,
+        "releaseAuthority": "Consult source-bound factory release evidence; exit status is not approval",
+        "deploymentAuthorized": false
+      },
+      "failedEvidence": null
+    }
+  ],
+  "subsequentFix": {
+    "commit": "0418dbe4bd4f073a97ef9276597388b4cc683e61",
+    "description": "Native worker parent watchdog and provider-child reaping close the observed detached-process lifetime gap. Actual OS fixtures and both clean CI platforms pass; no later successful installed live MCP mission is inferred."
+  },
+  "hermesContinuation": {
+    "ok": false,
+    "installedBase": "0cebc49",
+    "sealedConverterGrantCommit": "6cf4b78",
+    "fixtureFixCommit": "5dac7bc",
+    "qualificationDirectory": ".runtime/install-qualification/checkout-W5Mwnr",
+    "installEvidence": "npm ci, setup and offline doctor passed at base. Its aggregate found a nested install subprocess fixture failure. After the source-only upgrade, offline doctor and all 27 focused checks passed. Both clean GitHub CI platforms passed 5dac7bc.",
+    "ciRun": 44668603804,
+    "observations": [
+      "Official MCP SDK prepared the sealed converter, froze the pack hash, recorded an inert approval request, submitted the real mission and rejected duplicate submission.",
+      "Both attempts spent one model call and stopped before construction when the commander hit its 1,536-token cap. The additional Tencent native no-thinking request flag did not resolve this and was reverted.",
+      "Both failed runs independently verify offline. No construction/release artifact was produced."
+    ],
+    "attempts": [
+      {
+        "directory": ".runtime/installed-mcp-qualification/qualification-YBwPOn",
+        "commit": "5dac7bcc413daf7071d496c14e247cf419125eac",
+        "runId": "factory-2026-11-20T03-35-33-216Z",
+        "packSha256": "f700cd0796f07c0e4ec1821294ccaff58ddb083ff51e109ddad8c6d1822d0e19",
+        "missionSha256": "f468a6165b574e11b1319460cb6f37b9fad98ae80bd96676a2bdf752787d1d97",
+        "terminal": {
+          "schema": "kujo.factory.control-terminal/v1",
+          "state": "controller-failed",
+          "code": 1,
+          "signal": null,
+          "loggingFailed": false,
+          "finishedAt": "2026-11-20T03:36:12.417Z",
+          "cleanupVerified": false,
+          "releaseAuthority": "Consult source-bound factory release evidence; exit status is not approval",
+          "deploymentAuthorized": false
+        },
+        "model": "tencent/hy4-flash:free",
+        "usage": [
+          {
+            "input_tokens": 1743,
+            "output_tokens": 1536,
+            "cached_input_tokens": null
+          }
+        ],
+        "outputTokenLimit": 1536,
+        "providerReportedCostUsd": 0,
+        "failedEvidenceBundle": "sha256:41e0d6c9e276010c85ddba07711f352e481a4897b5a1c78c974bb1fd38391178",
+        "networkDeniedStandaloneVerificationPassed": true
+      },
+      {
+        "directory": ".runtime/installed-mcp-qualification/qualification-MJGgt1",
+        "commit": "bc7c1b15bcdd95941a9163fd863084755de31fb1",
+        "runId": "factory-2026-11-20T03-37-14-789Z",
+        "packSha256": "f700cd0796f07c0e4ec1821294ccaff58ddb083ff51e109ddad8c6d1822d0e19",
+        "missionSha256": "f468a6165b574e11b1319460cb6f37b9fad98ae80bd96676a2bdf752787d1d97",
+        "terminal": {
+          "schema": "kujo.factory.control-terminal/v1",
+          "state": "controller-failed",
+          "code": 1,
+          "signal": null,
+          "loggingFailed": false,
+          "finishedAt": "2026-11-20T03:37:42.638Z",
+          "cleanupVerified": false,
+          "releaseAuthority": "Consult source-bound factory release evidence; exit status is not approval",
+          "deploymentAuthorized": false
+        },
+        "model": "tencent/hy4-flash:free",
+        "usage": [
+          {
+            "input_tokens": 1743,
+            "output_tokens": 1536,
+            "cached_input_tokens": null
+          }
+        ],
+        "outputTokenLimit": 1536,
+        "providerReportedCostUsd": 0,
+        "failedEvidenceBundle": "sha256:fcf6c819dc157e288d9e035e4c2832a2bc20dfc5e3fe5a4118747c3c2cd48a05",
+        "networkDeniedStandaloneVerificationPassed": true
+      }
+    ]
+  },
+  "codexSolContinuation": {
+    "ok": false,
+    "commit": "d171a07ad84ca2421484f50fa069650edcb16288",
+    "provider": "codex",
+    "requestedModel": "gpt-6.2-sol",
+    "authentication": "ChatGPT account via Codex CLI 0.144.4",
+    "runId": "factory-2026-11-20T03-41-07-133Z",
+    "directory": ".runtime/installed-mcp-qualification/qualification-AOXcEO",
+    "terminal": {
+      "schema": "kujo.factory.control-terminal/v1",
+      "state": "controller-failed",
+      "code": 1,
+      "signal": null,
+      "loggingFailed": false,
+      "finishedAt": "2026-11-20T03:41:23.264Z",
+      "cleanupVerified": false,
+      "releaseAuthority": "Consult source-bound factory release evidence; exit status is not approval",
+      "deploymentAuthorized": false
+    },
+    "failure": "The mission received provider_process_failed before construction. One separate restricted structured-output probe returned model_not_found and the service stated that the model is not supported with a ChatGPT account.",
+    "modelUsage": null,
+    "cost": null,
+    "failedEvidenceBundle": "sha256:fcb85836f14ca3793f034861b1f3e49189775098c81eda321da0d6dbd690c9a0",
+    "networkDeniedStandaloneVerificationPassed": true
+  },
+  "codexDefaultQualification": {
+    "ok": true,
+    "source": {
+      "commit": "d171a07ad84ca2421484f50fa069650edcb16288",
+      "tree": "92d3b72d42ad82b990938e7e95cfbab68af758b0",
+      "dirty": false,
+      "identityScope": "Git HEAD; dirty working-tree bytes are separately hashed below"
+    },
+    "directory": ".runtime/installed-mcp-qualification/qualification-Avux6W",
+    "runId": "factory-2026-11-20T03-45-22-277Z",
+    "submissionId": "da16a99a-8ec9-43fa-ab9c-36c67c399a82",
+    "packSha256": "f700cd0796f07c0e4ec1821294ccaff58ddb083ff51e109ddad8c6d1822d0e19",
+    "missionSha256": "cda5dd2bab4d3c406dececaacfb295f67eccfd728b95978e84cc9b5a8453e4d1",
+    "mcpSdk": {
+      "name": "@modelcontextprotocol/sdk",
+      "version": "1.32.2",
+      "lockSha256": "4a3913537d78dfd95cdc1fca4b924a059e0d890f497077e5e4d2552caac667fa"
+    },
+    "provider": "codex",
+    "requestedModel": null,
+    "authentication": "ChatGPT account",
+    "maxCalls": 9,
+    "actualCalls": 6,
+    "providerReportedCostUsd": null,
+    "usage": {
+      "input_tokens": 74479,
+      "output_tokens": 11985,
+      "cached_input_tokens": 0
+    },
+    "sourceHash": "04dd130caa854bc0a4e5f4419bdb231d0fa8f7235639d1614b852592731eb6a9",
+    "runtimeImage": "sha256:c62fa7844cd38dd67d18421162af5016b2973a48d6db0a119982b2bf4b661383",
+    "networkDeniedStandaloneVerificationPassed": true,
+    "bundleId": "sha256:ff33c643215c2c8a5c04f4d3e21fec96b4653cfe8499bbbe35f491e4200c5c14",
+    "buildFiles": [
+      "build/CHANGELOG.md",
+      "build/README.md",
+      "build/build.mjs",
+      "build/package.json",
+      "build/public/app.js",
+      "build/public/index.html",
+      "build/public/style.css",
+      "build/server.mjs",
+      "build/tests/README.md",
+      "build/tests/contract.json"
+    ],
+    "deploymentAuthorized": false,
+    "checks": [
+      {
+        "name": "exact frozen submission, inert approval request and duplicate rejection",
+        "passed": true
+      },
+      {
+        "name": "actual installed provider/Workcell independent release, MCP owned reads and portable evidence",
+        "passed": true
+      },
+      "MCP owned release record matches exact local release",
+      "Bundle contains the verified build and passed network-denied standalone verification"
+    ],
+    "scope": "Installed checkout upgraded from clean 0cebc49 with unchanged dependency locks, then real sealed converter construction via official local stdio MCP SDK; historical failed attempts remain preserved.",
+    "retainedRecords": [
+      {
+        "path": ".runtime/installed-mcp-qualification/qualification-Avux6W/qualification.json",
+        "sha256": "0e136359a68aea6850e467e891fdc344da8e9075e0a93028713f855ca7337976"
+      },
+      {
+        "path": ".runtime/installed-mcp-qualification/qualification-Avux6W/mcp-release-artifact.json",
+        "sha256": "524f244bcb651b836cf1063ff7dde22d712673ccd13a4d7cbb71cc73c10482b0"
+      },
+      {
+        "path": ".runtime/installed-mcp-qualification/qualification-Avux6W/network-denied-verify.json",
+        "sha256": "0403a1c89f0c4ec3d494681df4352cb8e6aa70018dd946c7faf64e7de49d36ee"
+      },
+      {
+        "path": ".runtime/installed-mcp-qualification/qualification-Avux6W/terminal-status.json",
+        "sha256": "08349f6e1feaa97c45c40522914f229bc5d1b91e8b4f355f8b81b38ba737f6f3"
+      },
+      {
+        "path": ".runtime/installed-mcp-qualification/qualification-Avux6W/budget.json",
+        "sha256": "af9f224fb723e76040f0085d4841488c3046ec7393819a5cef9997b787eb8e20"
+      }
+    ]
+  },
+  "scopeNote": "Top-level success reflects the later Codex-default qualification. Original failed attempts and their source and guard notes remain historical."
+}

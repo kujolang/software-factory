@@ -1,0 +1,12 @@
+from src.config import config_defaults
+from src.pack import pack_validate_manifest, pack_apply
+from src.validate import validate_run
+value := parse_json(read_file(args()[0]))
+cfg := config_defaults()
+validation := pack_validate_manifest(value["files"],cfg,os_getcwd())
+result := {"validation":validation,"applied":null,"contentValidation":null}
+if validation["ok"] {
+ result["applied"] = pack_apply(value["files"],cfg,os_getcwd(),false)
+ result["contentValidation"] = validate_run("agent",cfg)
+}
+print(to_json(result))

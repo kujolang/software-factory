@@ -1,0 +1,51 @@
+{
+  "schema": "kujo.factory.provider-qualification-attempts/v1",
+  "date": "2026-11-20",
+  "currentLiveTwoProviderGatePassed": false,
+  "cost": null,
+  "attempts": [
+    {
+      "runId": "factory-recheck-2026-11-20T01-24-34-694Z",
+      "status": "failed",
+      "reason": "Bounded provider timeout",
+      "offlineVerified": true,
+      "bundleId": "sha256:6bc0e69113cbbe4bb7181e3c9d9f134ea878c6ac14ec1fc4fcc5550c71b94a58",
+      "verificationRecord": ".runtime/ledger-completion/ollama-current-failures/factory-recheck-2026-11-20T01-24-34-694Z-offline.json",
+      "sha256": "665f0046ff378a16fdd17d49ff541bea13896c16610c1653524db4c1f93bd028"
+    },
+    {
+      "runId": "factory-recheck-2026-11-20T01-38-21-106Z",
+      "status": "failed",
+      "reason": "Reviewer proposed a prohibited file effect",
+      "offlineVerified": true,
+      "bundleId": "sha256:bc4c44c9612848edd398afacb07d2c00bef94199abc750aeb2ae659ed5118547",
+      "verificationRecord": ".runtime/ledger-completion/ollama-current-failures/factory-recheck-2026-11-20T01-38-21-106Z-offline.json",
+      "sha256": "a745528c97c571df3729dfc085ef99740c2f4353afbceccf47a092798d516244"
+    },
+    {
+      "runId": "factory-recheck-2026-11-20T01-48-04-785Z",
+      "recordedRunStatus": "running",
+      "operatorObservation": "Interrupted before release; observed owned controller, release worker and provider bridge stopped. Exact abandoned admission archived with receipt; uncertain reservations remain consumed.",
+      "reason": "Reviewer passed while reporting a correctness issue. The contradiction guard now rejects this.",
+      "terminalExportRefused": true,
+      "recoverySnapshotVerified": true,
+      "verificationRecord": ".runtime/ledger-completion/interrupted-provider-recovery-verify.json",
+      "sha256": "9cc2523510ce71edeb6661dfb151ea416b5d585595da728d7f463f37d3d6df85"
+    },
+    {
+      "runId": "webops-g9bwFA",
+      "status": "failed",
+      "reason": "Loading local qwen3.5:4b caused resource pressure; owned provider transport was stopped and model unloaded. No qualification claim.",
+      "offlineVerified": true,
+      "bundleId": "sha256:78aeff951905d2b2ae952411dbb68057f31b9729a6355ba6b073bf907fb3cc54",
+      "verificationRecord": ".runtime/ledger-completion/interrupted-provider-evidence/webops-g9bwFA-offline.json",
+      "sha256": "6291db5b7e52303712fca7b0c825284f512c46b9441a505ef6160db05e046ed6"
+    }
+  ],
+  "subsequentFixes": {
+    "6eaa883": "Constrain read-only Node proposal schemas",
+    "c9c4bf4": "Reject contradictory passing independent reviews",
+    "0418dbe": "Stop orphaned native workers and reap owned provider children"
+  },
+  "scope": "Observed failures and interrupted qualification are not successful provider qualification. Checksums verify retained record identity, not execution authenticity or approval."
+}

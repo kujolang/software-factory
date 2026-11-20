@@ -1,0 +1,124 @@
+{
+  "schema": "kujo.factory.hermes-recovery-qualification/v1",
+  "date": "2026-11-20",
+  "ok": true,
+  "source": {
+    "commit": "316ffc5a307d420fb95a21ccfb74f8260699c444",
+    "tree": "b6ab54850aa0f9959a43ea4aef267a0ed23918cc",
+    "dirty": false,
+    "identityScope": "Git HEAD; dirty working-tree bytes are separately hashed below"
+  },
+  "model": "tencent/hy4-flash:free",
+  "scope": "Live production recovery while revalidating a previously approved converter. Interruption occurred after independent review and Workcell acceptance, before independent release verification. No full new-build recovery claim.",
+  "runId": "factory-recheck-2026-11-20T03-25-32-700Z",
+  "runDirectory": ".runtime/production-recovery/qualification-Siantm/runs/factory-recheck-2026-11-20T03-25-32-700Z",
+  "harness": ".runtime/ledger-completion/hermes-recovery-ypxRFZee/qualify-revalidation.mjs",
+  "checks": {
+    "initialExitCode": 143,
+    "resumeExitCode": 0,
+    "completedAtInterruption": [
+      "verify"
+    ],
+    "pendingAtInterruption": [
+      "release"
+    ],
+    "completedStepExecutedOnce": true,
+    "originalDeadlinePreserved": true,
+    "originalReviewReceiptPreserved": true,
+    "originalCheckpointPreserved": true,
+    "controllerFilesUnchanged": true,
+    "independentReleasePassed": true,
+    "networkDeniedStandaloneVerificationPassed": true,
+    "deploymentAuthorized": false
+  },
+  "bundleId": "sha256:44f8c725a3403a6f88bd29c5fdfdb7eaff95169089731f355030da053799d61d",
+  "providerCalls": [
+    {
+      "model": "tencent/hy4-flash:free",
+      "role": "code-reviewer",
+      "status": "completed",
+      "reason": null,
+      "usage": [
+        {
+          "input_tokens": 7733,
+          "output_tokens": 443,
+          "cached_input_tokens": null
+        }
+      ],
+      "providerReportedCostUsd": 0
+    },
+    {
+      "model": "tencent/hy4-flash:free",
+      "role": "release-verifier",
+      "status": "completed",
+      "reason": null,
+      "usage": [
+        {
+          "input_tokens": 5572,
+          "output_tokens": 826,
+          "cached_input_tokens": null
+        }
+      ],
+      "providerReportedCostUsd": 0
+    }
+  ],
+  "providerReportedCostUsdAcrossAllThreeCalls": 0,
+  "firstAttempt": {
+    "runId": "factory-2026-11-20T03-24-19-476Z",
+    "outcome": "Failed before the interruption checkpoint when the commander exhausted its 1,024-token output limit. No release approval.",
+    "receipt": {
+      "model": "tencent/hy4-flash:free",
+      "role": "general-commander",
+      "status": "failed",
+      "reason": "output_token_limit",
+      "usage": [
+        {
+          "input_tokens": 1664,
+          "output_tokens": 1024,
+          "cached_input_tokens": null
+        }
+      ],
+      "providerReportedCostUsd": 0
+    },
+    "bundleId": "sha256:ac6e722c98089cb35b56d00a65ce9e67e2396e0c2f64d9a051a5555ad050c29a",
+    "networkDeniedStandaloneVerificationPassed": true
+  },
+  "records": [
+    {
+      "path": ".runtime/production-recovery/qualification-Siantm/controller.json",
+      "sha256": "d11f6fb0bc0d8b37065787f3b2c0da8950d87ae0d74f93aeb5ca5e549c061159"
+    },
+    {
+      "path": ".runtime/production-recovery/qualification-Siantm/checkpoint-window.json",
+      "sha256": "a274a77374981fd22ab28d7f59adb08de5e302c9acb1a669f6ece551597a3f7b"
+    },
+    {
+      "path": ".runtime/production-recovery/qualification-Siantm/resume-assessment.json",
+      "sha256": "a5dcb38c7fb8b9d7cde81902828bf871d4d2f272cbf3a5c79691fc9e6ebeeb0a"
+    },
+    {
+      "path": ".runtime/production-recovery/qualification-Siantm/result.json",
+      "sha256": "24024bbcfd16cf4137742746e4e8bc55453522b5a9dae7d99907e56b2b31f2bb"
+    },
+    {
+      "path": ".runtime/ledger-completion/hermes-recovery-ypxRFZee/recovered-offline.json",
+      "sha256": "3859e0be0179db7e8fae944f05a5a92ca497de6db2283e9f82361141e3ffef5e"
+    },
+    {
+      "path": ".runtime/ledger-completion/hermes-recovery-ypxRFZee/failed-build-offline.json",
+      "sha256": "a9fe1cbdf969d739b5187d099894d7f6dd6f88d4ffb2f111b80746bbf10ed3dd"
+    },
+    {
+      "path": ".runtime/ledger-completion/hermes-recovery-ypxRFZee/qualify-revalidation.mjs",
+      "sha256": "5231906d6f20f873539e489ba111e2fe3901e7abfd7a899749b0576009f501ec"
+    },
+    {
+      "path": ".runtime/production-recovery/qualification-Siantm/runs/factory-recheck-2026-11-20T03-25-32-700Z/artifacts/review-0-receipt.json",
+      "sha256": "51e2aa1d7d01d63b6dc9367399844ba3f8ff0961bad9ab23ef49dd619cddaaad"
+    },
+    {
+      "path": ".runtime/production-recovery/qualification-Siantm/runs/factory-recheck-2026-11-20T03-25-32-700Z/artifacts/release-receipt.json",
+      "sha256": "894c2f4a72a9bcf922a7ef7b8ce9cd16de5a6116cfe825af34cba615e20ee358"
+    }
+  ]
+}

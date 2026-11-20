@@ -8,6 +8,7 @@ import path from 'node:path';
 import {spawn} from 'node:child_process';
 import {once} from 'node:events';
 import {root} from '../factory/settings.mjs';
+import {callReadTool} from '../factory/mcp.mjs';
 test('standalone observer serves local assets and cannot mutate factory state',async t=>{
  const reservation=net.createServer();reservation.listen(0,'127.0.0.1');await once(reservation,'listening');const port=reservation.address().port;await new Promise(r=>reservation.close(r));
  const runs=fs.mkdtempSync(path.join(os.tmpdir(),'factory-observer-'));
@@ -15,12 +16,20 @@ test('standalone observer serves local assets and cannot mutate factory state',a
  const ended=once(child,'close');t.after(async()=>{child.kill('SIGTERM');await ended;fs.rmSync(runs,{recursive:true});});
  let ready='';for await(const chunk of child.stdout){ready+=chunk;if(ready.includes('Factory Floor'))break;}
  const url=`http://127.0.0.1:${port}`;
+ const reactRoot=path.join(root,'.runtime/react-missions');fs.mkdirSync(reactRoot,{recursive:true});const react=fs.mkdtempSync(path.join(reactRoot,'observer-fixture-')),reactId=path.basename(react);t.after(()=>fs.rmSync(react,{recursive:true,force:true}));fs.mkdirSync(path.join(react,'artifacts'));fs.writeFileSync(path.join(react,'run.json'),JSON.stringify({id:reactId,schema:'kujo.factory.react-mission/v1',kind:'react-static-construction',fixture:true,status:'failed',mission:'Synthetic persisted observer fixture'}));fs.writeFileSync(path.join(react,'result.json'),JSON.stringify({softwareReleaseApproval:false}));
+ const reactResponse=await fetch(url+'/api/missions/react/'+reactId);assert.equal(reactResponse.status,200);const reactView=await reactResponse.json();assert.equal(reactView.family,'react');assert.equal(reactView.status,'failed');assert.equal(reactView.softwareReleaseApproval,false);assert.equal(reactView.deploymentAuthorized,false);const mcpView=callReadTool('factory_read_mission',{family:'react',id:reactId});assert.equal(mcpView.status,'failed');assert.equal(mcpView.softwareReleaseApproval,false);assert.equal(mcpView.deploymentAuthorized,false);assert.equal((await fetch(url+'/api/missions/react/'+reactId,{method:'POST'})).status,405);
+
  const response=await fetch(url);assert.equal(response.status,200);assert.match(await response.text(),/Factory Floor/);
  assert.deepEqual(await(await fetch(url+'/api/runs')).json(),[]);
  assert.equal((await fetch(url+'/api/runs',{method:'POST',body:'{}'})).status,405);
+ const catalog=await(await fetch(url+'/api/catalog')).json();assert.equal(catalog.roles.filter(r=>r.package==='chain-of-command').length,28);assert.equal(catalog.skills.length,136);assert.equal((await fetch(url+'/api/catalog',{method:'POST'})).status,405);
  const badHost=await new Promise((resolve,reject)=>{const request=http.get(url+'/api/runs',{headers:{host:'outside.invalid'}},response=>{response.resume();resolve(response.statusCode);});request.on('error',reject);});
  assert.equal(badHost,403);
  assert.equal((await fetch(url+'/assets/DepartureMono-Regular.woff2')).status,200);
  assert.equal((await fetch(url+'/%2e%2e%2ffactory%2fworker.mjs')).status,403);
- assert.deepEqual(fs.readdirSync(runs),[]);
+ const run=path.join(runs,'factory-fixture');fs.mkdirSync(path.join(run,'artifacts/verified-build'),{recursive:true});
+ fs.writeFileSync(path.join(run,'artifacts/verified-build/index.html'),'<script>throw Error("untrusted")</script>');
+ const candidate=await fetch(url+'/evidence/factory-fixture/artifacts/verified-build/index.html');assert.equal(candidate.status,200);assert.match(candidate.headers.get('content-type'),/^text\/plain/);assert.equal(candidate.headers.get('x-content-type-options'),'nosniff');
+ fs.symlinkSync(path.join(root,'factory'),path.join(run,'artifacts/link'));
+ assert.equal((await fetch(url+'/evidence/factory-fixture/artifacts/link/worker.mjs')).status,403);
 });

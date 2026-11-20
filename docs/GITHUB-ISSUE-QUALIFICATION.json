@@ -1,0 +1,136 @@
+{
+  "schema": "kujo.factory.github-issue-qualification/v1",
+  "ok": true,
+  "issue": "https://github.com/kujolang/software-factory/issues/1",
+  "issueSnapshot": ".runtime/mission-workflows/mission-HJ3cZN/github-issue.json",
+  "issueSnapshotSha256": "af7441232a7a93df493c59c0a8aa25c5ab184a379e25ce3c185ea602ff5e19c6",
+  "seed": {
+    "schema": "kujo.factory.github-issue-seed-proof/v1",
+    "ok": true,
+    "publicSeedCommit": "64c313ba2b10329018148a9c2bf34de32ae5f52a",
+    "projectedCommit": "b0a3bf8176e7132f26a475e4cb83b5daa10a1241",
+    "qualificationSha256": "1365526ea1d9e4655f976816c3a9a13a5f066054409ca3976f0bf57d7cf8e677",
+    "observedFailure": "99 !== 32",
+    "nativeReceiptVerified": true,
+    "cleanupVerified": true,
+    "cleanupSha256": "001890772eb2dccc42cf1b0c57838da724b8370fa151ee49b955905219223463",
+    "nativeVerificationSha256": "a4e9d66c03547b8e0fe5039888818877a15f3f4d272f4152349a40d394d1a76e",
+    "scope": "Actual rootless Workcell wrong-answer rejection of admitted committed intentional fixture; no software release approval",
+    "preservedPriorFailure": "seed-qualification.json records forbidden Git metadata admission failure, not arithmetic rejection"
+  },
+  "workflowDirectory": ".runtime/mission-workflows/mission-HJ3cZN",
+  "provider": "ChatGPT account default Codex",
+  "reportedCostUsd": null,
+  "attempts": [
+    {
+      "runId": "factory-2026-11-20T03-53-41-638Z",
+      "source": {
+        "commit": "be4ad22a2c8b02abfb8a5bc8a352744b8ceda666",
+        "tree": "7c389fdbcc5608a4401463a0429b876f82f64c4c",
+        "dirty": false,
+        "identityScope": "Git HEAD; dirty working-tree bytes are separately hashed below"
+      },
+      "outcome": "Independent Workcell acceptance, browser, build and Lens passed; release reviewer withheld approval pending operator evidence and later steps.",
+      "callReservations": 10,
+      "usage": {
+        "input_tokens": 169146,
+        "output_tokens": 15731
+      },
+      "failedEvidenceBundle": "sha256:756888f0ca6c699eef324c12f7b846d02e87c003ec938ebe371285955f1a5029",
+      "offlineVerificationPassed": true
+    },
+    {
+      "runId": "factory-2026-11-20T04-01-28-293Z",
+      "source": {
+        "commit": "be4ad22a2c8b02abfb8a5bc8a352744b8ceda666",
+        "tree": "7c389fdbcc5608a4401463a0429b876f82f64c4c",
+        "dirty": false,
+        "identityScope": "Git HEAD; dirty working-tree bytes are separately hashed below"
+      },
+      "outcome": "Independent reviewer blocked the existing frontend stale-response race. Two-call review-only budget prevented an implementation correction; no release.",
+      "callReservations": 1,
+      "usage": {
+        "input_tokens": 11900,
+        "output_tokens": 1051
+      },
+      "failedEvidenceBundle": "sha256:49a12f62337cf456b63227e53b8d145497595d6292209b1174ba15e4e8e67048",
+      "offlineVerificationPassed": true
+    }
+  ],
+  "unpublishedPrPacketPrepared": true,
+  "qualificationFixBranchPushed": false,
+  "prPublished": false,
+  "deploymentAuthorized": false,
+  "callsConsumed": 13,
+  "scopeDecision": "Operator explicitly approved the additional browser response-order fix. The sealed converter pack and controller gates were unchanged. The two previous failed attempts remain failed.",
+  "completedQualification": {
+    "runId": "factory-2026-11-20T04-05-59-574Z",
+    "source": {
+      "commit": "dd2488ddf350255d3ae66851f470fc675451c3a9",
+      "tree": "4191a10942ede1880919dd667550a93e53dc4361",
+      "dirty": false,
+      "identityScope": "Git HEAD; dirty working-tree bytes are separately hashed below"
+    },
+    "actualCalls": 2,
+    "usage": {
+      "input_tokens": 26658,
+      "output_tokens": 2392
+    },
+    "providerReportedCostUsd": null,
+    "workcellImage": "sha256:c62fa7844cd38dd67d18421162af5016b2973a48d6db0a119982b2bf4b661383",
+    "approvedSourceHash": "c11363d1f16e13459fd3a89666b97338c88ca5aa636b1f8c3ef0162b9c5f3016",
+    "packSha256": "f700cd0796f07c0e4ec1821294ccaff58ddb083ff51e109ddad8c6d1822d0e19",
+    "browserRegression": {
+      "record": ".runtime/github-issue-qualification/qualification-pbjey_12/browser-order-W9h3BK/result.json",
+      "sha256": "5ca1cece05da85baab326d8714ddfeeabdd6dc779c924b030abf303d1c43971d",
+      "baselineRejected": true,
+      "correctedChecks": [
+        "open",
+        "old-input",
+        "old-submit",
+        "new-input",
+        "new-submit",
+        "release-new",
+        "new-settled",
+        "release-old",
+        "latest-survives"
+      ]
+    },
+    "bundleId": "sha256:e3078dccd1be364aa44db10f1af841cee30e120d4a09d2e23b565d8cda6f2e5d",
+    "networkDeniedStandaloneVerificationPassed": true,
+    "unpublishedPrPacket": {
+      "path": ".runtime/github-issue-qualification/qualification-pbjey_12/unpublished-pr-packet.json",
+      "sha256": "32bd0d8c0f6fa69e05a573ad6196a4bb767e6b448ecab26c268b6c04335a9e8e",
+      "schema": "kujo.factory.qualification-pr-packet/v1",
+      "repository": "kujolang/software-factory",
+      "issue": "https://github.com/kujolang/software-factory/issues/1",
+      "title": "Repair and verify the converter on the qualification seed branch",
+      "body": "Qualification-only repair for issue #1. Restores the correct Celsius-to-Fahrenheit offset and, with operator authorization after independent review, prevents older responses from overwriting the latest result. The isolated browser regression reproduces the baseline failure and verifies the corrected client. The unchanged sealed contract passed independent review, Workcell API/browser checks, Lens and release verification. Offline evidence: sha256:e3078dccd1be364aa44db10f1af841cee30e120d4a09d2e23b565d8cda6f2e5d",
+      "baseBranch": "codex/qualification-converter-seed",
+      "baseCommit": "64c313ba2b10329018148a9c2bf34de32ae5f52a",
+      "headBranch": "codex/qualification-converter-fix",
+      "headCommit": "8e609801bac75e6859fd5fdb51840395969f2d8e",
+      "patchSha256": "ea7050c9ef762d649f885da9a63dfa5789c56f399cb30b7df5d28c5a0c7b9bf9",
+      "bundleId": "sha256:e3078dccd1be364aa44db10f1af841cee30e120d4a09d2e23b565d8cda6f2e5d",
+      "projectionCommit": "b0a3bf8176e7132f26a475e4cb83b5daa10a1241",
+      "repairedProjectionCommit": "d7accdcb487662d82a3be5d037d170efcc7891ac",
+      "originalIssueRun": "factory-2026-11-20T03-53-41-638Z",
+      "mapping": [
+        {
+          "path": "examples/converter/public/app.js",
+          "seedSha256": "48c233f7c83ea8924c92ce4ca55339107582e2f39527ee49701a12d39217a579",
+          "approvedSha256": "cf09dd40410ed220a67644c73dfeae0c5430104fc6bbdf402096258e21248447"
+        },
+        {
+          "path": "examples/converter/server.mjs",
+          "seedSha256": "d1a2b6cb046dd18baba9cf6078d26c598c7ba0efbeb3b271d87f03bef2aa9ff7",
+          "approvedSha256": "d6909fbf6c926c18e703f52bc166b8fe4af10c51af5a03c18cd693cd11d2bdab"
+        }
+      ],
+      "nativeConflictCheckPassed": true,
+      "published": false,
+      "pushed": false,
+      "deploymentAuthorized": false
+    }
+  }
+}

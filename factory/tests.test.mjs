@@ -1,3 +1,7 @@
+import {evaluateVerification} from './evaluation.mjs';
+import {startMissionAccounting} from './lifecycle.mjs';
+import {controllerProvenance} from './provenance.mjs';
+import {dependency} from './settings.mjs';
 import test from "node:test";
 import { productDocs } from "./product-docs.mjs";
 import assert from "node:assert/strict";
@@ -8,7 +12,7 @@ import { pathToFileURL } from "node:url";
 import { materialize, digest, event, events, command } from "./core.mjs";
 
 function fixture(t) {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "factory-test-"));
+  const dir = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), "factory-test-"));
   t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
   return dir;
 }
@@ -199,9 +203,10 @@ test("release worker rejects generated source that exits successfully before ass
   fs.writeFileSync(
     path.join(dir, "run.json"),
     JSON.stringify({
+      id:path.basename(dir),accountabilityRequired:true,
       mission: "Controlled gate regression",
       workspace: dir,
-      agentsRoot: path.join(dir, "agents"),
+      agentsRoot: dependency("kujo-agents"),
       tasks: [
         {
           id: "release",
@@ -212,6 +217,10 @@ test("release worker rejects generated source that exits successfully before ass
       ],
     }),
   );
+  const read=name=>JSON.parse(fs.readFileSync(path.join(artifacts,name)));
+  const evaluation=await evaluateVerification({dir,sourceHash:digest(app),verification:read('verification.json'),review:read('review-binding.json'),browser:read('browser.json')});
+  fs.writeFileSync(path.join(artifacts,'evaluation.json'),JSON.stringify(evaluation));
+  await startMissionAccounting(dir,{id:path.basename(dir)},controllerProvenance(),{provider:'offline-fixture',model:'none'});
   // Offline provider fixture explicitly scoped to this test; no live model call.
   const provider = `#!${process.execPath}\nimport fs from 'node:fs'; const args=process.argv.slice(2);fs.writeFileSync(args[args.indexOf('-o')+1],JSON.stringify({summary:'Fixture only',verdict:'pass',issues:[],files:[]}));console.log(JSON.stringify({type:'turn.completed',usage:{input_tokens:0,output_tokens:0}}));\n`;
   fs.writeFileSync(path.join(bin, "codex"), provider, { mode: 0o700 });
@@ -219,7 +228,7 @@ test("release worker rejects generated source that exits successfully before ass
     process.execPath,
     [path.join(import.meta.dirname, "worker.mjs"), dir, "release"],
     {
-      timeout: 10000,
+      timeout: 30000,
       env: {
         PATH: bin + path.delimiter + process.env.PATH,
         DOCKER_HOST: "unix:///tmp/factory-test-missing-engine.sock",
@@ -235,7 +244,7 @@ test("release worker rejects generated source that exits successfully before ass
     ),
     "missing isolated build blocks before reviewer",
   );
-  assert.ok(journal.some((e) => e.type === "release.blocked"));
+  assert.ok(journal.some((e) => e.type === "release.blocked" && /docker info failed/.test(e.summary)), JSON.stringify(journal));
   assert.ok(!journal.some((e) => e.type === "release.approved"));
 });
 
@@ -279,15 +288,18 @@ test("missing engine blocks candidate assertion mutation without host execution"
   assert.match(r.err, /docker info failed/);
 });
 
-test("SIGTERM to worker cleans up its active command process group", async (t) => {
+for (const [signal, exitCode] of [["SIGTERM", 143], ["SIGINT", 130]])
+test(`${signal} to worker cleans up its active command process group`, async (t) => {
   const { spawn } = await import("node:child_process");
   const dir = fixture(t),
-    pidFile = path.join(dir, "pid");
+    pidFile = path.join(dir, "pid"),
+    exitObservation = path.join(dir, "exit-observation.json"),
+    resumed = path.join(dir, "resumed");
   const moduleUrl = pathToFileURL(
     path.join(import.meta.dirname, "core.mjs"),
   ).href;
-  const childCode = `require('node:fs').writeFileSync(${JSON.stringify(pidFile)},String(process.pid));setInterval(()=>{},1000);`;
-  const source = `import {command} from ${JSON.stringify(moduleUrl)};await command(process.execPath,['-e',${JSON.stringify(childCode)}],{timeout:10000});`;
+  const childCode = `const fs=require('node:fs');fs.writeFileSync(${JSON.stringify(pidFile+'.tmp')},String(process.pid));fs.renameSync(${JSON.stringify(pidFile+'.tmp')},${JSON.stringify(pidFile)});setInterval(()=>{},1000);`;
+  const source = `import {command} from ${JSON.stringify(moduleUrl)};import fs from "node:fs";process.once("exit",()=>{let alive=false;try{process.kill(Number(fs.readFileSync(${JSON.stringify(pidFile)},"utf8")),0);alive=true}catch{}fs.writeFileSync(${JSON.stringify(exitObservation)},JSON.stringify({alive}));});await command(process.execPath,['-e',${JSON.stringify(childCode)}],{timeout:10000});fs.writeFileSync(${JSON.stringify(resumed)},"unexpected continuation");`;
   const parent = spawn(
     process.execPath,
     ["--input-type=module", "-e", source],
@@ -299,12 +311,18 @@ test("SIGTERM to worker cleans up its active command process group", async (t) =
     } catch {}
   });
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-  for (let i = 0; i < 100 && !fs.existsSync(pidFile); i++) await sleep(20);
-  assert.ok(fs.existsSync(pidFile), "child started");
-  const pid = Number(fs.readFileSync(pidFile, "utf8"));
+  let pid;
+  for (let i = 0; i < 100; i++) {
+    const text = fs.existsSync(pidFile) ? fs.readFileSync(pidFile, "utf8") : "";
+    if (/^[1-9][0-9]*$/.test(text) && Number.isSafeInteger(Number(text)) && Number(text) > 1) { pid = Number(text); break; }
+    await sleep(20);
+  }
+  assert.ok(Number.isSafeInteger(pid) && pid > 1, "child published a valid PID atomically");
   const exited = new Promise((r) => parent.once("exit", r));
-  parent.kill("SIGTERM");
-  assert.equal(await exited, 143);
+  parent.kill(signal);
+  assert.equal(await exited, exitCode);
+  assert.equal(fs.existsSync(resumed),false,"signal cleanup cannot resume mission work");
+  assert.deepEqual(JSON.parse(fs.readFileSync(exitObservation,"utf8")),{alive:false},"worker reaps its child before exiting");
   let alive = true;
   for (let i = 0; i < 100; i++) {
     try {

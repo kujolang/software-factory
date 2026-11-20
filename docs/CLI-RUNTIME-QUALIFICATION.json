@@ -1,0 +1,1085 @@
+{
+  "schema": "kujo.factory.cli-runtime-qualification/v1",
+  "scope": "Local Linux amd64 rootless Workcell CLI fixtures; no service/framework or cross-platform qualification",
+  "runtimes": {
+    "python-cli": {
+      "version": "3.13.9",
+      "qualification": "qualified-cli-fixtures-linux-amd64",
+      "imageId": "sha256:0c858030a48881dd918554ea0420070659c282d21703630ff7df23657618e0f8",
+      "platform": "linux/amd64",
+      "command": "node scripts/qualify-python-cli.mjs",
+      "log": ".runtime/ecosystem-phase-b/python-cli-qualified.log",
+      "logSha256": "5d9c769ff1d1104a76639c09969e842eb882cfcded8227d55e511692d85fe2d4",
+      "evidence": ".runtime/python-cli-qualification-WckP9H",
+      "outcomes": [
+        {
+          "name": "positive",
+          "ok": true,
+          "observed": [
+            {
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "wrong-answer",
+          "ok": false,
+          "observed": [
+            {
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "timeout",
+          "ok": false,
+          "observed": [
+            {
+              "code": null,
+              "reason": "timeout"
+            }
+          ]
+        },
+        {
+          "name": "forged-output",
+          "ok": false,
+          "observed": [
+            {
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "diagnostic-flood",
+          "ok": false,
+          "observed": [
+            {
+              "code": null,
+              "reason": "output_limit"
+            }
+          ]
+        },
+        {
+          "name": "isolation",
+          "ok": true,
+          "observed": [
+            {
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        }
+      ]
+    },
+    "kujo-cli": {
+      "version": "1.9.0",
+      "qualification": "qualified-cli-fixtures-linux-amd64",
+      "imageId": "sha256:c62fa7844cd38dd67d18421162af5016b2973a48d6db0a119982b2bf4b661383",
+      "platform": "linux/amd64",
+      "command": "node scripts/qualify-kujo-cli.mjs",
+      "log": ".runtime/ecosystem-phase-b/kujo-cli-qualified.log",
+      "logSha256": "58a655ba9c776ca46f9ea3cbd2d1d1c3c91862be01cef366c6acf96f18381129",
+      "evidence": ".runtime/kujo-cli-qualification-BVvwT4",
+      "outcomes": [
+        {
+          "name": "positive",
+          "ok": true,
+          "observed": [
+            {
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "wrong-answer",
+          "ok": false,
+          "observed": [
+            {
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "timeout",
+          "ok": false,
+          "observed": [
+            {
+              "code": null,
+              "reason": "timeout"
+            }
+          ]
+        },
+        {
+          "name": "forged-output",
+          "ok": false,
+          "observed": [
+            {
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "protected-write",
+          "ok": false,
+          "observed": [
+            {
+              "code": 4,
+              "reason": ""
+            }
+          ]
+        }
+      ]
+    },
+    "typescript-cli": {
+      "version": "7.0.2",
+      "qualification": "qualified-cli-fixtures-linux-amd64",
+      "imageId": "sha256:0952d2a6f776fa396bd4a7a3fed61615db9685501c1227e0170c484bfb683fc1",
+      "platform": "linux/amd64",
+      "command": "node scripts/qualify-compiled-cli.mjs typescript-cli",
+      "log": ".runtime/ecosystem-phase-b/typescript-cli-qualification.log",
+      "logSha256": "4b3937430f0df3d0e06728f9752b2e25b83710571320e083898833c263fc1d27",
+      "evidence": ".runtime/typescript-cli-qualification-LESJIN",
+      "outcomes": [
+        {
+          "name": "positive",
+          "ok": true,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "wrong",
+          "ok": false,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "timeout",
+          "ok": false,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": null,
+              "reason": "timeout"
+            }
+          ]
+        },
+        {
+          "name": "compileFailure",
+          "ok": false,
+          "observed": [
+            {
+              "buildCode": 2,
+              "code": 2,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "protected",
+          "ok": true,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        }
+      ]
+    },
+    "go-cli": {
+      "version": "1.27.4",
+      "qualification": "qualified-cli-fixtures-linux-amd64",
+      "lastExecution": {
+        "scope": "default noexec profile",
+        "compileExitCode": 0,
+        "executionExitCode": 126,
+        "result": "Correctly denied native execution from /tmp",
+        "evidence": ".runtime/go-cli-qualification-mR9v64",
+        "log": {
+          "path": ".runtime/ecosystem-phase-b/go-cli-qualification.log",
+          "sha256": "e240be1be553aaa9ab6150fd152dae892431e80d31ad7c54b0ff8fbc4a90edd8"
+        }
+      },
+      "pending": "General-purpose application/framework/service and cross-platform qualifications remain outside this standard-library CLI evidence",
+      "functionalVerification": {
+        "passed": true,
+        "evidence": ".runtime/go-cli-qualification-YPFW9K",
+        "outcomes": [
+          {
+            "name": "positive",
+            "ok": true,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "wrong",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "timeout",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": null,
+                "reason": "timeout"
+              }
+            ]
+          },
+          {
+            "name": "compileFailure",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 1,
+                "code": 1,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "protected",
+            "ok": true,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          }
+        ],
+        "log": {
+          "path": ".runtime/ecosystem-phase-b/go-cli-native-qualification.log",
+          "sha256": "d633d8c105bd299877e57180f8bbe660053e62d6536a95d2fc43e7034902b2d5"
+        }
+      },
+      "securityQualificationPassed": true,
+      "readonlyV2Qualification": {
+        "functionalPassed": true,
+        "securityPassed": true,
+        "integrationStatus": "installed-pinned-source-verified",
+        "upstreamNativeCommit": "099d1b6d17b38c8c247e8c6617649d8ea21ba157",
+        "evidence": ".runtime/go-cli-qualification-GGzbD1",
+        "outcomes": [
+          {
+            "name": "positive",
+            "ok": true,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "wrong",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "timeout",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": null,
+                "reason": "timeout"
+              }
+            ]
+          },
+          {
+            "name": "compileFailure",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 1,
+                "code": 1,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "protected",
+            "ok": true,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          }
+        ],
+        "log": {
+          "path": ".runtime/ecosystem-phase-b/go-cli-readonly-qualification.log",
+          "sha256": "19432a4c10555a1b1183cc3027312fd3f49da89438013f64a57c238513539ec0"
+        },
+        "imageId": "sha256:6535831b94cd8d317b51b306ce5c057a61fe27100e26e3c9aa75c6c8f22101ee",
+        "scope": "Historical original v2 image qualification before compiled snapshot reread hardening"
+      },
+      "imageId": "sha256:13a334b023ea9304bdaecc31d3a4954d53e68170b372b1df59632f2be6403338",
+      "platform": "linux/amd64",
+      "log": ".runtime/compiled-snapshot-requalification/go-functional.log",
+      "logSha256": "fa751f3e6876789fc7cf54116beb4247dfb609a6a68aeb2bcb2190dd3d1bbf75",
+      "evidence": ".runtime/go-cli-qualification-c2ntXX",
+      "outcomes": [
+        {
+          "name": "positive",
+          "ok": true,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "wrong",
+          "ok": false,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "timeout",
+          "ok": false,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": null,
+              "reason": "timeout"
+            }
+          ]
+        },
+        {
+          "name": "compileFailure",
+          "ok": false,
+          "observed": [
+            {
+              "buildCode": 1,
+              "code": 1,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "protected",
+          "ok": true,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "historicalImageBeforeSnapshotFix": "sha256:6535831b94cd8d317b51b306ce5c057a61fe27100e26e3c9aa75c6c8f22101ee",
+      "historicalPendingBeforeReadonlyQualification": "Upstream explicit readonly workspace capability and renewed native security qualification; factory rejects profile before engine access",
+      "helperSnapshotQualification": {
+        "functionalPassed": true,
+        "securityPassed": true,
+        "installedPublicPassed": true,
+        "imageId": "sha256:13a334b023ea9304bdaecc31d3a4954d53e68170b372b1df59632f2be6403338",
+        "helperSha256": "ce5ba162941dfc9395ce0e80604d1c734d2662a0d49e1be6c8bef464e3e2a993",
+        "functionalEvidence": ".runtime/go-cli-qualification-c2ntXX",
+        "securityEvidence": ".runtime/native-staging-qualification-LseTPd",
+        "checks": [
+          "packaged compiled helper matches reviewed source bytes",
+          "same-tick mutation rejected by packaged byte comparison",
+          "symlink rejected",
+          "hardlink rejected",
+          "oversize rejected",
+          "observed readonly workspace mount",
+          "bounded immutable artifact executed only in Workcell",
+          "UID, immutable bind/source/image, credentials and socket boundaries",
+          "egress denied"
+        ],
+        "build": {
+          "base": "sha256:0952d2a6f776fa396bd4a7a3fed61615db9685501c1227e0170c484bfb683fc1",
+          "exitCode": 0,
+          "imageId": "sha256:13a334b023ea9304bdaecc31d3a4954d53e68170b372b1df59632f2be6403338"
+        },
+        "logs": {
+          "build": {
+            "path": ".runtime/compiled-snapshot-requalification/go-image-build.log",
+            "sha256": "2989e2d4cf5a43f2d0bab5b94e5a2d773e5e5410393f955c3b58563f2dfb6c33"
+          },
+          "functional": {
+            "path": ".runtime/compiled-snapshot-requalification/go-functional.log",
+            "sha256": "fa751f3e6876789fc7cf54116beb4247dfb609a6a68aeb2bcb2190dd3d1bbf75"
+          },
+          "security": {
+            "path": ".runtime/compiled-snapshot-requalification/go-security.log",
+            "sha256": "99cf40cb2c893a8f7fe6a22a31027df60f0c11cac6232c9a98c8a37d545b5d61"
+          }
+        }
+      }
+    },
+    "rust-cli": {
+      "version": "1.100.0",
+      "qualification": "qualified-cli-fixtures-linux-amd64",
+      "imageBuild": {
+        "base": "sha256:c62fa7844cd38dd67d18421162af5016b2973a48d6db0a119982b2bf4b661383",
+        "exitCode": 0,
+        "imageId": "sha256:ff5420e6093b3c1d0e86fa3cd554657072a7a93886e8ca3a18a1c9bb4b55b952"
+      },
+      "executionQualification": "not performed",
+      "pending": "General-purpose application/framework/service and cross-platform qualifications remain outside this standard-library CLI evidence",
+      "functionalVerification": {
+        "passed": true,
+        "evidence": ".runtime/rust-cli-qualification-MtDOpB",
+        "outcomes": [
+          {
+            "name": "positive",
+            "ok": true,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "wrong",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "timeout",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": null,
+                "reason": "timeout"
+              }
+            ]
+          },
+          {
+            "name": "compileFailure",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 1,
+                "code": 1,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "protected",
+            "ok": true,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          }
+        ],
+        "log": {
+          "path": ".runtime/ecosystem-phase-b/rust-cli-native-qualification.log",
+          "sha256": "8b320ef44bb30afa171e9780b2bf416e501f0ced4abeb8691d4e7f81d06d5d01"
+        }
+      },
+      "securityQualificationPassed": true,
+      "readonlyV2Qualification": {
+        "functionalPassed": true,
+        "securityPassed": true,
+        "integrationStatus": "installed-pinned-source-verified",
+        "upstreamNativeCommit": "099d1b6d17b38c8c247e8c6617649d8ea21ba157",
+        "evidence": ".runtime/rust-cli-qualification-wnPt7N",
+        "outcomes": [
+          {
+            "name": "positive",
+            "ok": true,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "wrong",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "timeout",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": null,
+                "reason": "timeout"
+              }
+            ]
+          },
+          {
+            "name": "compileFailure",
+            "ok": false,
+            "observed": [
+              {
+                "buildCode": 1,
+                "code": 1,
+                "reason": ""
+              }
+            ]
+          },
+          {
+            "name": "protected",
+            "ok": true,
+            "observed": [
+              {
+                "buildCode": 0,
+                "code": 0,
+                "reason": ""
+              }
+            ]
+          }
+        ],
+        "log": {
+          "path": ".runtime/ecosystem-phase-b/rust-cli-readonly-qualification.log",
+          "sha256": "0e9d71efa6de284d55fc86314f07dcfad58776b629b183a73e09ee9857b45642"
+        },
+        "imageId": "sha256:6a5c8acb308500d7d0837a23882e763d9f8dfefae36b2db62f092f7b6436a0c5",
+        "scope": "Historical original v2 image qualification before compiled snapshot reread hardening"
+      },
+      "imageId": "sha256:e53cfae50d0430337eaecd02e188a9d9220d604af38360003ba9fd4ddd7e88bc",
+      "platform": "linux/amd64",
+      "log": ".runtime/compiled-snapshot-requalification/rust-functional.log",
+      "logSha256": "2757875ed02ab78753f7af2f03fb7ed223e9ea3c587ae68bffedaebfa2d0d0b6",
+      "evidence": ".runtime/rust-cli-qualification-4VfZsr",
+      "outcomes": [
+        {
+          "name": "positive",
+          "ok": true,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "wrong",
+          "ok": false,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "timeout",
+          "ok": false,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": null,
+              "reason": "timeout"
+            }
+          ]
+        },
+        {
+          "name": "compileFailure",
+          "ok": false,
+          "observed": [
+            {
+              "buildCode": 1,
+              "code": 1,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "name": "protected",
+          "ok": true,
+          "observed": [
+            {
+              "buildCode": 0,
+              "code": 0,
+              "reason": ""
+            }
+          ]
+        }
+      ],
+      "historicalImageBeforeSnapshotFix": "sha256:6a5c8acb308500d7d0837a23882e763d9f8dfefae36b2db62f092f7b6436a0c5",
+      "historicalPendingBeforeReadonlyQualification": "Upstream explicit readonly workspace capability and renewed native security qualification; factory rejects profile before engine access",
+      "helperSnapshotQualification": {
+        "functionalPassed": true,
+        "securityPassed": true,
+        "installedPublicPassed": true,
+        "imageId": "sha256:e53cfae50d0430337eaecd02e188a9d9220d604af38360003ba9fd4ddd7e88bc",
+        "helperSha256": "ce5ba162941dfc9395ce0e80604d1c734d2662a0d49e1be6c8bef464e3e2a993",
+        "functionalEvidence": ".runtime/rust-cli-qualification-4VfZsr",
+        "securityEvidence": ".runtime/native-staging-qualification-OM3eKu",
+        "checks": [
+          "packaged compiled helper matches reviewed source bytes",
+          "same-tick mutation rejected by packaged byte comparison",
+          "symlink rejected",
+          "hardlink rejected",
+          "oversize rejected",
+          "observed readonly workspace mount",
+          "bounded immutable artifact executed only in Workcell",
+          "UID, immutable bind/source/image, credentials and socket boundaries",
+          "egress denied"
+        ],
+        "build": {
+          "base": "sha256:ff5420e6093b3c1d0e86fa3cd554657072a7a93886e8ca3a18a1c9bb4b55b952",
+          "exitCode": 0,
+          "imageId": "sha256:e53cfae50d0430337eaecd02e188a9d9220d604af38360003ba9fd4ddd7e88bc"
+        },
+        "logs": {
+          "build": {
+            "path": ".runtime/compiled-snapshot-requalification/rust-image-build.log",
+            "sha256": "db9c629acec9fd505c7d740fb4561f16af3d75d259ce7595975f6d41ba184cdd"
+          },
+          "functional": {
+            "path": ".runtime/compiled-snapshot-requalification/rust-functional.log",
+            "sha256": "2757875ed02ab78753f7af2f03fb7ed223e9ea3c587ae68bffedaebfa2d0d0b6"
+          },
+          "security": {
+            "path": ".runtime/compiled-snapshot-requalification/rust-security.log",
+            "sha256": "d1895554174a8c5bdb99dc2792e1e8aaae1c27e24fa69228ee1eea43ed81cab1"
+          }
+        }
+      }
+    }
+  },
+  "nativeProfileBlocker": {
+    "reason": "Actual UID65534 write to host-backed isolated clone succeeded despite reported root ownership/mode; permission metadata is insufficient on this host sharing filesystem",
+    "defaultProfileAffected": false,
+    "profileDisabledBeforeEngineAccess": true,
+    "originalHostRepositoryExposed": false,
+    "log": {
+      "path": ".runtime/ecosystem-phase-b/native-staging-qualification.log",
+      "sha256": "86fb9916bb4e9099c7e087ed7d6742f66b33dee7fa04082812cc1e2143c84bd1"
+    },
+    "failClosedTest": {
+      "path": ".runtime/ecosystem-phase-b/cli-runtime-failclosed.log",
+      "sha256": "558b9c018f500c7e89b9d0fdf827d8b3c425dd7f929ec4aac7beeefdbc92ceec"
+    },
+    "scope": "Historical native-compiled-cli/v1 failure; v1 stays disabled. V2 uses independently observed kernel read-only mount."
+  },
+  "deterministicVerification": {
+    "command": "node --test tests/cli-runtime.test.mjs tests/lens.test.mjs tests/compiled-artifact.test.mjs tests/compiled-export.test.mjs",
+    "passed": 24,
+    "failed": 0,
+    "scope": "Trusted byte/record fixtures; no host candidate execution",
+    "log": {
+      "path": ".runtime/ecosystem-phase-b/runtime-installed-final-unit.log",
+      "sha256": "109c7b389aa13f49139cc273ac1355b6a00c20a3cdd887c25ea511bb3331dd1d"
+    }
+  },
+  "sourceLock": {
+    "path": "config/cli-runtime-sources.lock.json",
+    "sha256": "de693fdd2945f9b9fdf968ada03c72d1d8ea99b1845ab24dad968ea14d8776e9"
+  },
+  "readonlyV2Security": {
+    "ok": true,
+    "checks": [
+      "symlink rejected",
+      "hardlink rejected",
+      "oversize rejected",
+      "observed readonly workspace mount",
+      "bounded immutable artifact executed only in Workcell",
+      "UID, immutable bind/source/image, credentials and socket boundaries",
+      "egress denied"
+    ],
+    "evidence": ".runtime/native-staging-qualification-lV0wjT",
+    "log": {
+      "path": ".runtime/ecosystem-phase-b/native-readonly-staging-qualification.log",
+      "sha256": "ea8ed787ff860355e5fc16aa4b6e3c4cfa7a9bb1f6d41249372016bad539e7e4"
+    }
+  },
+  "installedPublicCLI": {
+    "ok": true,
+    "base": "/Users/robertdevore/2026/Kujolang/kujo-repos/software-factory/.runtime/native-installed-qualification-30CBEm",
+    "records": [
+      {
+        "profile": "go-cli",
+        "elapsedMs": 33902,
+        "sourceHash": "502d64a669a2d45e804d35d7f892e53063cd232861006621db3713b3ca52b542",
+        "workcellSource": {
+          "commit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+          "expectedCommit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+          "clean": true,
+          "trackedFiles": 270,
+          "trackedBytes": 1820045,
+          "trackedInventorySha256": "8d3fce926a99fdab023288284d7d9fe22cab7c3b6644825a0392529fa9ff8175",
+          "scope": "Pinned tracked Git blob bytes and executable modes; ignored files and generated caches are not authenticated"
+        },
+        "imageId": "sha256:13a334b023ea9304bdaecc31d3a4954d53e68170b372b1df59632f2be6403338",
+        "stdoutSha256": "b9e9d10be8ef7de2f65d4c5981cb31c92bf4ce3256153b9d4d70063274c63d7b",
+        "evidence": "go-cli/evidence"
+      },
+      {
+        "profile": "rust-cli",
+        "elapsedMs": 11199,
+        "sourceHash": "028997150d8b5dba2d363b566189380229ab8400eca8c49676c3b9c9347ccec9",
+        "workcellSource": {
+          "commit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+          "expectedCommit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+          "clean": true,
+          "trackedFiles": 270,
+          "trackedBytes": 1820045,
+          "trackedInventorySha256": "8d3fce926a99fdab023288284d7d9fe22cab7c3b6644825a0392529fa9ff8175",
+          "scope": "Pinned tracked Git blob bytes and executable modes; ignored files and generated caches are not authenticated"
+        },
+        "imageId": "sha256:e53cfae50d0430337eaecd02e188a9d9220d604af38360003ba9fd4ddd7e88bc",
+        "stdoutSha256": "56ffb26b34f172b1ceb956e88e69d3484d26bd03fc1c2900700628ddcbc4ee2a",
+        "evidence": "rust-cli/evidence"
+      }
+    ],
+    "scope": "Installed public CLI standard-library positives; no full application/runtime compatibility claim",
+    "evidence": ".runtime/native-installed-qualification-30CBEm",
+    "command": "node scripts/qualify-installed-native-cli.mjs",
+    "log": {
+      "path": ".runtime/compiled-snapshot-requalification/installed-public.log",
+      "sha256": "9d7b7866567c0381c79c53acf22d724a4a9564a2051466ef8e4e793bed2fcf0e"
+    }
+  },
+  "upstreamWorkcell": {
+    "url": "https://github.com/kujolang/workcell.git",
+    "branch": "codex/workcell-readonly-workspace",
+    "commit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+    "clean": true,
+    "pushed": true,
+    "testedKujo": "1.9.0",
+    "nativeUnitPassed": 223,
+    "portableUnitPassed": 23,
+    "adapterTestsPassed": 30,
+    "releaseReportPassed": 257,
+    "auditVulnerabilities": 0,
+    "fullSuiteExitCode": 0,
+    "remoteLiveQualified": false,
+    "logs": [
+      {
+        "path": ".runtime/ecosystem-phase-b/workcell-readonly-all-final.log",
+        "sha256": "ad599f0a98e4a4acc297d1c12ed04760609c7a55629d4a4340352ed129f03fb4"
+      },
+      {
+        "path": ".runtime/ecosystem-phase-b/workcell-readonly-unsupported.log",
+        "sha256": "44d51ee313be7d5f44004b5dcac792d8f409c82f383bb4803b0dca653a1dab6b"
+      },
+      {
+        "path": ".runtime/ecosystem-phase-b/workcell-adapter-security-tests.log",
+        "sha256": "f317a8f85d8b9f114c1db8b3e07148dc710f99f00799b3b02b227ef468987d37"
+      },
+      {
+        "path": ".runtime/ecosystem-phase-b/workcell-adapter-security-audit-final.json",
+        "sha256": "d413743c70bf782d3b8dfb55b486bbf4cddeb34f87f48ac947673bc3d3e2ed4b"
+      },
+      {
+        "path": ".runtime/ecosystem-phase-b/workcell-readonly-pinned-setup.log",
+        "sha256": "82e4ccbf291219824b519cb8b2621dd6f53a1b237ffc2b36d8b8a4473bf81598"
+      },
+      {
+        "path": ".runtime/ecosystem-phase-b/workcell-readonly-installed-live.log",
+        "sha256": "9878fab541d2d2c259d407ffddd075566d3714311e7bfdb882f009136f59829b"
+      }
+    ]
+  },
+  "controllerSourceBytes": {
+    "factory/cli-runtime.mjs": "98e08123e27907fc32be6ce3932a0f9f0feccc50525d9bbe9153e2fbc44d637d",
+    "factory/cli-runtime-worker.mjs": "b6cdd7e23135dd3998400367f5ae3ac4f7d90f87273e31d5bb1e06da1ec141f5",
+    "factory/workcell.mjs": "968834b8f26c16c2682bfeff568fb6f31f2e7a88473d6e77b52212523c0f9a1e",
+    "factory/compiled-export.mjs": "8e3f0154d27104cbae7c2a554228f1b35cd79e3364d4a3810684bb275c621fec",
+    "factory/runtime-images/compiled-artifact-contract.mjs": "ce5ba162941dfc9395ce0e80604d1c734d2662a0d49e1be6c8bef464e3e2a993",
+    "factory/runtime-images/compiled-keepalive.mjs": "c545e206ea402ebb5a2ceadbc5b52df3fee67bd8e075f153c50019224c28a72f",
+    "factory/runtime-images/export-compiled.mjs": "a54636bce4523c8eb43545441088f023a01e3dd3750d8b8c812406e97224e3ad",
+    "config/cli-runtime-profiles.json": "795a2290c9eb84caae38265bfee1be5b0c6eba906d6949797fdd16dc9f22a6c3",
+    "config/cli-runtime-sources.lock.json": "de693fdd2945f9b9fdf968ada03c72d1d8ea99b1845ab24dad968ea14d8776e9",
+    "sources.lock.json": "67407995783d72ab15328c7eb1d18a98fb75d140e98091dbcfea05fab07efca4"
+  },
+  "sourceIdentityRequalification": {
+    "sourceCommit": "45be0c3dcd0164ad0439017b6e372f96d3cd3b7a",
+    "command": "node scripts/qualify-installed-native-cli.mjs",
+    "exitCode": 0,
+    "log": {
+      "path": ".runtime/ledger-completion/native-identity-final.log",
+      "sha256": "d52e03c2ff55a32e7778bb70e65f2455aa261ab5ce951fc4e525f4c87c1c81de"
+    },
+    "result": {
+      "ok": true,
+      "base": "/Users/robertdevore/2026/Kujolang/kujo-repos/software-factory/.runtime/native-installed-qualification-Y4Dw7J",
+      "records": [
+        {
+          "profile": "go-cli",
+          "elapsedMs": 26324,
+          "sourceHash": "502d64a669a2d45e804d35d7f892e53063cd232861006621db3713b3ca52b542",
+          "workcellSource": {
+            "commit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+            "expectedCommit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+            "clean": true,
+            "trackedFiles": 270,
+            "trackedBytes": 1820045,
+            "trackedInventorySha256": "8d3fce926a99fdab023288284d7d9fe22cab7c3b6644825a0392529fa9ff8175",
+            "scope": "Pinned tracked Git blob bytes and executable modes; ignored files and generated caches are not authenticated"
+          },
+          "imageId": "sha256:6535831b94cd8d317b51b306ce5c057a61fe27100e26e3c9aa75c6c8f22101ee",
+          "stdoutSha256": "ac2624f0c928f95a5a21f577c8de93925e532309e199b45248fc5d9fb8dff084",
+          "evidence": "go-cli/evidence"
+        },
+        {
+          "profile": "rust-cli",
+          "elapsedMs": 11142,
+          "sourceHash": "028997150d8b5dba2d363b566189380229ab8400eca8c49676c3b9c9347ccec9",
+          "workcellSource": {
+            "commit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+            "expectedCommit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+            "clean": true,
+            "trackedFiles": 270,
+            "trackedBytes": 1820045,
+            "trackedInventorySha256": "8d3fce926a99fdab023288284d7d9fe22cab7c3b6644825a0392529fa9ff8175",
+            "scope": "Pinned tracked Git blob bytes and executable modes; ignored files and generated caches are not authenticated"
+          },
+          "imageId": "sha256:6a5c8acb308500d7d0837a23882e763d9f8dfefae36b2db62f092f7b6436a0c5",
+          "stdoutSha256": "08f056e7b1a36609a99c47779657ecd947ce6a00a7046bc16c6ddab1712b1d15",
+          "evidence": "rust-cli/evidence"
+        }
+      ],
+      "scope": "Installed public CLI standard-library positives; no full application/runtime compatibility claim"
+    }
+  },
+  "historicalInstalledPublicCLI": {
+    "ok": true,
+    "evidence": ".runtime/native-installed-qualification-Z0VI97",
+    "records": [
+      {
+        "profile": "go-cli",
+        "elapsedMs": 29466,
+        "sourceHash": "502d64a669a2d45e804d35d7f892e53063cd232861006621db3713b3ca52b542",
+        "workcellSource": {
+          "commit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+          "clean": true,
+          "expectedCommit": "144ab49da88a17fd0d786d01d98030d7ec7798cb"
+        },
+        "imageId": "sha256:6535831b94cd8d317b51b306ce5c057a61fe27100e26e3c9aa75c6c8f22101ee",
+        "stdoutSha256": "43949b962132d19216148ca5eb340305c9c1caf860af123c31fd9e3412ce0eea",
+        "evidence": "go-cli/evidence"
+      },
+      {
+        "profile": "rust-cli",
+        "elapsedMs": 11087,
+        "sourceHash": "028997150d8b5dba2d363b566189380229ab8400eca8c49676c3b9c9347ccec9",
+        "workcellSource": {
+          "commit": "144ab49da88a17fd0d786d01d98030d7ec7798cb",
+          "clean": true,
+          "expectedCommit": "144ab49da88a17fd0d786d01d98030d7ec7798cb"
+        },
+        "imageId": "sha256:6a5c8acb308500d7d0837a23882e763d9f8dfefae36b2db62f092f7b6436a0c5",
+        "stdoutSha256": "f258b09868c81c77f32f6cde3e20cdb725e222a3cbc14eb6564f47a6339b7d86",
+        "evidence": "rust-cli/evidence"
+      }
+    ],
+    "command": "node scripts/qualify-installed-native-cli.mjs",
+    "log": {
+      "path": ".runtime/ecosystem-phase-b/native-installed-public-qualification.log",
+      "sha256": "1c090960de26a88511b9e7415c7cc171c99029564c191730f500cda5435d9a7b"
+    }
+  },
+  "historicalControllerSourceBytes": {
+    "factory/cli-runtime.mjs": "98e08123e27907fc32be6ce3932a0f9f0feccc50525d9bbe9153e2fbc44d637d",
+    "factory/cli-runtime-worker.mjs": "88b60fab37af88adfb1e764e5821b731b0caae6ea4f68e553eeb29eecd41f90b",
+    "factory/workcell.mjs": "968834b8f26c16c2682bfeff568fb6f31f2e7a88473d6e77b52212523c0f9a1e",
+    "factory/compiled-export.mjs": "8e3f0154d27104cbae7c2a554228f1b35cd79e3364d4a3810684bb275c621fec",
+    "factory/runtime-images/compiled-artifact-contract.mjs": "9f56670deb98907a4125cc1257d812dee4af8afdacea152402dc8d43497c18a2",
+    "factory/runtime-images/compiled-keepalive.mjs": "c545e206ea402ebb5a2ceadbc5b52df3fee67bd8e075f153c50019224c28a72f",
+    "factory/runtime-images/export-compiled.mjs": "a54636bce4523c8eb43545441088f023a01e3dd3750d8b8c812406e97224e3ad",
+    "config/cli-runtime-profiles.json": "967859f74cd53eebd22213ff2c90de49488f8fe8d719a4d1ad0dac1ddf829254",
+    "config/cli-runtime-sources.lock.json": "de693fdd2945f9b9fdf968ada03c72d1d8ea99b1845ab24dad968ea14d8776e9",
+    "sources.lock.json": "67407995783d72ab15328c7eb1d18a98fb75d140e98091dbcfea05fab07efca4"
+  },
+  "nativeHelperSnapshotRequalification": {
+    "helperCommit": "5fcc907f35fed8ae7eb41187a6221133a5d88abf",
+    "helperSha256": "ce5ba162941dfc9395ce0e80604d1c734d2662a0d49e1be6c8bef464e3e2a993",
+    "discovery": {
+      "report": {
+        "path": ".runtime/linux-checkout-qualification/qualification.json",
+        "sha256": "fca2a7464b80d3a297f0022388696d1c4a0fad2c8509a7c48bfe7e875002bd90"
+      },
+      "timestampProbe": {
+        "path": ".runtime/linux-checkout-qualification/timestamp-probe.json",
+        "sha256": "538057c5ac1db53fa7e0b582bc73daea97afab53bd3361e17df007b675a40a34"
+      },
+      "scope": "Fresh Linux checkout reproduced persistent same-tick mutation with unchanged nanosecond metadata"
+    },
+    "fix": "Second bounded positional byte comparison plus final descriptor/path identity validation; snapshot byte identity does not prove absence of transient ABA writes",
+    "unit": {
+      "passed": 10,
+      "failed": 0,
+      "log": {
+        "path": ".runtime/compiled-snapshot-requalification/unit.log",
+        "sha256": "e7d028f3d8581caac751be468e471495336019569a7cc4d06c102f101925a3d4"
+      }
+    },
+    "images": {
+      "go-cli": {
+        "functionalPassed": true,
+        "securityPassed": true,
+        "installedPublicPassed": true,
+        "imageId": "sha256:13a334b023ea9304bdaecc31d3a4954d53e68170b372b1df59632f2be6403338",
+        "helperSha256": "ce5ba162941dfc9395ce0e80604d1c734d2662a0d49e1be6c8bef464e3e2a993",
+        "functionalEvidence": ".runtime/go-cli-qualification-c2ntXX",
+        "securityEvidence": ".runtime/native-staging-qualification-LseTPd",
+        "checks": [
+          "packaged compiled helper matches reviewed source bytes",
+          "same-tick mutation rejected by packaged byte comparison",
+          "symlink rejected",
+          "hardlink rejected",
+          "oversize rejected",
+          "observed readonly workspace mount",
+          "bounded immutable artifact executed only in Workcell",
+          "UID, immutable bind/source/image, credentials and socket boundaries",
+          "egress denied"
+        ],
+        "build": {
+          "base": "sha256:0952d2a6f776fa396bd4a7a3fed61615db9685501c1227e0170c484bfb683fc1",
+          "exitCode": 0,
+          "imageId": "sha256:13a334b023ea9304bdaecc31d3a4954d53e68170b372b1df59632f2be6403338"
+        },
+        "logs": {
+          "build": {
+            "path": ".runtime/compiled-snapshot-requalification/go-image-build.log",
+            "sha256": "2989e2d4cf5a43f2d0bab5b94e5a2d773e5e5410393f955c3b58563f2dfb6c33"
+          },
+          "functional": {
+            "path": ".runtime/compiled-snapshot-requalification/go-functional.log",
+            "sha256": "fa751f3e6876789fc7cf54116beb4247dfb609a6a68aeb2bcb2190dd3d1bbf75"
+          },
+          "security": {
+            "path": ".runtime/compiled-snapshot-requalification/go-security.log",
+            "sha256": "99cf40cb2c893a8f7fe6a22a31027df60f0c11cac6232c9a98c8a37d545b5d61"
+          }
+        }
+      },
+      "rust-cli": {
+        "functionalPassed": true,
+        "securityPassed": true,
+        "installedPublicPassed": true,
+        "imageId": "sha256:e53cfae50d0430337eaecd02e188a9d9220d604af38360003ba9fd4ddd7e88bc",
+        "helperSha256": "ce5ba162941dfc9395ce0e80604d1c734d2662a0d49e1be6c8bef464e3e2a993",
+        "functionalEvidence": ".runtime/rust-cli-qualification-4VfZsr",
+        "securityEvidence": ".runtime/native-staging-qualification-OM3eKu",
+        "checks": [
+          "packaged compiled helper matches reviewed source bytes",
+          "same-tick mutation rejected by packaged byte comparison",
+          "symlink rejected",
+          "hardlink rejected",
+          "oversize rejected",
+          "observed readonly workspace mount",
+          "bounded immutable artifact executed only in Workcell",
+          "UID, immutable bind/source/image, credentials and socket boundaries",
+          "egress denied"
+        ],
+        "build": {
+          "base": "sha256:ff5420e6093b3c1d0e86fa3cd554657072a7a93886e8ca3a18a1c9bb4b55b952",
+          "exitCode": 0,
+          "imageId": "sha256:e53cfae50d0430337eaecd02e188a9d9220d604af38360003ba9fd4ddd7e88bc"
+        },
+        "logs": {
+          "build": {
+            "path": ".runtime/compiled-snapshot-requalification/rust-image-build.log",
+            "sha256": "db9c629acec9fd505c7d740fb4561f16af3d75d259ce7595975f6d41ba184cdd"
+          },
+          "functional": {
+            "path": ".runtime/compiled-snapshot-requalification/rust-functional.log",
+            "sha256": "2757875ed02ab78753f7af2f03fb7ed223e9ea3c587ae68bffedaebfa2d0d0b6"
+          },
+          "security": {
+            "path": ".runtime/compiled-snapshot-requalification/rust-security.log",
+            "sha256": "d1895554174a8c5bdb99dc2792e1e8aaae1c27e24fa69228ee1eea43ed81cab1"
+          }
+        }
+      }
+    },
+    "installedPublic": {
+      "path": ".runtime/compiled-snapshot-requalification/installed-public.log",
+      "sha256": "9d7b7866567c0381c79c53acf22d724a4a9564a2051466ef8e4e793bed2fcf0e"
+    },
+    "controllerSourceBytes": {
+      "factory/cli-runtime.mjs": "98e08123e27907fc32be6ce3932a0f9f0feccc50525d9bbe9153e2fbc44d637d",
+      "factory/cli-runtime-worker.mjs": "b6cdd7e23135dd3998400367f5ae3ac4f7d90f87273e31d5bb1e06da1ec141f5",
+      "factory/workcell.mjs": "968834b8f26c16c2682bfeff568fb6f31f2e7a88473d6e77b52212523c0f9a1e",
+      "factory/compiled-export.mjs": "8e3f0154d27104cbae7c2a554228f1b35cd79e3364d4a3810684bb275c621fec",
+      "factory/runtime-images/compiled-artifact-contract.mjs": "ce5ba162941dfc9395ce0e80604d1c734d2662a0d49e1be6c8bef464e3e2a993",
+      "factory/runtime-images/compiled-keepalive.mjs": "c545e206ea402ebb5a2ceadbc5b52df3fee67bd8e075f153c50019224c28a72f",
+      "factory/runtime-images/export-compiled.mjs": "a54636bce4523c8eb43545441088f023a01e3dd3750d8b8c812406e97224e3ad",
+      "config/cli-runtime-profiles.json": "795a2290c9eb84caae38265bfee1be5b0c6eba906d6949797fdd16dc9f22a6c3",
+      "config/cli-runtime-sources.lock.json": "de693fdd2945f9b9fdf968ada03c72d1d8ea99b1845ab24dad968ea14d8776e9",
+      "sources.lock.json": "67407995783d72ab15328c7eb1d18a98fb75d140e98091dbcfea05fab07efca4"
+    },
+    "finalUnit": {
+      "passed": 18,
+      "failed": 0,
+      "log": {
+        "path": ".runtime/compiled-snapshot-requalification/final-unit.log",
+        "sha256": "5deba7bea964a973c318015e0415301214e2d0971e1dd086775321d08e281404"
+      }
+    }
+  }
+}
