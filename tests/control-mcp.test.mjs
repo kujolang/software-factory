@@ -60,3 +60,26 @@ test('a non-string control tool name is rejected without interrupting the sessio
  assert.deepEqual(replies[1],{jsonrpc:'2.0',id:2,result:{}});
  assert.deepEqual(fs.readdirSync(grant.stateRoot),[]);
 });
+
+test('operator routing is frozen during preparation and required before native launch',async t=>{
+ const providerRouting={
+   'general-commander':{provider:'codex',model:'gpt-5.6-sol'},
+   'code-reviewer':{provider:'hermes',model:'tencent/hy4-flash:free'},
+ };
+ const f=fixture(t,{softwarePack:'converter',providerRouting});
+ let invocation;
+ const s=createControlSession({...f.options,runner:i=>{invocation=i;return fixtureRunner(i);}});
+ t.after(()=>s.close());
+ const prepared=await f.prepare(s);
+ assert.match(prepared.providerRoutingSha256,/^[a-f0-9]{64}$/);
+ const routeFile=path.join(f.grant.stateRoot,prepared.submissionId,'provider-routing.json');
+ const bytes=fs.readFileSync(routeFile);
+ assert.deepEqual(JSON.parse(bytes),providerRouting);
+ const submit=()=>s.call('factory_control_submit',{preparedId:prepared.submissionId,missionSha256:prepared.missionSha256});
+ fs.writeFileSync(routeFile,'{}');
+ await assert.rejects(submit(),/routing identity mismatch/);
+ assert.equal(invocation,undefined);
+ fs.writeFileSync(routeFile,bytes);
+ await submit();
+ assert.deepEqual(invocation.args.slice(-2),['--routing',routeFile]);
+});

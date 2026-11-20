@@ -25,6 +25,15 @@ contract. Preparation records its sealed hash, and submission checks that hash
 before delegating to the existing CLI. MCP callers cannot supply pack paths or
 switch the selected pack. Omitting the field uses the default Node application.
 
+An operator can also add `"providerRouting"` to the grant using the same
+role-to-provider map accepted by `run --routing`. For example, route
+`general-commander` to Codex and `code-reviewer` to the free Hermes model.
+Preparation freezes the map and records its SHA-256. Submission verifies the
+copy before passing it to the native controller. External callers cannot
+supply or override a route. Roles absent from the map use the operator's
+default provider. Follow the [provider budget guide](PROVIDER-BUDGETS.md)
+when using live models.
+
 Use `chmod 700` for both directories and `chmod 600` for the capability file. Put your mission text inside the mission directory. The launch grant must explicitly name the actions it allows; it cannot add actions absent from the capability file:
 
 ```sh
