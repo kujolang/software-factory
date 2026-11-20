@@ -1,6 +1,6 @@
 # Kujo Software Factory
 
-[![Version](https://img.shields.io/badge/version-0.1.0-black)](package.json)
+[![Version](https://img.shields.io/badge/version-0.2.0-black)](package.json)
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)](LICENSE)
 [![built with Kujo](https://img.shields.io/badge/built%20with-Kujo-white.svg)](https://github.com/kujolang/kujo)
 [![Verification](https://img.shields.io/github/actions/workflow/status/kujolang/software-factory/verify.yml?branch=main&label=verification&color=black)](https://github.com/kujolang/software-factory/actions/workflows/verify.yml)

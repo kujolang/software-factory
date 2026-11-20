@@ -1,13 +1,19 @@
 # Changelog
 
 
-## Unreleased — repository hardening
+## 0.2.0 — Reviewable missions and portable release evidence
+
+- Turn ideas into reviewed specifications and run supported construction, repair, dependency, migration and documentation missions locally. Independent acceptance binds approval to exact source.
+- Route work with the pinned 28-role Chain of Command and 136-skill catalog. Use the Factory Floor or local MCP to inspect status and evidence.
+- Export evidence for offline verification. Optional signing supports manifest authenticity when checked against a trusted key.
+
+### Repository hardening
 
 - Bound subprocess output and observer evidence reads. Factory Floor list requests read only run metadata.
 - Share bounded UTF-8 MCP framing between discovery and control, with output backpressure.
 - Preserve the newest converter result when several conversions complete out of order.
 
-## Unreleased — lifecycle and qualification completion
+### lifecycle and qualification completion
 
 - Detached native workers now stop when their immediate parent disappears; provider children join the existing owned-process shutdown/reaping mechanism. Separate Workcell watchdog enforcement remains required.
 
@@ -20,11 +26,11 @@
 - Require native Redact and selected credential checks before real provider calls and new candidate promotion; retain failed scans and prevent requirement-marker removal.
 - Add native Spec change-impact reports, empirical API/browser defect sensitivity, immutable upstream catalog comparison, local failure notifications and nondeleting observation-log rotation.
 - Qualify official MCP SDK interoperability, offline installation/rollback, production checkpoint recovery, and strengthened Go/Rust artifact-byte checks. Preserve historical failed attempts and distinguish them from later passing evidence.
-- Add a locked React static runtime with actual interactive/browser and hostile-input qualification. Model construction and final-source release acceptance remain tracked in the implementation ledger.
+- Add a locked React static runtime with actual interactive/browser and hostile-input qualification. Live React construction has its own qualification record.
 
 The scoped release matrix passes, including free Hermes revalidation, installed MCP construction and live GitHub issue-to-repair. The verified fix and unpublished PR packet target the separate qualification seed branch. Release publication, merge and deployment require separate authorization.
 
-## Unreleased — additional bounded ecosystem paths
+### additional bounded ecosystem paths
 
 - Require canonical role deliverables, bounded skill work orders and role-specific provider routes; keep independent release authority.
 - Bind native Lens reports and observed sandbox identities into portable release evidence.
@@ -36,7 +42,7 @@ The scoped release matrix passes, including free Hermes revalidation, installed 
 
 This is an incomplete integration increment. See the qualification report for actual passing paths, retained failures and release blockers.
 
-## Unreleased — ecosystem integration increment (release blocked)
+### ecosystem integration increment (release blocked)
 
 Phase B continuation wires native RunLedger lifecycle, CaseFile failure retention, Eval and selected ShipCheck gates into missions. Verified artifacts now require terminal accounting before local promotion; offline audit/recheck/export validate native gate bindings. Evidence code is served inertly by the observer.
 

@@ -1,6 +1,6 @@
 # Release qualification
 
-**Recommendation: block the requested feature-complete release until the active acceptance gates pass.** Version remains 0.1.0. See the [acceptance manifest](../config/release-acceptance.json), [implementation ledger](IMPLEMENTATION-LEDGER.md) and [known limitations](KNOWN-LIMITATIONS.md). No release tag, merge, public release or deployment has been performed.
+Software Factory 0.2.0 is a scoped release. The [acceptance manifest](../config/release-acceptance.json) records the verified paths. The [hardening audit](audits/repository-hardening.md) documents Linux and macOS CI and live rootless Workcell regression results from the merged hardening. The [known limitations](KNOWN-LIMITATIONS.md) describe the boundaries of runtime, provider, and deployment support.
 
 ## Current qualification overview — November 20, 2026
 
