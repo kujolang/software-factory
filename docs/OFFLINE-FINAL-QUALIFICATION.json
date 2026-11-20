@@ -1,0 +1,65 @@
+{
+  "schema": "kujo.factory.offline-final-qualification/v1",
+  "date": "2026-11-19",
+  "factoryCommit": "3997bc0c9c288e433e8a9bef235dbf562284f80a",
+  "manifestSha256": "10721d7d053f39fbe34cce85960408de16db14255407686a6b443cdbe56479cd",
+  "ok": true,
+  "networkDenied": true,
+  "priorCommit": "e6b32ea0fba65f4a13c8beb9826d65021f65f753",
+  "stageRecordSha256": "a30afd6461f05778c301b1e0f9c99126f423011c98cf52d52c02e630f9bace38",
+  "steps": [
+    {
+      "operation": "upgrade",
+      "version": "10721d7d053f39fbe34cce85960408de16db14255407686a6b443cdbe56479cd"
+    },
+    {
+      "operation": "installed-public-cli",
+      "exitCode": 0
+    },
+    {
+      "operation": "rollback",
+      "version": "3cc997c42b77a3d2ab87a7eaf45dbbef9c1c128ad1169e5b3781387fd53d54d8",
+      "preservedStateSha256": "674ed335ff1243311b5d84e01882c2c8b7b0334e28149038262cf49df18dc53a"
+    },
+    {
+      "operation": "stale-activation-rejected",
+      "unchanged": true
+    },
+    {
+      "operation": "restore-current",
+      "version": "10721d7d053f39fbe34cce85960408de16db14255407686a6b443cdbe56479cd"
+    }
+  ],
+  "evidence": [
+    {
+      "path": ".runtime/offline-final-qualification/export-result.json",
+      "sha256": "e9f40fa29dd9c317e07ff385ef1dc42a5cba87b1cfe27ce00b20229b6fb0af58"
+    },
+    {
+      "path": ".runtime/offline-final-qualification/network-denial-probe.json",
+      "sha256": "d2d7e14c96089f06f857ec6829bf2e9a9246f978477d5d8d22dc1919bf0d57d0"
+    },
+    {
+      "path": ".runtime/offline-final-qualification/network-denied-verification.json",
+      "sha256": "b7a8b0ff87eaebe6dffb20fbda4fb41fdfe19e5df589817dbe961d5e18f17119"
+    },
+    {
+      "path": ".runtime/offline-final-qualification/network-denied-stage.log",
+      "sha256": "6feae46394368ede250b26b9a0869ac486a03b70a1e802dff12dbefda0a49b77"
+    },
+    {
+      "path": ".runtime/offline-final-qualification/upgrade-qualification.json",
+      "sha256": "feb6d23865dec0d1fdfb935eea667de02ae9fc908f054e9926b02e5c160c4409"
+    },
+    {
+      "path": ".runtime/offline-final-qualification/upgrade-process.log",
+      "sha256": "22198b56c079230fbdec96cac489cb718e9a07469ae520e6dfc13e7de32aafcd"
+    },
+    {
+      "path": ".runtime/offline-final-qualification/upgrade-process-retry.log",
+      "sha256": "03d91427b0bea36a04c9e8461a5b56756159f3e6c0c1e49ea7ca12ac9a6663e6"
+    }
+  ],
+  "scope": "Actual existing macOS host, pinned source installation with all child network access denied, local upgrade/rollback and persisted inert-state preservation. No clean OS, provider credentials, database or external effects migration claim.",
+  "preservedFailure": "Initial private upgrade harness import path was wrong and exited before activation; corrected harness passed. Original log retained."
+}
