@@ -1,6 +1,6 @@
 # React static profile assessment
 
-Status: feasible scoped implementation, not yet qualified. No React application or framework build has executed during this assessment. Existing semver admission remains unchanged.
+Historical assessment, superseded by [runtime and mission qualification](REACT-STATIC.md). At this assessment checkpoint no React application or framework build had executed; the statements below preserve that original scope. Existing semver admission was unchanged.
 
 The exact registry graph inspected on 2026-11-13 is React18.3.1, react-dom18.3.1, scheduler0.23.2, loose-envify1.4.0 and js-tokens4.0.0. Metadata and SRI-verified archive inventories are retained under `.runtime/react-static-assessment`. No package declares an install lifecycle hook; react-dom has a start script and development packages declare test/build scripts, none of which this profile will invoke. Explicit offline npm ci with ignore-scripts and no-bin-links is required regardless.
 
