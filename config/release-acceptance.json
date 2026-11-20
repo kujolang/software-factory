@@ -1,13 +1,13 @@
 {
   "schema": "kujo.factory.release-acceptance/v1",
-  "date": "2026-11-19",
+  "date": "2026-11-20",
   "releaseReady": false,
   "releaseRecommendation": "blocked-incomplete",
   "criteria": [
     {
       "id": "AC-01",
       "requirement": "Full Chain of Command available, validated and routed",
-      "status": "partial",
+      "status": "verified",
       "implementation": [
         "factory/catalog.mjs",
         "factory/selection.mjs",
@@ -23,14 +23,16 @@
       "evidence": [
         "docs/qualification-results.json",
         "docs/RELEASE-QUALIFICATION.md",
-        ".runtime/ecosystem-phase-b/canonical-role-final-qualification.json"
+        ".runtime/ecosystem-phase-b/canonical-role-final-qualification.json",
+        "docs/CI-QUALIFICATION.json",
+        "docs/PRODUCTION-RECOVERY-QUALIFICATION.json"
       ],
-      "limits": "All 28 canonical Chain roles passed independent semantic judgment for one bounded scenario (67 actual provider calls, initial failures preserved), with contract, effect and handoff checks. Selected native Dispatch consultations are implemented. This is not universal competence; final-source routing, escalation and live handoff qualification remain pending."
+      "limits": "All 28 canonical Chain roles passed independent semantic judgment for one bounded scenario (67 actual provider calls, initial failures preserved). Current-source catalog, selection, effect, escalation and handoff tests pass in the 430-test suite; the actual recovered production mission completed selected native Dispatch handoffs. This establishes scoped role contracts and routing, not universal model competence."
     },
     {
       "id": "AC-02",
       "requirement": "Complete canonical skills catalog discoverable and validated",
-      "status": "partial",
+      "status": "verified",
       "implementation": [
         "config/catalog.lock.json",
         "factory/catalog.mjs",
@@ -46,14 +48,15 @@
         "docs/qualification-results.json",
         "docs/RELEASE-QUALIFICATION.md",
         "docs/CATALOG-DRIFT.md",
-        "docs/KNOWN-LIMITATIONS.md"
+        "docs/KNOWN-LIMITATIONS.md",
+        "docs/CI-QUALIFICATION.json"
       ],
-      "limits": "All 136 complete pinned skill packages are discoverable, integrity/schema validated and selected as bounded guidance with receipts; the 85-role and 45-kit catalogs are pinned. Immutable roster/schema/resource/dependency drift comparison is implemented. Upstream skills do not supply uniform dependency metadata; no invented compatibility or authorization is claimed. Final-source catalog tests remain pending."
+      "limits": "All 136 complete pinned skill packages are discoverable, integrity/schema validated and selected as bounded guidance with receipts; 85 roles and 45 workflow kits remain pinned. Current-source catalog/routing/immutable drift tests pass. Upstream lacks uniform skill dependency metadata; absent metadata remains unknown and guidance never grants permissions."
     },
     {
       "id": "AC-03",
       "requirement": "Relevant accountability components genuinely integrated",
-      "status": "partial",
+      "status": "verified",
       "implementation": [
         "factory/accountability.mjs",
         "factory/lifecycle.mjs",
@@ -96,14 +99,16 @@
         "docs/SECRET-GATE-QUALIFICATION.json",
         "docs/WEBOPS-QUALIFICATION.json",
         "docs/EDITORIAL-DOCUMENTATION.md",
-        "docs/QUALITY-EVALUATION.md"
+        "docs/QUALITY-EVALUATION.md",
+        "docs/CI-QUALIFICATION.json",
+        "docs/PRODUCTION-RECOVERY-QUALIFICATION.json"
       ],
-      "limits": "Native core lifecycle plus scoped context/change/security/visual/accounting paths have actual execution evidence. New native Redact provider/source gates, Spec impact, fixed defect sensitivity, locked dependency audits, editorial and WebOps reviews are implemented. Missing/private upstream interfaces stay disabled; no enterprise retrieval, remote delivery, continuous telemetry or universal vulnerability-scanning claim. Final-source qualification remains pending."
+      "limits": "Native core lifecycle and scoped context/change/security/visual/accounting paths have actual execution evidence, with current adapter and negative tests passing. Native Redact provider/source gates, Spec impact, fixed defect sensitivity, locked dependency audits, editorial and WebOps reviews are exercised. Missing/private upstream interfaces remain disabled; no enterprise retrieval, remote delivery, continuous telemetry or universal vulnerability-scanning claim."
     },
     {
       "id": "AC-04",
       "requirement": "Every required integration has executable tests",
-      "status": "partial",
+      "status": "verified",
       "implementation": [
         "config/factory-capabilities.json"
       ],
@@ -117,14 +122,17 @@
       "evidence": [
         "docs/qualification-results.json",
         "docs/IMPLEMENTATION-LEDGER.md",
-        "docs/CI-QUALIFICATION.json"
+        "docs/CI-QUALIFICATION.json",
+        "docs/FINAL-ENGINE-QUALIFICATION.json",
+        "docs/REACT-MISSION-QUALIFICATION.json",
+        "docs/PROVIDER-BUDGET-QUALIFICATION.json"
       ],
-      "limits": "Executable adapter and negative-path tests cover implemented scoped integrations. Portable budget and React checks are implemented and targeted regressions passed; all-source final aggregate and engine matrix remain pending. Capability-by-capability acceptance reconciliation remains required; optional unavailable interfaces stay explicit."
+      "limits": "Implemented required integrations have executable positive/negative tests. Current-source Linux/macOS aggregate passes 428 of 430 tests plus eight native Dispatch tests; two retained-private React evidence cases pass locally. Actual required engine suites, React construction, tight budgets and recovery have separate evidence. Optional unavailable interfaces remain disabled and are not counted as executed integrations."
     },
     {
       "id": "AC-05",
       "requirement": "Existing security boundaries remain intact",
-      "status": "partial",
+      "status": "verified",
       "implementation": [
         "factory/workcell.mjs",
         "factory/providers.mjs",
@@ -144,14 +152,16 @@
       "evidence": [
         "docs/qualification-results.json",
         "docs/SECRET-GATE-QUALIFICATION.json",
-        "docs/PROVIDER-BUDGETS.md"
+        "docs/PROVIDER-BUDGETS.md",
+        "docs/FINAL-ENGINE-QUALIFICATION.json",
+        "docs/PROVIDER-BUDGET-QUALIFICATION.json"
       ],
-      "limits": "Historical default isolation and newly qualified runtime adversarial cases passed. New provider/source-secret gates and durable call/prompt-byte budgets fail closed. Current-source smoke/isolation/controller-death and full adversarial matrix remain pending. Monetary ceilings are rejected rather than presented as enforced billing."
+      "limits": "Current default smoke/isolation/controller-death/pack suites and scoped runtime adversarial checks pass. Rootless, seccomp, independent harness, no candidate credentials/host execution and watchdog cleanup remain enforced. Provider/source-secret checks and durable call/prompt-byte budgets fail closed. Monetary ceilings remain rejected rather than represented as enforced billing."
     },
     {
       "id": "AC-06",
       "requirement": "Independent verification cannot be bypassed by implementation agents",
-      "status": "partial",
+      "status": "verified",
       "implementation": [
         "factory/worker.mjs",
         "factory/pack.mjs",
@@ -179,9 +189,11 @@
         "docs/RELEASE-QUALIFICATION.md",
         "docs/SQLITE-MIGRATION-QUALIFICATION.json",
         "docs/node-package-runtime.md",
-        "docs/REACT-STATIC.md"
+        "docs/REACT-STATIC.md",
+        "docs/REACT-MISSION-QUALIFICATION.json",
+        "docs/PRODUCTION-RECOVERY-QUALIFICATION.json"
       ],
-      "limits": "Independent contracts, source review, repeated runtime acceptance, source-secret scans and promotion identities are implemented across scoped software families. Documentation has separate editorial/final review and WebOps is advisory only. Current-source complete matrix and React live mission remain pending; models, seals and local assertion identities confer no human/deployment authority."
+      "limits": "Independent contracts, source review, repeated runtime acceptance, source-secret scans and exact promotion identities are exercised across bounded software families, including new actual React construction. Documentation has separate editorial/final review; WebOps is advisory. Models, seals and local assertion identities confer no human or deployment authority."
     },
     {
       "id": "AC-07",
@@ -202,14 +214,15 @@
         "docs/qualification-results.json",
         "docs/PROVIDER-BUDGETS.md",
         "docs/SDK-PROVIDERS.md",
-        "docs/PROVIDER-BUDGET-QUALIFICATION.json"
+        "docs/PROVIDER-BUDGET-QUALIFICATION.json",
+        "docs/PROVIDER-QUALIFICATION-ATTEMPTS.json"
       ],
-      "limits": "Actual Codex construction/repair and Ollama bounded revalidation independently passed at earlier source checkpoints. OpenAI/Anthropic/Gemini native SDK paths have protocol fixtures only. New budgets are wired but the tight-budget live WebOps attempt stopped at the disk guard after one consumed call. Final-source two-path qualification remains pending; no unreported cost is zero."
+      "limits": "Codex revalidation passed at dae93ee; historical local Ollama revalidation passed at its original source. Current local attempts exposed a timeout, prohibited proposal, contradictory passing review and larger-model resource exhaustion. Read-only schemas and contradictory-decision rejection are now enforced and tested. No successful live two-provider qualification is claimed after the latest fixes. Cloud SDK paths remain protocol-fixture-only; unknown cost stays null."
     },
     {
       "id": "AC-08",
       "requirement": "Multiple language runtime profiles independently qualified",
-      "status": "partial",
+      "status": "verified",
       "implementation": [
         "factory/workcell-image/Dockerfile",
         "factory/cli-runtime.mjs",
@@ -235,14 +248,16 @@
         "docs/CLI-RUNTIME-QUALIFICATION.json",
         "docs/node-package-runtime.md",
         "docs/SQLITE-MIGRATION-QUALIFICATION.json",
-        "docs/REACT-STATIC.md"
+        "docs/REACT-STATIC.md",
+        "docs/REACT-MISSION-QUALIFICATION.json",
+        "docs/FINAL-ENGINE-QUALIFICATION.json"
       ],
-      "limits": "Actual Python/Kujo/TypeScript/Go/Rust CLI construction and runtime observations exist; only Python/Kujo current-format promotion exports are qualified, and historical incomplete formats cannot be retrofitted. Locked Node semver upgrades and disposable SQLite missions passed actual repeated checks and standalone verification. React static runtime passed positive/hostile cases, but its new construction mission awaits live qualification. All scopes remain narrow and final-source matrix is pending."
+      "limits": "Actual Python/Kujo/TypeScript/Go/Rust CLI construction and runtime observations exist; current-format Python/Kujo promotion exports pass, while historical incomplete formats cannot be retrofitted. Locked Node semver, disposable SQLite and React18 static construction pass actual independent repeated checks and standalone verification. Support remains restricted to documented qualified profiles, not universal language/framework compatibility."
     },
     {
       "id": "AC-09",
       "requirement": "Evidence export and independent verification",
-      "status": "partial",
+      "status": "verified",
       "implementation": [
         "factory/evidence.mjs",
         "factory/export.mjs",
@@ -266,9 +281,12 @@
         ".runtime/ledger-completion/node-package-live-offline-verify.json",
         ".runtime/ledger-completion/performance-live-offline-verify.json",
         ".runtime/ledger-completion/editorial-docs-live-offline-verify.json",
-        ".runtime/ledger-completion/webops-live-offline-verify.json"
+        ".runtime/ledger-completion/webops-live-offline-verify.json",
+        "docs/PROVIDER-BUDGET-QUALIFICATION.json",
+        "docs/REACT-MISSION-QUALIFICATION.json",
+        "docs/PRODUCTION-RECOVERY-QUALIFICATION.json"
       ],
-      "limits": "Standalone success and failure verification passed for Node v2/v3, current CLI, SQLite, package, performance, editorial and WebOps exports. Portable budget and React consistency checks are implemented with targeted actual-evidence and semantic-tampering regressions; a live budget-bound React mission/export and final-source aggregate remain pending. Signatures authenticate attestations, not execution or deployment."
+      "limits": "Standalone success/failure verification passed for Node v2/v3, current CLI, SQLite, package, performance, editorial, WebOps, budget-bound missions and actual React. Current-source tamper regressions pass; recovered production bundle verifies with a copied standalone verifier under network denial. Integrity is distinct from authentication, execution proof, human approval and deployment authority."
     },
     {
       "id": "AC-10",
@@ -294,9 +312,11 @@
         "docs/RELEASE-QUALIFICATION.md",
         ".runtime/production-recovery/qualification-CSuUD5/qualification.json",
         "docs/OPERATIONS.md",
-        "docs/OFFLINE-FINAL-QUALIFICATION.json"
+        "docs/OFFLINE-FINAL-QUALIFICATION.json",
+        "docs/PRODUCTION-RECOVERY-QUALIFICATION.json",
+        "docs/FINAL-ENGINE-QUALIFICATION.json"
       ],
-      "limits": "Actual production completed/pending checkpoint interruption and explicitly authorized native continuation passed: command executed once, original deadline/receipt preserved, independent release and offline bundle passed. Uncertain effects and protected approval states remain blocked. New provider-budget and performance recovery identity changes require final-source interruption regression; rejected recovery cannot alter original approval."
+      "limits": "Actual production recovery at a39b8a8 passed once-only command execution, original deadline/receipt/checkpoint preservation, independent release and offline export. Current 0418dbe OS parent-death/provider-reaping fixtures and Workcell watchdog/controller-death checks pass. A later positive live production continuation remains required after lifetime hardening; uncertain effects remain blocked."
     },
     {
       "id": "AC-11",
@@ -321,7 +341,7 @@
     {
       "id": "AC-12",
       "requirement": "Factory Floor meaningful status and evidence",
-      "status": "partial",
+      "status": "verified",
       "implementation": [
         "factory/web/app.js",
         "factory/cli.mjs",
@@ -341,9 +361,11 @@
       "evidence": [
         "docs/qualification-results.json",
         "docs/RELEASE-QUALIFICATION.md",
-        "docs/OPERATIONS.md"
+        "docs/OPERATIONS.md",
+        "docs/FACTORY-FLOOR-QUALIFICATION.json",
+        "docs/CI-QUALIFICATION.json"
       ],
-      "limits": "Read-only browser qualification passed against synthetic data. Bounded projections include new mission families, benchmark metrics and secret gate counts; local notifications and bounded observation journals are implemented. Current-source final UI regression, including new React/budget status, remains pending; no authenticated control UI claim."
+      "limits": "Current read-only Factory Floor browser checks passed in actual rootless Workcell against explicitly synthetic observations, including unknown costs, provider/skills/failure/evidence views, inert injection, replay and snapshot disclosure. New React/budget projections and observer boundaries pass current deterministic tests. No authenticated state-changing viewer is claimed."
     },
     {
       "id": "AC-13",
@@ -366,9 +388,11 @@
       "evidence": [
         "docs/qualification-results.json",
         "docs/RELEASE-QUALIFICATION.md",
-        "docs/MCP-CLIENT-QUALIFICATION.json"
+        "docs/MCP-CLIENT-QUALIFICATION.json",
+        "docs/INSTALLED-MCP-QUALIFICATION.json",
+        "docs/CI-QUALIFICATION.json"
       ],
-      "limits": "Actual official MCP SDK 1.32.2 stdio discovery of 85 roles/136 skills/45 kits and grant-scoped preparation/status/denial passed. Local read-only and separately granted control interfaces are documented and fixture-tested. Live submission/editor-specific hosts/remote multi-user authentication and final-source checks are not inferred from this result."
+      "limits": "Official SDK 1.32.2 read-only discovery and grant-scoped preparation/status/denial passed. Four actual installed submissions produced no qualified release; failed evidence is preserved. The observed detached-worker cancellation defect is fixed and actual OS regressions pass. Successful current-source installed MCP construction/artifact retrieval remains unqualified; no remote multi-user/editor-host claim."
     },
     {
       "id": "AC-14",
@@ -392,14 +416,15 @@
         ".runtime/ledger-completion/ci-macos-269c8da.log",
         "docs/CI-QUALIFICATION.json",
         "docs/INSTALLED-MISSION-QUALIFICATION.json",
-        "docs/OFFLINE-FINAL-QUALIFICATION.json"
+        "docs/OFFLINE-FINAL-QUALIFICATION.json",
+        "docs/INSTALLED-MCP-QUALIFICATION.json"
       ],
-      "limits": "Fresh published3997bc0 macOS checkout passed setup/offline doctor/423+8 tests (two retained-private React fixtures skipped). Actual installed WebOps advisory/provider/accounting/export passed. Network-denied current-source setup and upgrade/rollback passed. Installed software construction still requires the qualified Workcell VM, currently unreachable; no clean-OS or WSL execution claim."
+      "limits": "Fresh 3997bc0 macOS setup/doctor/aggregate, actual installed advisory, network-denied setup and upgrade/rollback passed. Current 0418dbe Linux/macOS clean CI passes. Installed MCP software-construction attempts remain failed/interrupted, not a successful clean-install construction claim. Approximately 1.4 GiB free is below unchanged 2 GiB mission and 3 GiB fresh-install floors; no clean-OS/WSL execution claim."
     },
     {
       "id": "AC-15",
       "requirement": "Documentation accurately describes support",
-      "status": "partial",
+      "status": "verified",
       "implementation": [
         "docs/KNOWN-LIMITATIONS.md",
         "docs/IMPLEMENTATION-LEDGER.md"
@@ -412,7 +437,7 @@
         "docs/KNOWN-LIMITATIONS.md",
         "docs/IMPLEMENTATION-LEDGER.md"
       ],
-      "limits": "Current scoped support and limitations are recorded; this manifest corrects superseded pending claims without changing historical evidence. Final feature-complete implementation/release report and exact frozen-source result reconciliation remain pending."
+      "limits": "Current reports separate implemented scoped behavior, source-specific passing evidence, preserved failures, unavailable optional interfaces and still-blocked release gates. Required implementation report filename is not a feature-complete claim. No release/tag/deployment recommendation is inferred from documentation."
     },
     {
       "id": "AC-16",
@@ -433,7 +458,7 @@
     {
       "id": "AC-17",
       "requirement": "Previous acceptance/isolation tests continue passing",
-      "status": "partial",
+      "status": "verified",
       "implementation": [
         "docs/qualification-results.json"
       ],
@@ -450,9 +475,10 @@
         ".runtime/ledger-completion/aggregate-budget-react.log",
         ".runtime/ledger-completion/ci-linux-269c8da.log",
         ".runtime/ledger-completion/ci-macos-269c8da.log",
-        "docs/CI-QUALIFICATION.json"
+        "docs/CI-QUALIFICATION.json",
+        "docs/FINAL-ENGINE-QUALIFICATION.json"
       ],
-      "limits": "Clean Linux/macOS CI at08c8526 passes412 deterministic plus8 native Dispatch tests per platform, fixing269c8da initialization failure. Historical real smoke/isolation/controller-death/packs passed; later source, including portable budget/React changes, still requires final full aggregate/default-engine/adversarial qualification."
+      "limits": "Current 0418dbe clean Linux/macOS CI passes 428 of 430 tests plus eight native Dispatch tests per platform; two private retained React fixture tests also pass locally. Current production controller files pass actual rootless smoke/isolation/controller-death and positive/negative pack checks. Earlier failures remain preserved."
     },
     {
       "id": "AC-18",
@@ -468,12 +494,12 @@
   ],
   "continuation": "docs/IMPLEMENTATION-LEDGER.md",
   "rule": "No file, stub, mock or schema compilation alone establishes working capability.",
-  "continuationScope": "Budget success/rejection and installed advisory plus network-denied upgrade/rollback qualified; React/software runtime/recovery matrix waits for rootless VM restoration.",
+  "continuationScope": "Current catalogs, engine and clean CI pass; live provider, installed MCP, authorized issue repair and post-hardening production recovery remain open.",
   "reconciliation": {
-    "date": "2026-11-19",
-    "sourceCheckpoint": "7314fca",
-    "scope": "Evidence-index reconciliation through recorded08c8526 CI and targeted portable-check tests; not final-source release approval",
-    "localResourceBlocker": "Less than 1 GiB free observed; existing 2 GiB mission and 3 GiB clean-install admission floors remain unchanged",
-    "historicalEvidencePolicy": "Private .runtime records are retained references; they are not bundled public artifacts and their original source scopes remain authoritative"
+    "date": "2026-11-20",
+    "sourceCheckpoint": "0418dbe4bd4f073a97ef9276597388b4cc683e61",
+    "scope": "Current clean CI and actual default engine qualification plus source-specific live results; not full release approval",
+    "localResourceBlocker": "Approximately 1.4 GiB free after model unload; unchanged 2 GiB mission / 3 GiB clean-install floors. Requested 10 GiB headroom or alternate volume.",
+    "historicalEvidencePolicy": "Private .runtime records are retained source-scoped evidence references, not bundled public artifacts. Failed and interrupted attempts remain unqualified."
   }
 }
