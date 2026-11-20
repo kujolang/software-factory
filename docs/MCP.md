@@ -12,7 +12,7 @@ A compatible host configuration is:
 {"mcpServers":{"software-factory":{"command":"node","args":["/absolute/path/to/software-factory/bin/software-factory.mjs","mcp"]}}}
 ```
 
-The launching operating-system user owns the local pipes. No TCP listener, bearer-token service, browser control interface or multi-user authentication is provided. Do not expose the process through a network proxy. Messages use newline-delimited JSON-RPC with MCP protocol version `2025-06-18`; input buffering is bounded to 1 MiB.
+The launching operating-system user owns the local pipes. No TCP listener, bearer-token service, browser control interface or multi-user authentication is provided. Do not expose the process through a network proxy. Messages use newline-delimited JSON-RPC with MCP protocol version `2025-06-18`; each UTF-8 input frame is capped at 1 MiB. Responses honor output backpressure in both local transports.
 
 Tools list the capability inventory, roles, skills and workflow kits; validate planning input; prepare advisory team plans; and verify a named export under `.runtime/exports/`. Bundle identifiers are single safe path components. The server never executes package instructions or bundle code. Every tool is read-only. No shell, container, approval, submission, cancellation, deployment or generic filesystem capability is exposed.
 
