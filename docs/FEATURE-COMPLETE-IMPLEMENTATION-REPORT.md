@@ -1,8 +1,64 @@
 # Feature-complete implementation report
 
+**Release recommendation: blocked by the remaining acceptance gates.** The filename is required by the implementation assignment; it is not a feature-completeness claim. The active status is in the [implementation ledger](IMPLEMENTATION-LEDGER.md) and [acceptance manifest](../config/release-acceptance.json). Version remains 0.1.0; no release tag, merge, public release or deployment has been performed.
+
+## Implemented and reused
+
+The factory installs 85 canonical roles, all 136 complete pinned skill packages and 45 workflow kits. The default software team includes all 28 Chain of Command roles with mission-specific selection, canonical schemas and handoffs, restricted proposals, role permissions and guidance receipts. Twenty software lifecycle types have bounded executable routes. Skills remain guidance; the controller enforces effects.
+
+Native Dispatch and Workcell remain the orchestration and isolation engines. Spec validates frozen mission projections; RunLedger accounts for actual attempts; CaseFile preserves failures; Eval evaluates retained verification evidence; selected ShipCheck controls strengthen the same independent release gate. Lens runs inside the trusted Workcell browser boundary. Source-secret gates reuse pinned Redact with selected controller credential checks. Context, change, telemetry and optional ecosystem adapters retain their inspected upstream contracts and maturity limits.
+
+Qualified development paths include dependency-free Node applications/repository changes, reviewed single-file Python/TypeScript/Go/Rust/Kujo CLIs, locked Node dependency upgrades, disposable SQLite migrations, fixed-request performance comparisons and locked React 18 static construction. Documentation adds Publishing House editorial review; WebOps reviews retained Lens evidence as advisory work. These bounded profiles do not imply arbitrary package scripts, universal frameworks, production migrations or deployment.
+
+Provider execution supports Codex and local Ollama plus optional native SDK paths for OpenAI, Anthropic and Gemini. The cloud SDK paths have protocol fixtures, not live credential qualification. Durable mission/role call and prompt-byte budgets reserve before transport, retain uncertain consumption and bind recovery to the original policy. Unsupported monetary ceilings fail closed; missing usage and cost remain unknown.
+
+Portable success/failure exports bind source, specifications, trusted harnesses, runtimes, provider reservations, verification and promotion records. A copied standalone verifier works offline. Optional signatures authenticate manifest attestations against independently trusted keys; they do not prove execution, human approval or deployment authority. Factory Floor and default MCP remain read-only; separate local POSIX grants permit bounded owned control.
+
+## Current observed qualification
+
+| Evidence | Observed result and boundary |
+| --- | --- |
+| [CI qualification](CI-QUALIFICATION.json) | Fresh Ubuntu 24.04/macOS 15 installs at `0418dbe`: 428 passing tests, two explicitly skipped private React fixtures, plus eight native Dispatch tests. Those two retained-evidence tests passed locally. |
+| Local aggregate | 428 tests plus eight native Dispatch tests passed through `c9c4bf4`; both fresh CI platforms passed at `0418dbe` with 428 tests, two private-fixture skips and eight Dispatch tests. Overlapping focused counts are not added. |
+| [Default engine](FINAL-ENGINE-QUALIFICATION.json) | Actual rootless smoke, isolation, controller SIGKILL/watchdog and sealed-pack positive/negative checks passed at `0418dbe`. |
+| [React construction](REACT-MISSION-QUALIFICATION.json) | `react-YfDO6E` passed four real Codex calls, both Workcell/API/browser/Lens rounds, native accounting, promotion and standalone offline verification at `350a262`; 55,969 input / 3,008 output tokens, cost unknown. |
+| [Provider budgets](PROVIDER-BUDGET-QUALIFICATION.json) | At `3997bc0`, a two-call advisory mission passed; a fresh one-call mission rejected reviewer transport before a second reservation. Both success/failure exports verified independently. |
+| [Installed advisory mission](INSTALLED-MISSION-QUALIFICATION.json) | Fresh published `3997bc0` checkout passed setup/doctor/aggregate and actual WebOps execution/export. This record does not claim installed software construction. |
+| [Production recovery](PRODUCTION-RECOVERY-QUALIFICATION.json) | Actual interruption/continuation at `a39b8a8` passed with six provider calls; completed command executed once, original deadline/receipt/checkpoint retained, independent release and network-denied copied offline verification passed. This predates `0418dbe`; no later live recovery completion is inferred. |
+| [Read-only Factory Floor](FACTORY-FLOOR-QUALIFICATION.json) | Current real Workcell browser regression passed with explicitly synthetic viewer observations at `.runtime/factory-floor-qualification/2026-11-20T01-23-54-950Z`; log `.runtime/ledger-completion/factory-floor-final.log`. |
+| [Offline installation and versions](OFFLINE-FINAL-QUALIFICATION.json) | `3997bc0` installed under OS-enforced network denial; upgrade, rollback, stale activation rejection and inert-state preservation passed against retained `e6b32ea`. |
+
+Historical CLI, SQLite, package, performance, specification, documentation, all-role, MCP and recovery records remain in their linked reports and the historical checkpoints below. Qualification belongs to its recorded source/image/input scope. It is not transferred automatically to changed code.
+
+## Failures, exclusions and remaining gates
+
+Original failures remain retained: early isolation defects, rejected model proposals, missing-directory initialization, low disk admission, stale provider authentication and qualification-harness mistakes. Fixes are separately tested. No failed receipt became a passing receipt. The upstream VideoOps VM Stack-underflow observation remains separate from the passing canonical JSON-schema catalog validation.
+
+The requested release remains blocked: current-source local Ollama qualification and installed software construction through granted MCP control have not passed, and actual GitHub issue-to-proposed-PR qualification awaits explicit issue-publication authorization. Historical passing provider runs do not qualify the changed controller. The latest review-consistency and orphan-worker fixes passed current-source deterministic CI and rootless engine regression; they do not establish a later successful live mission.
+
+Foreman remains excluded. BZBY, Agent City and commercial services are not architectural dependencies. Missing/private Ward/Capsule interfaces and unqualified remote/enterprise capabilities remain explicit optional or unavailable entries; no adapter fabricates an API from a product name. Full limitations are in [KNOWN-LIMITATIONS.md](KNOWN-LIMITATIONS.md).
+
+## Source and security provenance
+
+Exact component commits are retained in the repository lockfiles, including [sources.lock.json](../sources.lock.json), [accountability.lock.json](../config/accountability.lock.json), [provider-sources.lock.json](../config/provider-sources.lock.json), [context.lock.json](../config/context.lock.json), [change-tools.lock.json](../config/change-tools.lock.json) and runtime/catalog locks. npm versions remain Kujo 1.9.0, Codex CLI 0.144.4, AJV 8.20.0 and ajv-formats 3.0.1. The default-branch audit is a separate immutable source baseline.
+
+Upstream changes were limited to the recorded canonical manifest compatibility correction and reviewed Workcell read-only workspace/dependency updates, described in the historical provenance below. Native engines and canonical instructions were not duplicated. No upstream source changed during the latest budget/React/installation qualification continuation.
+
+Candidate execution remains rootless, seccomp-constrained, network-restricted and separate from credentials, trusted checks and release authority. No host execution fallback, candidate-controlled acceptance edits, Docker socket mount or automatic external delivery was introduced. Context/evidence may contain private source and remains operator-controlled.
+
+## Latest defects and blocked attempts
+
+Final qualification exposed two defects. Commit `c9c4bf4` rejects independent code/release decisions combining a passing verdict with unresolved issues; advisories belong in deliverables. Commit `0418dbe` adds immediate-parent monitoring to all nine native worker entry points and reaps owned provider children after interruption. Real SIGTERM/SIGKILL process fixtures and the 11 provider conformance cases passed. Fresh Linux/macOS CI at `0418dbe` passed 428 tests with two explicitly skipped private React fixtures and eight native Dispatch tests. Default rootless smoke, isolation, controller-death and pack regressions also passed; earlier evidence remains preserved at its original commits.
+
+[Four installed MCP construction attempts](INSTALLED-MCP-QUALIFICATION.json) remain unqualified; independent acceptance, unchanged disk admission and operator cancellation preserved their failures. The latest local Ollama resource attempt was stopped and its model unloaded when free space fell to approximately 350 MiB. Cleanup recovered approximately 1.4 GiB, still below the unchanged 2 GiB mission floor. No new model mission is qualified by cleanup, an interrupted review or an abandoned admission. Failed provider bundles and owned-process cleanup records remain retained.
+
+## Historical checkpoints — superseded status, retained evidence
+
+The following dated checkpoint text preserves the implementation history, original failures and then-open gaps. Its pending/status statements are historical; the current overview, ledger and machine-readable acceptance manifest take precedence.
+
 The requested release is **incomplete and blocked**. This report's required filename is not a completeness claim. The session implemented executable integration paths while retaining explicit runtime boundaries. The active implementation ledger is authoritative for ongoing work; frozen-source sections below are historical qualification checkpoints.
 
-## Implemented
+### Implemented
 
 - Source-backed audit of 77 capabilities, including every mandatory repository, named investigations, exact public commits and explicit unavailable/experimental decisions.
 - Pinned complete catalogs: 85 canonical roles, 136 skills, 45 workflow kits. Discovery, inspection, source/resource verification, locked synchronization and guidance activation receipts are executable. Agent schemas and handoffs are used directly; fixed proposals stay restricted.
@@ -12,7 +68,7 @@ The requested release is **incomplete and blocked**. This report's required file
 - Portable failed/successful evidence exports, offline integrity/binding verification, archival import, comparison and optional detached Ed25519 signatures against caller-trusted keys. Execution-start controller/harness hashes are recorded for new runs.
 - Read-only stdio MCP discovery/planning/verification, separately granted local control transport, and read-only Factory Floor mission/evidence views. Installation now assembles the reviewed catalog and accountability packages without sibling repositories.
 
-## Reused and changed upstream
+### Reused and changed upstream
 
 Native Dispatch and Workcell remain the execution/isolation primitives; the later reviewed Workcell pin update is recorded below. Canonical role instructions and skill packages remain upstream-owned. Spec, RunLedger, CaseFile, ShipCheck and Eval run their actual pinned CLIs. Ollama invokes the native supported client through a fixed Kujo bridge, rather than a second HTTP provider implementation.
 
@@ -20,21 +76,21 @@ Upstream `kujo-agents` correction `ce87309d8c920695cf5337ca76155ff188a7bf24`, br
 
 Exact installation commits are in [sources.lock.json](../sources.lock.json), [accountability.lock.json](../config/accountability.lock.json) and [provider-sources.lock.json](../config/provider-sources.lock.json) and [eval-source.lock.json](../config/eval-source.lock.json). Runtime versions remain Kujo 1.9.0, Codex CLI 0.144.4, AJV 8.20.0 and ajv-formats 3.0.1 as pinned by the existing npm lock. The broader default-branch audit is an immutable baseline separate from those implementation pins.
 
-## Verification and failures
+### Verification and failures
 
 See [release qualification](RELEASE-QUALIFICATION.md) for actual commands, outcomes and limits. Real rootless smoke/isolation/controller-death/pack checks pass. Both providers passed live structured-output smokes; complete mission outcomes are recorded separately in the qualification report. Actual accountability CLI tests pass. The stopped engine initially blocked tests, then was restored without reducing controls. An upstream VideoOps validator still fails with VM Stack underflow. Fresh-machine checks remain unqualified. Exact-checkpoint production resume is implemented; its frozen-source live qualification was still pending at this report review. Narrow additional CLI-runtime fixtures are recorded separately; they do not establish general language/framework compatibility. Full provider qualification remains incomplete.
 
-## Security and release decision
+### Security and release decision
 
 No candidate host execution, candidate-controlled test mutation, provider credential mount, Docker socket mount, network fallback or deployment authorization was introduced. Skills and MCP discovery cannot grant permissions. Changed or injected package bytes fail closed, including tracked source hidden from Git status by index flags. Export checksums are integrity only; explicit trusted-key signatures authenticate attestations, not execution.
 
 Foreman is excluded. Experimental cloud/remote/private packages remain optional or unavailable. No commercial service, BZBY or Agent City dependency was introduced. All other unimplemented capabilities remain visible in the inventory and acceptance manifest. Do not publish a feature-complete release until the continuation ledger's real execution gates pass.
 
-## Phase B continuation
+### Phase B continuation
 
 The additional lifecycle implementation is documented in [MISSION-ACCOUNTABILITY.md](MISSION-ACCOUNTABILITY.md), [EVALUATION.md](EVALUATION.md) and [RELEASE-POLICY.md](RELEASE-POLICY.md). Native Eval package 1.1.0 is pinned at `c1b263a10702c2fa8ab61ed507029a6bfec2e03d`; its emitted evaluator contract version is 2.0.0, a separate upstream version. That Phase B increment did not modify upstream source. Later adapters consume separately pinned inspected upstream contracts as recorded below. Model-backed mission and clean-checkout qualification results are recorded in the release report rather than inferred from module tests.
 
-## Further integration continuation (2026-11-13)
+### Further integration continuation (2026-11-13)
 
 The later continuation adds genuine executable paths while keeping the release blocked:
 
@@ -53,7 +109,7 @@ The standalone adapters preserve original repository/config authority boundaries
 
 See [RELEASE-QUALIFICATION.md](RELEASE-QUALIFICATION.md) for exact commands and failed cases, [KNOWN-LIMITATIONS.md](KNOWN-LIMITATIONS.md) for remaining unsupported behavior, and [IMPLEMENTATION-LEDGER.md](IMPLEMENTATION-LEDGER.md) for continuation. Broader provider construction, full role/workflow/runtime breadth and fresh-machine release gates still block the requested feature-complete release.
 
-## Installed native CLI and local telemetry qualification
+### Installed native CLI and local telemetry qualification
 
 Workcell is now pinned and installed at `144ab49da88a17fd0d786d01d98030d7ec7798cb` on reviewed upstream branch `codex/workcell-readonly-workspace`. Its ancestor `099d1b6d17b38c8c247e8c6617649d8ea21ba157` adds opt-in read-only native workspace definition/policy handling and tests, preserving the existing default profile. The final commit updates official optional remote-adapter dependencies and bundled integrity metadata for security advisories. Upstream gates passed: 223 native unit, 23 portable unit, 30 adapter tests, 257 release-report checks, zero dependency audit vulnerabilities; remote live providers remain unqualified.
 
@@ -64,7 +120,7 @@ Watchdog 1.2.2 at `7a0bd9a63d68421831ed66d6eed29805c48e1b24` supplies real nativ
 Current-source approved-candidate revalidation also passed at clean `cdf8686`, including automatic25-record Watchdog collection and a233-file offline-verified evidence export. It exercises the current controller and release path; it does not establish every-role consultations, broader workflow coverage or deployment authorization.
 
 
-## Frozen-source update: `e6b32ea0fba65f4a13c8beb9826d65021f65f753`
+### Frozen-source update: `e6b32ea0fba65f4a13c8beb9826d65021f65f753`
 
 This source inspection is read-only apart from this report and maintenance documentation. Final aggregate, recovery and newer construction qualification were still running elsewhere; this section does not anticipate their outcome.
 
@@ -78,7 +134,7 @@ The new quality adapter executes native Eval over controller-owned test-structur
 
 CLI construction now has native Dispatch stages for contract validation, independent contract review, implementation, independent source review, rootless verification, release review and repeated verification in [cli-mission.mjs](../factory/cli-mission.mjs). Recorded actual TypeScript/Go/Rust construction extends earlier fixture evidence; final-format Python/Kujo and current-source exports must be judged by the active qualification report. None of these paths accepts package installation, arbitrary services or frameworks. Operational policy now enforces shared admission and task-boundary deadlines/storage checks, exact-preview retention and archive-only restoration; these are not continuous filesystem quotas or automatic replay of uncertain effects.
 
-## Historical gap review at e6b32ea (superseded by active ledger)
+### Historical gap review at e6b32ea (superseded by active ledger)
 
 | Priority | Source-backed gap | Concrete next implementation and required evidence | Cause |
 | --- | --- | --- | --- |
@@ -98,7 +154,7 @@ The narrow ecosystem adapters reuse real upstream contracts: Ability definition 
 
 The historical gap list above must not be read as current implementation status. SQLite, package upgrades, performance, source-secret gates, editorial/WebOps review, visual baselines, Spec impact, defect sensitivity, SDK interoperability and catalog comparison now have concrete qualification recorded in the active ledger. Final release recommendation remains pending the current-source matrix and unresolved budget/runtime-construction work.
 
-## November 19 continuation
+### November 19 continuation
 
 The Node controller now creates its artifact directory before initializing frozen provider budgets. Both fresh CI platforms exposed the missing-directory defect; the correction passed Linux and macOS installation, offline doctor, 412 deterministic tests and eight native Dispatch tests at `08c85267728378b4e47b03b4ce8f382b8a120d2a`. Rejected fresh admission now records terminal failure without fabricating execution or ledger evidence; rejected recovery preserves original state.
 

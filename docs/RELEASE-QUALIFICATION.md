@@ -1,5 +1,40 @@
 # Release qualification
 
+**Recommendation: block the requested feature-complete release until the active acceptance gates pass.** Version remains 0.1.0. See the [acceptance manifest](../config/release-acceptance.json), [implementation ledger](IMPLEMENTATION-LEDGER.md) and [known limitations](KNOWN-LIMITATIONS.md). No release tag, merge, public release or deployment has been performed.
+
+## Current qualification overview — November 20, 2026
+
+| Check | Recorded result | Exact scope |
+| --- | --- | --- |
+| Fresh Linux/macOS CI installation | Passed at `0418dbe`: 428 tests, two private-fixture skips, eight native Dispatch tests | [CI-QUALIFICATION.json](CI-QUALIFICATION.json); skipped retained React fixtures passed locally; no daemon/model claim from CI |
+| Local aggregate | 428 tests plus eight Dispatch tests passed through `c9c4bf4` | Both fresh CI platforms passed 428 tests with two private-fixture skips plus eight Dispatch tests at `0418dbe`; earlier local counts remain historical |
+| Default rootless engine regression | Smoke 30.514 s, isolation 28.213 s, controller-death 16.315 s, packs 43.656 s; all passed | [FINAL-ENGINE-QUALIFICATION.json](FINAL-ENGINE-QUALIFICATION.json), source `0418dbe`, pinned image and actual independent watchdog |
+| React model-backed construction | Passed `react-YfDO6E`, 146.212 s | [REACT-MISSION-QUALIFICATION.json](REACT-MISSION-QUALIFICATION.json); four actual calls, repeated build/API/browser/Lens checks, native accounting, promotion, copied standalone offline verifier |
+| Durable provider budget gates | Actual two-call success and one-call rejection passed | [PROVIDER-BUDGET-QUALIFICATION.json](PROVIDER-BUDGET-QUALIFICATION.json), source `3997bc0`; failed evidence preserved, no monetary guarantee |
+| Fresh-checkout actual advisory mission | Passed `webops-Uaz9w8` | [INSTALLED-MISSION-QUALIFICATION.json](INSTALLED-MISSION-QUALIFICATION.json), source `3997bc0`; newly installed dependencies/private auth-only setup, no software-construction claim |
+| Network-denied installation, upgrade and rollback | Passed | [OFFLINE-FINAL-QUALIFICATION.json](OFFLINE-FINAL-QUALIFICATION.json), `3997bc0` and prior `e6b32ea`; EPERM network probe, stale activation rejection and preserved inert state |
+| Production checkpoint recovery | Passed at `a39b8a8` | [PRODUCTION-RECOVERY-QUALIFICATION.json](PRODUCTION-RECOVERY-QUALIFICATION.json); six actual calls, completed command executed once, original deadline/receipt/checkpoint preserved, independent release and copied offline verifier passed; predates the `0418dbe` worker-lifetime fix |
+| Read-only Factory Floor | Current browser qualification passed | [FACTORY-FLOOR-QUALIFICATION.json](FACTORY-FLOOR-QUALIFICATION.json); three API and 17 browser checks, real Workcell browser with explicitly synthetic viewer observations, not mission-execution evidence |
+| npm dependency audit | Zero reported known vulnerabilities on November 19 | `.runtime/ledger-completion/npm-audit-nov19.json`; installed npm closure only, not image OS packages or proof of absence |
+
+These are actual observations, not universal compatibility or execution-authenticity claims. Private logs and exported evidence retain failures as well as successes. Provider-reported usage is preserved; unreported cost/model identity stays unknown. Export integrity and signature attestations do not authorize publication, deployment or production migration.
+
+## Active qualification gates
+
+The requested release remains blocked: current-source local Ollama qualification and installed software construction through granted MCP control have not passed, and actual GitHub issue-to-proposed-PR qualification awaits explicit issue-publication authorization. Historical passing provider runs do not qualify the changed controller. The latest review-consistency and orphan-worker fixes passed current-source deterministic CI and rootless engine regression; they do not establish a later successful live mission.
+
+The VM/disk/authentication interruptions were environmental failures and remain retained; restored prerequisites do not retroactively qualify failed runs. WSL2 has an assessment, not a live execution result. Optional live cloud-provider paths require separately authorized credentials. Final acceptance must cite the exact successful runs and tested source/image identities rather than inheriting a historical pass.
+
+## Latest defects and blocked attempts
+
+Final qualification exposed two defects. Commit `c9c4bf4` rejects independent code/release decisions combining a passing verdict with unresolved issues; advisories belong in deliverables. Commit `0418dbe` adds immediate-parent monitoring to all nine native worker entry points and reaps owned provider children after interruption. Real SIGTERM/SIGKILL process fixtures and the 11 provider conformance cases passed. Fresh Linux/macOS CI at `0418dbe` passed 428 tests with two explicitly skipped private React fixtures and eight native Dispatch tests. Default rootless smoke, isolation, controller-death and pack regressions also passed; earlier evidence remains preserved at its original commits.
+
+[Four installed MCP construction attempts](INSTALLED-MCP-QUALIFICATION.json) remain unqualified; independent acceptance, unchanged disk admission and operator cancellation preserved their failures. The latest local Ollama resource attempt was stopped and its model unloaded when free space fell to approximately 350 MiB. Cleanup recovered approximately 1.4 GiB, still below the unchanged 2 GiB mission floor. No new model mission is qualified by cleanup, an interrupted review or an abandoned admission. Failed provider bundles and owned-process cleanup records remain retained.
+
+## Historical qualification checkpoints
+
+The dated records below retain original commands, failures and results. Their then-open blockers and older test counts are historical, not the current release overview.
+
 **Recommendation: block the requested feature-complete release.** This branch is an integration increment with explicit remaining work in [KNOWN-LIMITATIONS.md](KNOWN-LIMITATIONS.md) and [IMPLEMENTATION-LEDGER.md](IMPLEMENTATION-LEDGER.md). Version remains 0.1.0; no release tag, merge, publication or deployment was performed.
 
 Qualification date: 2026-11-13. Host: macOS x64, Node 26.12.1, Kujo 1.9.0. Existing rootless Colima Docker engine with seccomp was restored using `colima start default --activate=false` and `npm run engine:connect -- default`; no global Docker context or isolation policy was changed.
@@ -25,7 +60,7 @@ The first four engine attempts failed because the existing daemon was stopped. T
 
 Raw evidence is private under `.runtime/ecosystem-qualification/`, `.runtime/qualification/providers/` and the command-specific smoke/pack directories. Public [qualification-results.json](qualification-results.json) records result summaries and log hashes. The [acceptance manifest](../config/release-acceptance.json) maps all 18 release criteria to implementation, tests, evidence and remaining blockers. Most criteria remain partial or blocked; availability and schema checks alone never qualify execution.
 
-## Phase B continuation qualification
+### Phase B continuation qualification
 
 Implementation checkpoint: `fc96648c15dd006f9a110f6a712d72a6662f5f63`. `npm run verify` passed **118 tests and eight native Dispatch tests**, no failures or skips; 43 Markdown files passed link/path checks. New tests include persistent ledger attempts, CaseFile failure retention, native Eval, selected ShipCheck controls, two-stage promotion and offline native-record tamper rejection. Synthetic receipt tests are labeled and do not substitute for real missions.
 
@@ -41,7 +76,7 @@ Offline review found and fixed two consistency gaps: a removed accounting marker
 
 Final production-source checkpoint `dce41c7f471fa3815102d4f8b63153c77c6d6be7`: `npm run verify` passed **121 tests + eight native Dispatch tests**, zero failures/skips, and all 44 Markdown files (38.979 s). The same verifier passed the completed retry audit and both retained failed/successful offline exports. Exact commands and SHA-256 log identities are in qualification-results.json. Later commits update documentation and qualification metadata only.
 
-## Subsequent integration qualification (not the final-source release matrix)
+### Subsequent integration qualification (not the final-source release matrix)
 
 The previous tables are historical checkpoints. The continuation has additional implementation and scoped evidence; it does not replace the requirement to repeat final-source qualification after concurrent work settles. Subsequent aggregate `npm run verify` checkpoints recorded **175 tests plus eight native Dispatch tests** in `.runtime/ledger-completion/verify-resumed.log` and later **188 tests plus eight native Dispatch tests**, with 53 Markdown files, in `verify-current-retry.log`. Maintenance/audit tests and source changes followed, so neither is the final aggregate count.
 
@@ -78,7 +113,7 @@ The fresh published checkout at `14842049a4de1ad8ed4680c2c893bd3ab98f0305` insta
 
 Read-only upstream maintenance observed 20 locked repositories. Two HEAD differences were reviewed: the agent pin is a direct child compatibility patch with the same complete 85-role roster as current main; Kennel was deliberately updated to `3093c40039ddbaa10527f3121cae3b958cadc2b9`. Its declaration-only API avoids the previous validator's host-path existence/type probes. Six native change-tool tests pass; old source and the initial regression assertion failure remain retained. No other upstream revision was automatically adopted.
 
-## Later installed native v2 and Watchdog observations
+### Later installed native v2 and Watchdog observations
 
 The earlier Go noexec failure, Rust image-only observation, and native v1 shared-workspace write violation remain historical evidence. V1 is disabled. Their reviewed replacement is installed at Workcell `144ab49da88a17fd0d786d01d98030d7ec7798cb`; it includes the explicit read-only contract from `099d1b6d17b38c8c247e8c6617649d8ea21ba157` plus optional remote-adapter dependency security fixes. No remote live-provider qualification is claimed.
 
@@ -94,24 +129,24 @@ The earlier Go noexec failure, Rust image-only observation, and native v1 shared
 
 Watchdog unknown token values remain null in canonical storage; cost is unknown. No content, external telemetry, approval or execution-proof claim is created. These results do not establish complete language missions, services, frameworks, fresh-machine installation or final-source aggregate qualification. The later aggregate result below is separate from this scoped evidence.
 
-## Subsequent live specification result
+### Subsequent live specification result
 
 Five rejected attempts remain intact. The sixth, `spec-faXGCn`, completed successfully on `2cfc12845cfa3697423f6b313c7e72b7d1d83faf`: three real restricted Codex calls, native Dispatch and Spec, an independent reviewer with no blocking issues, frozen identity verification and a passing native RunLedger. Recorded usage is 39,464 input and 7,102 output tokens; model identity and cost remain unreported. The reviewed artifact hash is `d14b2d610e2b263aff6fc08412b9f14b4976f7a4d251c21a587b3e9c59dff123`. The scope is a precise static greeting specification with explicit manual safety follow-ups; no candidate tests were executed and no human/software/deployment approval was granted. Cumulative evidence: `.runtime/ecosystem-phase-b/spec-live-final-qualification.json`.
 
-## Published source qualification at 45be0c3
+### Published source qualification at 45be0c3
 
 `node scripts/qualify-install.mjs 45be0c3dcd0164ad0439017b6e372f96d3cd3b7a` passed a fresh public checkout with isolated HOME, npm cache and temporary directory, no copied dependencies/settings/authentication: npm ci, all pinned tool setup, offline doctor, 229 tests, eight native Dispatch tests and 54 Markdown checks. Evidence: `.runtime/install-qualification/checkout-NVug6p/qualification.json`. This is a fresh checkout on the existing macOS host, not a clean operating system or installed live mission. Earlier failed checkouts are preserved.
 
 The aggregate exposed and fixed a real controller child-reaping race (`b045b56`), followed by an atomic PID fixture correction (`acb5fe3`) and explicit CommonJS transport fixture (`9e9cf7c`). Workcell identity checks now ignore Git replacement refs (`275e526`) and verify stored object integrity (`6de72dc`); tamper reproductions remain retained. Rootless smoke, isolation, controller-death and packs all passed after the controller fix (54.864, 27.913, 16.973 and 66.143 seconds). Current Go/Rust public CLI positives passed again at45be0c3 (26.324 and11.142 seconds) with pinned tracked-byte/object verification. `npm audit --json` reported zero known vulnerabilities. Exact log hashes appear in [qualification-results.json](qualification-results.json). These results leave the wider release acceptance matrix incomplete.
 
-## Current-source live revalidation
+### Current-source live revalidation
 
 `FACTORY_RUNS=.runtime/ledger-live node bin/software-factory.mjs recheck factory-2026-11-13T18-32-50-406Z` completed as `factory-recheck-2026-11-13T19-50-22-471Z` at clean controller source `cdf86862fa99d1564a35c7c48da12b530b7b2b89`. Independent Codex review, real Workcell API/browser/Lens checks, release review and native accounting passed in94.324seconds. Two calls reported33,533 input,11,776 cached input and2,220 output tokens; cost/model identity remain unknown. Automatic Watchdog collection recorded25 content-free native observations. Audit,233-file export and offline verification all passed. The unsigned bundle verifies integrity and stated bindings, not producer authentication or execution proof. No deployment was authorized. Exact records are in [qualification-results.json](qualification-results.json).
 
-## November 19 source and evidence verification
+### November 19 source and evidence verification
 
 [CI-QUALIFICATION.json](CI-QUALIFICATION.json) records fresh Ubuntu24.04 and macOS15 setup, offline doctor and 412+8 passing tests at `08c85267728378b4e47b03b4ce8f382b8a120d2a`. It does not qualify later commits or live runtime execution. The earlier `269c8da` jobs remain failed evidence; both exposed new-run budget initialization before artifact-directory creation.
 
-Later portable budget and React verifier suites exercise real retained runtime evidence plus explicitly synthetic adversarial records. SDK transport tests are protocol fixtures, not live cloud-provider qualification. A fresh root `npm audit --json` on November19 reported zero known vulnerabilities in the installed npm dependency closure; this does not cover runtime-image OS packages or prove absence of vulnerabilities. Local records are under `.runtime/ledger-completion/`.
+Later portable budget and React verifier suites exercise real retained runtime evidence plus explicitly synthetic adversarial records. SDK transport tests are protocol fixtures, not live cloud-provider qualification. A fresh root `npm audit --json` on November 19 reported zero known vulnerabilities in the installed npm dependency closure; this does not cover runtime-image OS packages or prove absence of vulnerabilities. Local records are under `.runtime/ledger-completion/`.
 
 Current local offline doctor verifies all pinned catalogs and component closures but rejects low disk space. Full final-source execution remains blocked at the existing disk guard. Do not lower that guard, run candidates on the host, or convert historical successful receipts into a final-source release claim.
