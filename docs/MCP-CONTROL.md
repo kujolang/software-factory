@@ -19,6 +19,12 @@ Create separate private directories outside source control and a capability file
 }
 ```
 
+For a smaller bounded workflow, set the optional `"softwarePack": "converter"`
+in the capability file. The operator selects the bundled, reviewed converter
+contract. Preparation records its sealed hash, and submission checks that hash
+before delegating to the existing CLI. MCP callers cannot supply pack paths or
+switch the selected pack. Omitting the field uses the default Node application.
+
 Use `chmod 700` for both directories and `chmod 600` for the capability file. Put your mission text inside the mission directory. The launch grant must explicitly name the actions it allows; it cannot add actions absent from the capability file:
 
 ```sh

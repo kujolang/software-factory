@@ -25,3 +25,24 @@ test('actual OS stdio control process exchanges MCP and produces a durable prepa
 test('mission preparation matches the existing CLI character ceiling',async t=>{const f=fixture(t),s=createControlSession(f.options);t.after(()=>s.close());fs.writeFileSync(path.join(f.grant.missionRoot,'long.txt'),'x'.repeat(12001));await assert.rejects(s.call('factory_control_prepare',{missionFile:'long.txt'}),/12000/);assert.equal(fs.readdirSync(f.grant.stateRoot).length,0);});
 test('log write sync and close failures cannot cause success or hang owned child cleanup',async t=>{for(const fail of ['write','short-write','sync','close']){const f=fixture(t),logIO={write:fs.writeSync,sync:fs.fsyncSync,close:fs.closeSync,[fail](){throw Error('injected log I/O failure');}};if(fail==='short-write')logIO.write=()=>0;const runner=()=>spawn(process.execPath,['-e',['write','short-write'].includes(fail)?"console.log('fixture');setInterval(()=>{},1000)":"console.log('fixture')"],{stdio:['ignore','pipe','pipe']});const s=createControlSession({...f.options,runner,logIO});t.after(()=>s.close());const p=await f.prepare(s);await s.call('factory_control_submit',{preparedId:p.submissionId,missionSha256:p.missionSha256});const final=await terminal(s,p.submissionId);assert.equal(final.state,'controller-evidence-failed');assert.equal(final.terminal.loggingFailed,true);await s.close();}});
 test('grant expiration bounds an already running child independently of mission timeout',async t=>{const f=fixture(t,{expiresAt:new Date(Date.now()+1000).toISOString(),maxDurationMs:5000});let child;const s=createControlSession({...f.options,runner:i=>(child=fixtureRunner(i))});const p=await f.prepare(s);await s.call('factory_control_submit',{preparedId:p.submissionId,missionSha256:p.missionSha256});await new Promise(resolve=>child.once('close',resolve));assert.ok(child.signalCode);const final=JSON.parse(fs.readFileSync(path.join(f.grant.stateRoot,p.submissionId,'terminal.json')));assert.equal(final.state,'interrupted');await s.close();});
+
+test('operator grant selects only the sealed converter and binds its identity before submission',async t=>{
+ const invalid=fixture(t,{softwarePack:'../converter.json'});
+ assert.throws(()=>createControlSession(invalid.options),/Invalid or expired/);
+ const f=fixture(t,{softwarePack:'converter'});
+ let invocation;
+ const s=createControlSession({...f.options,runner:i=>{invocation=i;return fixtureRunner(i);}});
+ t.after(()=>s.close());
+ const p=await f.prepare(s);
+ assert.equal(p.workflow,'sealed-converter');
+ assert.match(p.packSha256,/^[0-9a-f]{64}$/);
+ const preparedFile=path.join(f.grant.stateRoot,p.submissionId,'prepared.json');
+ fs.writeFileSync(preparedFile,JSON.stringify({...p,packSha256:'a'.repeat(64)}));
+ const submit=()=>s.call('factory_control_submit',{preparedId:p.submissionId,missionSha256:p.missionSha256});
+ await assert.rejects(submit(),/pack identity mismatch/);
+ assert.equal(invocation,undefined);
+ fs.writeFileSync(preparedFile,JSON.stringify(p));
+ await submit();
+ assert.equal(invocation.args.at(-2),'--pack');
+ assert.match(invocation.args.at(-1),/\/packs\/converter\.json$/);
+});
