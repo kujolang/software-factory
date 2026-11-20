@@ -297,7 +297,7 @@ try {
     const r = await agent(
       "systems-architect",
       "architecture",
-      "Produce architecture.md with API/data model matching supplied fixed acceptance contract, module ownership (backend server.mjs/db.mjs; frontend public/*), concurrency independence, exact handoff conditions, verification gates. Include scoped backend and frontend work orders. Command context:\n" +
+      "Produce architecture.md with API/data model matching supplied fixed acceptance contract, module ownership (backend server.mjs/db.mjs; frontend public/*), concurrency independence, exact handoff conditions, verification gates. Include scoped backend and frontend work orders. Return this artifact inside files:[{path:\"architecture.md\",content:...}]. Command context:\n" +
         fs.readFileSync(path.join(artifact, "mission.md"), "utf8"),
     );
     if (
