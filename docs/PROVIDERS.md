@@ -9,11 +9,13 @@ code, approve a release, or authorize deployment.
 | Provider | Interface | Limits and qualification |
 |---|---|---|
 | `codex` | Pinned Codex CLI, fixed JSON schema, ephemeral read-only session | Tools, apps, browser and web search disabled; unexpected tool events rejected. Existing factory provider; the extracted adapter passed a live schema smoke and a converter construction followed by a fresh independently verified retry; see RELEASE-QUALIFICATION.md for the retained initial rejection and exact scope. |
-| `ollama` | Pinned Kujo Ollama `create_client`, `client_list_models`, `client_chat` through a fixed bridge | Local installed models only, JSON Schema output, no tools or streaming. One live local schema smoke passed; full-mission qualification remains open. |
+| `ollama` | Pinned Kujo Ollama `create_client`, `client_list_models`, `client_chat` through a fixed bridge | Local installed models only, JSON Schema output, no tools or streaming. Actual local structured output and bounded approved-candidate revalidation passed at their recorded commits; construction with this model remains unqualified. |
+| `openai`, `anthropic`, `gemini` | Pinned native Kujo AI SDK/driver adapters | Credential-isolated, fixed HTTPS origins and schema validation; protocol fixtures pass, live cloud qualification remains unavailable without separately authorized credentials. |
 | `mock` | Explicit host-supplied JSON fixture | Offline deterministic tests only. Receipt always marks `fixture: true`; never evidence of model execution. |
 
-OpenAI API, Anthropic, Gemini and other upstream packages are inventoried but are
-not implemented factory providers yet. No provider silently falls back to another.
+The optional SDK providers are implemented but are not presented as live-qualified. No provider silently falls back to another.
+
+Current-source local Ollama qualification remains blocked. Earlier bounded revalidation passes apply only to their recorded source/model. Recent attempts produced prohibited review files, contradictory passing verdicts, resource interruption or cancellation; none established a new passing release. Read-only role schemas now declare `files` with `maxItems: 0`, matching the existing host prohibition. Independent review rejects a passing verdict with unresolved issues. Worker parent monitoring and owned-child cleanup passed actual process fixtures; both fresh-platform CI and the default rootless regression passed at `0418dbe`. Current-source live provider qualification remains incomplete.
 
 ## Controller API
 
@@ -75,8 +77,7 @@ Usage comes only from provider-reported numeric counters. Missing usage stays
 `null`; Ollama cache usage is unknown. Monetary cost stays `null`. Any requested
 monetary ceiling fails before dispatch because no verified cost reservation exists.
 Codex rejects an output-token ceiling that its adapter cannot enforce. Ollama sends
-`num_predict` and rejects truncated results. Input-token and mission-wide cost
-reservation are not implemented. Retryable HTTP status classification is advisory;
+`num_predict` and rejects truncated results. Mission-wide and role-specific call/prompt-byte reservations are durable and frozen before execution. Unknown or cancelled attempts remain consumed; recovery cannot reset the policy. These are not input-token or monetary reservations. See [PROVIDER-BUDGETS.md](PROVIDER-BUDGETS.md) and [actual budget qualification](PROVIDER-BUDGET-QUALIFICATION.json). Retryable HTTP status classification is advisory;
 this adapter never retries automatically. A timeout can leave provider-side
 accounting uncertain even after the local client is killed.
 
@@ -91,15 +92,19 @@ accounting uncertain even after the local client is killed.
 - [AI SDK contract](https://github.com/kujolang/ai-sdk/blob/9083c0a8dd827dabdc840ac79a8fc07844d4888b/README.md)
   describes normalized provider drivers and SDK-owned transport. The factory uses
   the supported native Ollama surface here to retain its JSON Schema contract;
-  it does not claim AI SDK or Agents SDK runtime integration.
+  the separate OpenAI/Anthropic/Gemini paths use the pinned AI SDK and provider drivers. This does not claim a second Agents SDK orchestration engine.
 
 ## Verification
+
+Current scoped evidence includes real Codex React construction with four calls, repeated Workcell checks and standalone export verification ([REACT-MISSION-QUALIFICATION.json](REACT-MISSION-QUALIFICATION.json)); real two-call budget success and one-call pre-transport rejection ([PROVIDER-BUDGET-QUALIFICATION.json](PROVIDER-BUDGET-QUALIFICATION.json)); and a fresh-checkout advisory mission ([INSTALLED-MISSION-QUALIFICATION.json](INSTALLED-MISSION-QUALIFICATION.json)). Local Ollama revalidation `factory-recheck-2026-11-13T18-47-54-752Z` passed two actual calls and a standalone verified export, reporting 14,131 input and 292 output tokens. This qualifies that bounded revalidation path, not arbitrary construction or model interchangeability.
+
+The following initial transport-smoke observations are historical and do not supersede the later mission records.
 
 ```sh
 node --test tests/providers.test.mjs
 ```
 
-Nine deterministic tests cover real process cancellation/deadlines, environment
+The initial nine deterministic tests cover real process cancellation/deadlines, environment
 isolation, tool rejection, output and schema bounds, unknown usage, symlink output,
 and the real pinned Kujo Ollama client against an HTTP fixture, including redirect
 and cloud-alias denial. A separate regression hides a modified source file from
@@ -114,8 +119,7 @@ artifact `.runtime/qualification/providers/ollama-local-schema-retry.json`. A pr
 bridge implementation failure is preserved separately in
 `.runtime/qualification/providers/ollama-local-schema.json`. This is a single
 local structured-output smoke, not software-construction or two-provider release
-qualification. The release remains incomplete until two provider paths pass the
-required live mission and adversarial qualification.
+qualification. Later Ollama revalidation evidence is recorded above; final release acceptance still requires its current-source matrix.
 
 The extracted Codex adapter also passed a live schema smoke on 2026-11-13 with the
 existing private factory login: the exact `factory-conformance` response, 12,303
