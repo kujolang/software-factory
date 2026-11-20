@@ -34,7 +34,7 @@ Historical CLI, SQLite, package, performance, specification, documentation, all-
 
 Original failures remain retained: early isolation defects, rejected model proposals, missing-directory initialization, low disk admission, stale provider authentication and qualification-harness mistakes. Fixes are separately tested. No failed receipt became a passing receipt. The upstream VideoOps VM Stack-underflow observation remains separate from the passing canonical JSON-schema catalog validation.
 
-The requested release remains blocked: installed software construction through granted MCP control have not passed, and actual GitHub issue-to-proposed-PR qualification awaits explicit issue-publication authorization. Historical passing provider runs do not qualify the changed controller. The latest review-consistency and orphan-worker fixes passed current-source deterministic CI and rootless engine regression; they do not establish a later successful live mission.
+The [installed MCP qualification](INSTALLED-MCP-QUALIFICATION.json) passed real sealed converter construction, owned release record retrieval and network-denied build verification. Actual GitHub issue-to-proposed-PR qualification still awaits explicit issue-publication authorization. Historical evidence retains its original source scope.
 
 Foreman remains excluded. BZBY, Agent City and commercial services are not architectural dependencies. Missing/private Ward/Capsule interfaces and unqualified remote/enterprise capabilities remain explicit optional or unavailable entries; no adapter fabricates an API from a product name. Full limitations are in [KNOWN-LIMITATIONS.md](KNOWN-LIMITATIONS.md).
 

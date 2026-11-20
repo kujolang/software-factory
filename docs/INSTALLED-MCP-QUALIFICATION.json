@@ -1,9 +1,9 @@
 {
   "schema": "kujo.factory.installed-mcp-attempt-summary/v1",
-  "ok": false,
+  "ok": true,
   "sourceCommit": "3997bc0c9c288e433e8a9bef235dbf562284f80a",
   "recordedAt": "2026-11-20T02:02:44.356Z",
-  "successfulMcpConstruction": false,
+  "successfulMcpConstruction": true,
   "reasons": [
     "First attempt exhausted independent browser correction gates",
     "Second attempt stopped by free-space floor",
@@ -215,5 +215,88 @@
     "cost": null,
     "failedEvidenceBundle": "sha256:fcb85836f14ca3793f034861b1f3e49189775098c81eda321da0d6dbd690c9a0",
     "networkDeniedStandaloneVerificationPassed": true
-  }
+  },
+  "codexDefaultQualification": {
+    "ok": true,
+    "source": {
+      "commit": "d171a07ad84ca2421484f50fa069650edcb16288",
+      "tree": "92d3b72d42ad82b990938e7e95cfbab68af758b0",
+      "dirty": false,
+      "identityScope": "Git HEAD; dirty working-tree bytes are separately hashed below"
+    },
+    "directory": ".runtime/installed-mcp-qualification/qualification-Avux6W",
+    "runId": "factory-2026-11-20T03-45-22-277Z",
+    "submissionId": "da16a99a-8ec9-43fa-ab9c-36c67c399a82",
+    "packSha256": "f700cd0796f07c0e4ec1821294ccaff58ddb083ff51e109ddad8c6d1822d0e19",
+    "missionSha256": "cda5dd2bab4d3c406dececaacfb295f67eccfd728b95978e84cc9b5a8453e4d1",
+    "mcpSdk": {
+      "name": "@modelcontextprotocol/sdk",
+      "version": "1.32.2",
+      "lockSha256": "4a3913537d78dfd95cdc1fca4b924a059e0d890f497077e5e4d2552caac667fa"
+    },
+    "provider": "codex",
+    "requestedModel": null,
+    "authentication": "ChatGPT account",
+    "maxCalls": 9,
+    "actualCalls": 6,
+    "providerReportedCostUsd": null,
+    "usage": {
+      "input_tokens": 74479,
+      "output_tokens": 11985,
+      "cached_input_tokens": 0
+    },
+    "sourceHash": "04dd130caa854bc0a4e5f4419bdb231d0fa8f7235639d1614b852592731eb6a9",
+    "runtimeImage": "sha256:c62fa7844cd38dd67d18421162af5016b2973a48d6db0a119982b2bf4b661383",
+    "networkDeniedStandaloneVerificationPassed": true,
+    "bundleId": "sha256:ff33c643215c2c8a5c04f4d3e21fec96b4653cfe8499bbbe35f491e4200c5c14",
+    "buildFiles": [
+      "build/CHANGELOG.md",
+      "build/README.md",
+      "build/build.mjs",
+      "build/package.json",
+      "build/public/app.js",
+      "build/public/index.html",
+      "build/public/style.css",
+      "build/server.mjs",
+      "build/tests/README.md",
+      "build/tests/contract.json"
+    ],
+    "deploymentAuthorized": false,
+    "checks": [
+      {
+        "name": "exact frozen submission, inert approval request and duplicate rejection",
+        "passed": true
+      },
+      {
+        "name": "actual installed provider/Workcell independent release, MCP owned reads and portable evidence",
+        "passed": true
+      },
+      "MCP owned release record matches exact local release",
+      "Bundle contains the verified build and passed network-denied standalone verification"
+    ],
+    "scope": "Installed checkout upgraded from clean 0cebc49 with unchanged dependency locks, then real sealed converter construction via official local stdio MCP SDK; historical failed attempts remain preserved.",
+    "retainedRecords": [
+      {
+        "path": ".runtime/installed-mcp-qualification/qualification-Avux6W/qualification.json",
+        "sha256": "0e136359a68aea6850e467e891fdc344da8e9075e0a93028713f855ca7337976"
+      },
+      {
+        "path": ".runtime/installed-mcp-qualification/qualification-Avux6W/mcp-release-artifact.json",
+        "sha256": "524f244bcb651b836cf1063ff7dde22d712673ccd13a4d7cbb71cc73c10482b0"
+      },
+      {
+        "path": ".runtime/installed-mcp-qualification/qualification-Avux6W/network-denied-verify.json",
+        "sha256": "0403a1c89f0c4ec3d494681df4352cb8e6aa70018dd946c7faf64e7de49d36ee"
+      },
+      {
+        "path": ".runtime/installed-mcp-qualification/qualification-Avux6W/terminal-status.json",
+        "sha256": "08349f6e1feaa97c45c40522914f229bc5d1b91e8b4f355f8b81b38ba737f6f3"
+      },
+      {
+        "path": ".runtime/installed-mcp-qualification/qualification-Avux6W/budget.json",
+        "sha256": "af9f224fb723e76040f0085d4841488c3046ec7393819a5cef9997b787eb8e20"
+      }
+    ]
+  },
+  "scopeNote": "Top-level success reflects the later Codex-default qualification. Original failed attempts and their source and guard notes remain historical."
 }

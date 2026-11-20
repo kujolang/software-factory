@@ -373,7 +373,7 @@
     {
       "id": "AC-13",
       "requirement": "MCP and skills interfaces documented and tested",
-      "status": "partial",
+      "status": "verified",
       "implementation": [
         "factory/mcp.mjs",
         "docs/MCP.md",
@@ -395,12 +395,12 @@
         "docs/INSTALLED-MCP-QUALIFICATION.json",
         "docs/CI-QUALIFICATION.json"
       ],
-      "limits": "Official SDK 1.32.2 discovery, grant-scoped preparation, submission, status and duplicate denial pass. The operator can select the sealed converter by grant, with its reviewed pack hash bound before submission. Two real installed Hermes missions stopped at the commander output cap and have independently verified failed exports. Successful installed construction and artifact retrieval remain open; no remote multi-user claim."
+      "limits": "Official SDK 1.32.2 over local stdio passed scoped preparation/submission, duplicate denial, inert approval requests, owned status/evidence/release record retrieval and traversal rejection. The real installed sealed converter passed independent Workcell acceptance and release, and its build-containing export verified offline. Remote multi-user and editor-specific integrations remain unqualified."
     },
     {
       "id": "AC-14",
       "requirement": "Clean installation runs representative missions",
-      "status": "blocked",
+      "status": "verified",
       "implementation": [
         "scripts/setup.mjs",
         "scripts/setup-accountability.mjs",
@@ -422,7 +422,7 @@
         "docs/OFFLINE-FINAL-QUALIFICATION.json",
         "docs/INSTALLED-MCP-QUALIFICATION.json"
       ],
-      "limits": "Fresh checkout and independently scoped install evidence exist. The updated installation passed offline doctor and 27 focused checks; clean Linux/macOS CI passed at 5dac7bc. The previous default and current sealed-converter live MCP attempts produced no qualified construction release. Disk headroom was adequate for the latest attempts. WSL execution is unqualified."
+      "limits": "Clean Linux/macOS CI and scoped offline setup/upgrade/rollback passed at their recorded sources. The clean installed checkout, upgraded without dependency lock changes, ran a real sealed converter mission through MCP and produced verified build evidence at d171a07. Clean-OS or WSL execution is not claimed."
     },
     {
       "id": "AC-15",
@@ -497,7 +497,7 @@
   ],
   "continuation": "docs/IMPLEMENTATION-LEDGER.md",
   "rule": "No file, stub, mock or schema compilation alone establishes working capability.",
-  "continuationScope": "Current engine and clean CI pass; the free Hermes provider and current live checkpoint recovery passed for revalidation. Installed MCP construction and authorized issue repair remain open.",
+  "continuationScope": "Current engine, clean CI, scoped live provider/recovery and installed MCP converter pass. Authorized GitHub issue-to-repair qualification remains open.",
   "reconciliation": {
     "date": "2026-11-20",
     "sourceCheckpoint": "0418dbe4bd4f073a97ef9276597388b4cc683e61",

@@ -23,7 +23,7 @@ These are actual observations, not universal compatibility or execution-authenti
 
 The [free Hermes Nous qualification](HERMES-QUALIFICATION.json) passed real converter revalidation with two calls and a network-denied standalone export verification.
 
-The requested release remains blocked: installed software construction through granted MCP control have not passed, and actual GitHub issue-to-proposed-PR qualification awaits explicit issue-publication authorization. Historical passing provider runs do not qualify the changed controller. The latest review-consistency and orphan-worker fixes passed current-source deterministic CI and rootless engine regression; they do not establish a later successful live mission.
+The [installed MCP qualification](INSTALLED-MCP-QUALIFICATION.json) passed real sealed converter construction, owned release record retrieval and network-denied build verification. Actual GitHub issue-to-proposed-PR qualification still awaits explicit issue-publication authorization. Historical evidence retains its original source scope.
 
 The VM/disk/authentication interruptions were environmental failures and remain retained; restored prerequisites do not retroactively qualify failed runs. WSL2 has an assessment, not a live execution result. Optional live cloud-provider paths require separately authorized credentials. Final acceptance must cite the exact successful runs and tested source/image identities rather than inheriting a historical pass.
 
