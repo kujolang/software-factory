@@ -49,7 +49,6 @@ def run():
             "stream": False,
             "max_tokens": request["maxOutputTokens"],
             "reasoning": {"enabled": False},
-            "thinking": {"type": "disabled"},
             "messages": [{"role": "user", "content": request["prompt"]}],
             "response_format": {"type": "json_schema", "json_schema": {
                 "name": "factory_proposal", "strict": True, "schema": request["schema"],
