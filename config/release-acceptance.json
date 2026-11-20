@@ -201,7 +201,8 @@
       "evidence": [
         "docs/qualification-results.json",
         "docs/PROVIDER-BUDGETS.md",
-        "docs/SDK-PROVIDERS.md"
+        "docs/SDK-PROVIDERS.md",
+        "docs/PROVIDER-BUDGET-QUALIFICATION.json"
       ],
       "limits": "Actual Codex construction/repair and Ollama bounded revalidation independently passed at earlier source checkpoints. OpenAI/Anthropic/Gemini native SDK paths have protocol fixtures only. New budgets are wired but the tight-budget live WebOps attempt stopped at the disk guard after one consumed call. Final-source two-path qualification remains pending; no unreported cost is zero."
     },
@@ -292,7 +293,8 @@
         "docs/qualification-results.json",
         "docs/RELEASE-QUALIFICATION.md",
         ".runtime/production-recovery/qualification-CSuUD5/qualification.json",
-        "docs/OPERATIONS.md"
+        "docs/OPERATIONS.md",
+        "docs/OFFLINE-FINAL-QUALIFICATION.json"
       ],
       "limits": "Actual production completed/pending checkpoint interruption and explicitly authorized native continuation passed: command executed once, original deadline/receipt preserved, independent release and offline bundle passed. Uncertain effects and protected approval states remain blocked. New provider-budget and performance recovery identity changes require final-source interruption regression; rejected recovery cannot alter original approval."
     },
@@ -388,9 +390,11 @@
         "docs/WSL2-ASSESSMENT.md",
         ".runtime/ledger-completion/ci-linux-269c8da.log",
         ".runtime/ledger-completion/ci-macos-269c8da.log",
-        "docs/CI-QUALIFICATION.json"
+        "docs/CI-QUALIFICATION.json",
+        "docs/INSTALLED-MISSION-QUALIFICATION.json",
+        "docs/OFFLINE-FINAL-QUALIFICATION.json"
       ],
-      "limits": "Fresh GitHub-hosted Ubuntu24.04/macOS15 source08c8526 installations, offline doctor and412 deterministic plus8 native Dispatch tests passed per platform. Historical same-host OS-network-denied installation/upgrade/rollback passed. Current-source installed live mission, later-source CI and offline upgrade/rollback remain pending. WSL2 assessment exists; no actual WSL execution claim."
+      "limits": "Fresh published3997bc0 macOS checkout passed setup/offline doctor/423+8 tests (two retained-private React fixtures skipped). Actual installed WebOps advisory/provider/accounting/export passed. Network-denied current-source setup and upgrade/rollback passed. Installed software construction still requires the qualified Workcell VM, currently unreachable; no clean-OS or WSL execution claim."
     },
     {
       "id": "AC-15",
@@ -464,7 +468,7 @@
   ],
   "continuation": "docs/IMPLEMENTATION-LEDGER.md",
   "rule": "No file, stub, mock or schema compilation alone establishes working capability.",
-  "continuationScope": "Scoped historical real execution plus current implementation; final-source/live/installation qualification blocked and incomplete",
+  "continuationScope": "Budget success/rejection and installed advisory plus network-denied upgrade/rollback qualified; React/software runtime/recovery matrix waits for rootless VM restoration.",
   "reconciliation": {
     "date": "2026-11-19",
     "sourceCheckpoint": "7314fca",
