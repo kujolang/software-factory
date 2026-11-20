@@ -17,7 +17,7 @@ test('operator budget flag cannot be silently bypassed by direct real provider A
 
 test('Hermes binds each request to the reserved token cap and rejects unverified cost or model',async t=>{
  const budget=setup(t,policy(4,96));
- const binary=path.join(budget.parent,'hermes-python-fixture');
+ const binary=path.join(budget.parent,'hermes-python-fixture.cjs');
  const model='tencent/hy4-flash:free';
  const env=process.env.FACTORY_HERMES_PYTHON;
  process.env.FACTORY_HERMES_PYTHON=binary;
