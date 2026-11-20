@@ -163,8 +163,8 @@ export async function executeProposal(options = {}) {
         const schemaPath=path.join(temp,'schema.json'),outputPath=path.join(temp,'response.json');
         fs.writeFileSync(schemaPath,JSON.stringify(schema),{mode:0o600});
         env.CODEX_HOME=options.providerHome||providerHome;
-        const args=['exec','--ignore-user-config','--ephemeral','--sandbox','read-only','--disable','shell_tool','--disable','apps','--disable','in_app_browser','-c','web_search="disabled"','--skip-git-repo-check','-C',temp,'--json','--output-schema',schemaPath,'-o',outputPath,'-'];
-        if(model)args.splice(1,0,'--model',model);
+        const args=['-a','never','exec','--ignore-user-config','--ignore-rules','--ephemeral','--sandbox','read-only','--disable','shell_tool','--disable','apps','--disable','in_app_browser','--disable','multi_agent','--disable','hooks','--disable','skill_mcp_dependency_install','--disable','skill_env_var_dependency_prompt','-c','web_search="disabled"','--skip-git-repo-check','-C',temp,'--json','--output-schema',schemaPath,'-o',outputPath,'-'];
+        if(model)args.splice(3,0,'--model',model);
         const wire=await run(options.codexBinary||codexBinary,args,prompt);
         const events=wire.split('\n').filter(Boolean).map(line=>{try{return JSON.parse(line);}catch{throw failure('malformed_provider_events');}});
         const items=events.filter(e=>e.type==='item.completed'||e.type==='item.started').map(e=>e.item);
