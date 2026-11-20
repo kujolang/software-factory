@@ -135,7 +135,12 @@ export async function executeProposal(options = {}) {
       });
       let data;
       try{data=JSON.parse(wire);}catch{throw failure('malformed_provider_response');}
-      if(data.failed===true)throw failure('hermes_request_rejected');
+      if(data.failed===true){
+        const reason=['upstream_timeout','upstream_rate_limit','upstream_http'].includes(data.reason)
+          ? 'hermes_'+data.reason : 'hermes_request_rejected';
+        receipt.retryable=['upstream_timeout','upstream_rate_limit'].includes(data.reason);
+        throw failure(reason);
+      }
       receipt.usage=usageCounts({prompt_eval_count:data.promptEval,eval_count:data.completionEval});
       receipt.providerReportedCostUsd=data.costZero===true?0:null;
       if(data.model!==model||data.costZero!==true)throw failure('hermes_model_or_cost_unverified');

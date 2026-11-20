@@ -30,7 +30,7 @@ def run():
         raise ValueError("endpoint_rejected")
     with httpx.Client(
         headers={"Authorization": credential.token_type + " " + credential.bearer},
-        timeout=20, follow_redirects=False, trust_env=False,
+        timeout=httpx.Timeout(40, connect=10), follow_redirects=False, trust_env=False,
     ) as client:
         models = read_json(client, "GET", "/models", 2_000_000)["data"]
         matches = [model for model in models if model.get("id") == MODEL]
@@ -74,6 +74,11 @@ def run():
 if __name__ == "__main__":
     try:
         print(json.dumps(run(), allow_nan=False))
+    except httpx.TimeoutException:
+        print('{"failed":true,"reason":"upstream_timeout"}')
+    except httpx.HTTPStatusError as error:
+        reason = "upstream_rate_limit" if error.response.status_code == 429 else "upstream_http"
+        print(json.dumps({"failed": True, "reason": reason}))
     except Exception:
         # Authentication or inference failures must never print secrets or upstream bodies.
         print('{"failed":true}')
