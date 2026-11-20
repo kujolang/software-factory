@@ -1,3 +1,4 @@
+import { readMcpFrames, writeMcpFrame } from './mcp-transport.mjs';
 import {listMissions,readMission} from './mission-observer.mjs';
 import {missionWorkflowCatalog,validateMissionWorkflow} from './mission-workflows.mjs';
 // Local stdio MCP discovery interface. The launching OS user owns the transport.
@@ -57,17 +58,9 @@ export function handleMcp(message,options){
  }
  return reply({error:{code:-32601,message:'Method not found'}});
 }
+
 export async function serveMcp({input=process.stdin,output=process.stdout,...options}={}){
- let buffered=Buffer.alloc(0);const send=value=>{if(value)output.write(JSON.stringify(value)+'\n');};
- for await(const chunk of input){
-  buffered=Buffer.concat([buffered,Buffer.from(chunk)]);
-  if(buffered.length>1024*1024)throw Error('MCP input limit exceeded');
-  let end;
-  while((end=buffered.indexOf(10))!==-1){
-   const line=buffered.subarray(0,end).toString('utf8');buffered=buffered.subarray(end+1);if(!line.trim())continue;
-   let message;try{message=JSON.parse(line);}catch{send({jsonrpc:'2.0',id:null,error:{code:-32700,message:'Parse error'}});continue;}
-   send(handleMcp(message,options));
-  }
+ for await(const {message,error} of readMcpFrames(input)){
+  await writeMcpFrame(output,error||handleMcp(message,options));
  }
- if(buffered.length)throw Error('Incomplete MCP message');
 }
