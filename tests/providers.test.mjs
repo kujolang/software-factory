@@ -125,3 +125,10 @@ test('provider byte inventory detects index-hidden changes ignored imports and s
     await assert.rejects(executeProposal(options),{code:'provider_source_drift'});
   } finally {fs.rmSync(dir,{recursive:true,force:true});}
 });
+
+test('Hermes blocks another model, missing budget and excessive token cap before transport',async()=>{
+  const hermes={...base,provider:'hermes',model:'tencent/hy4-flash:free'};
+  await assert.rejects(executeProposal({...hermes,model:'tencent/hy4-flash'}),{code:'hermes_free_model_required'});
+  await assert.rejects(executeProposal(hermes),{code:'budget_context_required'});
+  await assert.rejects(executeProposal({...hermes,budgetContext:{},maxOutputTokens:2049}),{code:'invalid_token_limit'});
+});

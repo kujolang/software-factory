@@ -8,11 +8,12 @@ import {spawn, execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import Ajv2020 from 'ajv/dist/2020.js';
 import {executeSDKProposal,sdkProviderCatalog} from './provider-sdk.mjs';
-import {root, dependency, codexBinary, providerHome, kujoBinary} from './settings.mjs';
+import {root, dependency, codexBinary, providerHome, kujoBinary, hermesPython, hermesModel} from './settings.mjs';
 
 export const providerCatalog = Object.freeze([
   {id:'codex', transport:'restricted-cli', structuredOutput:true, tools:false, streaming:false, usage:'reported', qualification:'live schema smoke passed; full mission requalification required'},
   {id:'ollama', transport:'kujo-native-local-chat', structuredOutput:true, tools:false, streaming:false, usage:'reported', qualification:'live local schema smoke passed; full mission qualification required'},
+  {id:'hermes', transport:'nous-portal-hermes-oauth', structuredOutput:true, tools:false, streaming:false, usage:'reported', qualification:'optional; restricted free Tencent model'},
   ...sdkProviderCatalog,
   {id:'mock', transport:'offline-fixture', structuredOutput:true, tools:false, streaming:false, usage:null, qualification:'deterministic tests only; never execution proof'},
 ]);
@@ -108,6 +109,12 @@ export async function executeProposal(options = {}) {
     if(provider==='codex'&&maxOutputTokens!==null)throw failure('token_ceiling_unenforceable');
     if(provider==='ollama'&&Buffer.byteLength(prompt)+Buffer.byteLength(JSON.stringify(schema))>Math.min(48000,65536-(maxOutputTokens||8192)-8192))throw failure('context_byte_budget');
     if(model!==undefined&&(typeof model!=='string'||!model.trim()||model.length>200||/[\r\n\0]/.test(model)))throw failure('invalid_model');
+    if(provider==='hermes'){
+      if(model!==hermesModel)throw failure('hermes_free_model_required');
+      if(!options.budgetContext)throw failure('budget_context_required');
+      maxOutputTokens??=1536;
+      if(maxOutputTokens>2048)throw failure('invalid_token_limit');
+    }
     if(signal?.aborted)throw failure('cancelled');
     if(provider!=='mock')receipt.secretScan=requireCredentialSafeInput(prompt,schema);
     if(options.budgetContext&&!sdkProviderCatalog.some(p=>p.id===provider)){budgetReservation=reserveProviderBudget({...options.budgetContext,provider,model:model??null,inputBytes:Buffer.byteLength(prompt)+Buffer.byteLength(JSON.stringify(schema)),requestedMaxOutputTokens:maxOutputTokens});maxOutputTokens=budgetReservation.maxOutputTokens;receipt.budgetReservation={...budgetReservation,directory:undefined};}
@@ -120,6 +127,22 @@ export async function executeProposal(options = {}) {
       if(Buffer.byteLength(encoded)>maxBytes)throw failure('output_limit');
       output=JSON.parse(encoded);
       receipt.model='offline-fixture';
+    } else if(provider==='hermes') {
+      const wire=await runProcess(hermesPython(),['-I',path.join(root,'factory/provider-hermes.py')],{
+        cwd:root,env:{HOME:os.homedir(),PATH:'/usr/bin:/bin',LANG:'C.UTF-8'},
+        input:JSON.stringify({model,prompt,schema,maxOutputTokens,maxBytes}),
+        timeoutMs:Math.min(timeoutMs,45000),maxBytes,signal,
+      });
+      let data;
+      try{data=JSON.parse(wire);}catch{throw failure('malformed_provider_response');}
+      if(data.failed===true)throw failure('hermes_request_rejected');
+      receipt.usage=usageCounts({prompt_eval_count:data.promptEval,eval_count:data.completionEval});
+      receipt.providerReportedCostUsd=data.costZero===true?0:null;
+      if(data.model!==model||data.costZero!==true)throw failure('hermes_model_or_cost_unverified');
+      if(data.toolsRequested!==false){receipt.observedToolCalls=1;throw failure('prohibited_tool_call');}
+      if(data.finishReason==='length')throw failure('output_token_limit');
+      if(data.finishReason!=='stop'||typeof data.content!=='string'||!receipt.usage)throw failure('incomplete_provider_response');
+      try{output=JSON.parse(data.content);}catch{throw failure('malformed_structured_output');}
     } else if(sdkProviderCatalog.some(p=>p.id===provider)) {
       if(!model)throw failure('model_required');
       if(maxOutputTokens!==null&&maxOutputTokens>16000)throw failure('invalid_token_limit');

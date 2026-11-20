@@ -41,7 +41,7 @@ export function verifyCLIMission(dir){verifyMissionProviderBudget(dir);
 }
 /** Explicit provider fixture seam is never exposed through CLI and never approves a release. */
 export async function runCLIMission({input,provider=defaultProvider,model=defaultModel,parent=path.join(root,'.runtime/cli-missions'),fixtureOutputs}={}){
- validateCLIMission(input);if(!['codex','ollama','openai','anthropic','gemini'].includes(provider))throw Error('Unsupported CLI mission provider');
+ validateCLIMission(input);if(!['codex','ollama','openai','anthropic','gemini','hermes'].includes(provider))throw Error('Unsupported CLI mission provider');
  if(fixtureOutputs!==undefined&&(!fixtureOutputs||typeof fixtureOutputs!=='object'||Array.isArray(fixtureOutputs)||JSON.stringify(fixtureOutputs).length>1000000))throw Error('Invalid CLI fixture');
  let existing=path.resolve(parent);while(!fs.existsSync(existing))existing=path.dirname(existing);specPlain(existing);fs.mkdirSync(parent,{recursive:true,mode:0o700});specPlain(parent);
  const dir=fs.mkdtempSync(path.join(parent,'cli-')),id=path.basename(dir);for(const name of ['artifacts','application'])fs.mkdirSync(path.join(dir,name),{mode:0o700});

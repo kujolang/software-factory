@@ -2,7 +2,7 @@ import {verifyTrackedSourceIdentity} from '../factory/tracked-source-identity.mj
 import fs from 'node:fs';
 import path from 'node:path';
 import {spawnSync} from 'node:child_process';
-import {root,kujoBinary,dependency,codexBinary,providerHome,agentsRoot,dispatchRoot,workcellBinary,provider,model,ollamaHost} from '../factory/settings.mjs';
+import {root,kujoBinary,dependency,codexBinary,providerHome,agentsRoot,dispatchRoot,workcellBinary,provider,model,ollamaHost,hermesPython,hermesModel} from '../factory/settings.mjs';
 const args=process.argv.slice(2);
 if(args.some(a=>!['--offline','--json'].includes(a)))throw Error('Usage: npm run doctor -- [--offline] [--json]');
 const offline=args.includes('--offline'),checks=[];
@@ -27,6 +27,11 @@ const {verifyEvalDependency}=await import('../factory/evaluation.mjs');check('ev
 const {validateReleasePolicy}=await import('../factory/release-policy.mjs');check('release-policy',()=>validateReleasePolicy(JSON.parse(fs.readFileSync(path.join(root,'config/release-policy.json')))).id,'Restore the reviewed controller release policy.');
 check('disk',()=>{const s=fs.statfsSync(root);const available=s.bavail*s.bsize;if(available<2*1024**3)throw Error('Less than 2 GiB free');return {availableGiB:Math.round(available/1024**3)};},'Free disk space before creating images or run receipts; initial image build should have at least 10 GiB available.');
 if(provider==='ollama')check('ollama-configuration',()=>{const u=new URL(ollamaHost);if(!model||u.protocol!=='http:'||u.hostname!=='127.0.0.1'||u.username||u.password||u.pathname!=='/'||u.search||u.hash||ollamaHost!==u.origin)throw Error('Ollama requires FACTORY_MODEL and canonical loopback HTTP origin');return {model,endpoint:ollamaHost,qualification:'local model execution requires separate qualification'};},'Set FACTORY_MODEL and optional FACTORY_OLLAMA_HOST=http://127.0.0.1:11434.');
+if(provider==='hermes')check('hermes-configuration',()=>{
+  if(model!==hermesModel)throw Error('Only the pinned free Tencent model is supported');
+  hermesPython();
+  return {model,qualification:'Runtime verifies live catalog pricing and model identity before accepting output'};
+},'Connect the default local Hermes profile using hermes auth add nous --type oauth.');
 if(['openai','anthropic','gemini'].includes(provider))check('sdk-provider-credentials',()=>{const file=process.env['FACTORY_'+provider.toUpperCase()+'_CREDENTIAL_FILE'];if(!model||!file)throw Error('Explicit model and owner-only credential file required');let cursor=path.resolve(file);while(true){if(fs.lstatSync(cursor).isSymbolicLink())throw Error('Credential path symlink refused');if(path.dirname(cursor)===cursor)break;cursor=path.dirname(cursor);}const st=fs.lstatSync(file);if(!st.isFile()||st.nlink!==1||(st.mode&0o777)!==0o600||st.uid!==process.getuid()||st.size<1||st.size>16000)throw Error('Credential file permissions/type invalid');return {provider,model,qualification:'Optional API path; live qualification not established by credential presence'};},'Set FACTORY_MODEL and FACTORY_'+provider.toUpperCase()+'_CREDENTIAL_FILE to an existing owner-only key file; never paste keys into mission input.');
 if(!offline){
  if(provider==='codex')check('codex-authentication',()=>{run(codexBinary,['login','status']);return 'Signed in; credential values are not inspected or saved';},'Run npm run login and complete provider sign-in.');

@@ -135,3 +135,23 @@ Local Ollama requests explicitly set `num_ctx:65536` and reject combined prompt/
 ## Optional native SDK API providers
 
 OpenAI, Anthropic and Gemini can be selected through the same proposal interface and role routes. They are credential-gated and **not live-qualified** by deterministic conformance. Set `FACTORY_PROVIDER` and an explicit `FACTORY_MODEL`; supply the path to an owner-only mode-0600 key file through `FACTORY_OPENAI_CREDENTIAL_FILE`, `FACTORY_ANTHROPIC_CREDENTIAL_FILE` or `FACTORY_GEMINI_CREDENTIAL_FILE`. No key belongs in mission JSON, source, prompts or chat. Setup installs pinned native SDK/driver closures. The adapter fixes HTTPS endpoints, rejects redirects and tools, bounds output/deadlines, and validates JSON against the host schema. Provider-native schema enforcement, streaming and identical provider behavior are not claimed. See [SDK-PROVIDERS.md](SDK-PROVIDERS.md) for actual contracts, immutable pins and conformance limits. Monetary ceilings remain fail-closed because none of these adapters establishes billed-cost reservation.
+
+
+## Optional Hermes Nous Portal provider
+
+Connect the local default Hermes profile with `hermes auth add nous --type oauth`.
+Select `FACTORY_PROVIDER=hermes` to use `tencent/hy4-flash:free`. The adapter uses
+the Hermes Python environment (override its absolute interpreter path with
+`FACTORY_HERMES_PYTHON`). It uses the Hermes OAuth credential resolver directly
+and submits text and a JSON Schema to the official Nous inference endpoint over
+HTTPS. Only the exact free model is eligible. Missing or nonzero live catalog
+pricing, a changed response model, missing or nonzero reported cost, unexpected
+tool requests and invalid JSON all fail closed. Requests disable reasoning,
+require a durable budget reservation, default to 1,536 output tokens and cap at
+2,048. There is no model fallback or retry inside the adapter.
+
+Use `--budget-policy POLICY.json` with a strict mission-level and per-role call
+limit for live qualification. Mission content is sent to Nous after Factory's
+existing credential checks. The adapter neither launches the Hermes agent nor
+requires a Discord gateway, and the local OAuth token is never serialized into
+an evidence bundle.

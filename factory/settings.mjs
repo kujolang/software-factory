@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import os from 'node:os';
 import {createRequire} from 'node:module';
 export const root = path.resolve(import.meta.dirname, '..');
 export const settingsFile = path.join(root, '.runtime/settings.json');
@@ -29,11 +30,18 @@ export const agentsRoot = path.resolve(process.env.FACTORY_AGENTS_ROOT || depend
 export const dispatchRoot = path.resolve(process.env.FACTORY_DISPATCH_ROOT || dependency('dispatch'));
 export const workcellBinary = process.env.FACTORY_WORKCELL_BIN || path.join(dependency('workcell'),'bin/workcell');
 export const codexBinary = process.env.FACTORY_CODEX_BIN || path.join(root,'node_modules/.bin/codex');
-export const model = process.env.FACTORY_MODEL || settings.model;
+export const hermesModel = 'tencent/hy4-flash:free';
+export function hermesPython(){
+  const file=process.env.FACTORY_HERMES_PYTHON || path.join(os.homedir(),'.hermes/hermes-agent/venv/bin/python3');
+  if(!path.isAbsolute(file))throw Error('Hermes Python path must be absolute');
+  fs.accessSync(file,fs.constants.X_OK);
+  return file;
+}
+export const model = process.env.FACTORY_MODEL || (process.env.FACTORY_PROVIDER==='hermes'?hermesModel:settings.model);
 export const runsRoot = path.resolve(root,process.env.FACTORY_RUNS || settings.runsDirectory || '.runtime/runs');
 
 export const providerHome = path.join(root,'.runtime/provider');
 
 export const provider = process.env.FACTORY_PROVIDER || 'codex';
-if(!['codex','ollama','openai','anthropic','gemini'].includes(provider))throw Error('Unsupported FACTORY_PROVIDER; fixtures cannot run production missions');
+if(!['codex','ollama','openai','anthropic','gemini','hermes'].includes(provider))throw Error('Unsupported FACTORY_PROVIDER; fixtures cannot run production missions');
 export const ollamaHost = process.env.FACTORY_OLLAMA_HOST || 'http://127.0.0.1:11434';

@@ -26,7 +26,7 @@ export function verifyFrozenSpec(dir){verifyMissionProviderBudget(dir);
 }
 /** fixtureOutputs is an explicit test-only seam; the production CLI never accepts it. */
 export async function runSpecPipeline({idea,provider=defaultProvider,model=defaultModel,parent=path.join(root,'.runtime/specifications'),fixtureOutputs}={}){
- if(typeof idea!=='string'||!idea.trim()||idea.length>12000||idea.includes('\0'))throw Error('Idea must be 1–12000 characters');if(!['codex','ollama','openai','anthropic','gemini'].includes(provider))throw Error('Unsupported specification provider');
+ if(typeof idea!=='string'||!idea.trim()||idea.length>12000||idea.includes('\0'))throw Error('Idea must be 1–12000 characters');if(!['codex','ollama','openai','anthropic','gemini','hermes'].includes(provider))throw Error('Unsupported specification provider');
  if(fixtureOutputs!==undefined&&(!fixtureOutputs||typeof fixtureOutputs!=='object'||Array.isArray(fixtureOutputs)||Buffer.byteLength(JSON.stringify(fixtureOutputs))>1_000_000))throw Error('Invalid explicit specification fixture');
  let existing=path.resolve(parent);while(!fs.existsSync(existing))existing=path.dirname(existing);specPlain(existing);fs.mkdirSync(parent,{recursive:true,mode:0o700});specPlain(parent);
  const dir=fs.mkdtempSync(path.join(parent,'spec-')),id=path.basename(dir);fs.mkdirSync(path.join(dir,'artifacts'),{mode:0o700});
