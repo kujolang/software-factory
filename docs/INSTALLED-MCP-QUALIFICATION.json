@@ -190,5 +190,30 @@
         "networkDeniedStandaloneVerificationPassed": true
       }
     ]
+  },
+  "codexSolContinuation": {
+    "ok": false,
+    "commit": "d171a07ad84ca2421484f50fa069650edcb16288",
+    "provider": "codex",
+    "requestedModel": "gpt-6.2-sol",
+    "authentication": "ChatGPT account via Codex CLI 0.144.4",
+    "runId": "factory-2026-11-20T03-41-07-133Z",
+    "directory": ".runtime/installed-mcp-qualification/qualification-AOXcEO",
+    "terminal": {
+      "schema": "kujo.factory.control-terminal/v1",
+      "state": "controller-failed",
+      "code": 1,
+      "signal": null,
+      "loggingFailed": false,
+      "finishedAt": "2026-11-20T03:41:23.264Z",
+      "cleanupVerified": false,
+      "releaseAuthority": "Consult source-bound factory release evidence; exit status is not approval",
+      "deploymentAuthorized": false
+    },
+    "failure": "The mission received provider_process_failed before construction. One separate restricted structured-output probe returned model_not_found and the service stated that the model is not supported with a ChatGPT account.",
+    "modelUsage": null,
+    "cost": null,
+    "failedEvidenceBundle": "sha256:fcb85836f14ca3793f034861b1f3e49189775098c81eda321da0d6dbd690c9a0",
+    "networkDeniedStandaloneVerificationPassed": true
   }
 }
