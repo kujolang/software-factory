@@ -23,10 +23,36 @@ function receipt(root,operation,data){const record={schema:'kujo.factory.git-rec
 function open(root){root=plain(root);const binding=json(path.join(root,'repository.json'));if(binding.schema!=='kujo.factory.git-repository/v1')throw Error('Invalid Git binding');const repository=plain(path.join(root,'repository'));plain(path.join(repository,'.git'));return {root,binding,repository};}
 function treeSafe(repository,ref){const entries=git(repository,['ls-tree','-r','-l','-z',ref]).output.split('\0').filter(Boolean);if(entries.length>10000)throw Error('Git tree too large');let total=0;for(const entry of entries){const header=/^100(644|755) blob [0-9a-f]+ +([0-9]+)\t/.exec(entry);if(!header)throw Error('Symlink or submodule Git tree rejected');const size=Number(header[2]);total+=size;if(size>maxBytes||total>32*1024*1024)throw Error('Git projected tree exceeds bound');const name=entry.slice(entry.indexOf('\t')+1);if(name.split('/').some(part=>part==='.git'||part==='..'))throw Error('Unsafe Git tree path');}}
 function revision(repository,ref){bounded(ref,'revision',200);if(!/^[a-zA-Z0-9][a-zA-Z0-9._/-]*$/.test(ref)||ref.includes('..'))throw Error('Invalid revision');return git(repository,['rev-parse','--verify',ref+'^{commit}']).output.trim();}
+function boundObjectStore(root) {
+ let bytes=0,count=0;
+ function walk(dir,depth) {
+  if(depth>8)throw Error('Git object store depth exceeded');
+  for(const entry of fs.readdirSync(dir,{withFileTypes:true})){
+   const file=path.join(dir,entry.name);
+   const stat=fs.lstatSync(file);
+   if(++count>100000||stat.isSymbolicLink()||(!stat.isDirectory()&&!stat.isFile()))throw Error('Unsafe Git object store');
+   if(stat.isDirectory())walk(file,depth+1);
+   else{
+    bytes+=stat.size;
+    if(bytes>128*1024*1024)throw Error('Git object store exceeds bound');
+   }
+  }
+ }
+ walk(root,0);
+}
+function checkObjectStore(root) {
+ try {
+  boundObjectStore(root);
+ } catch (error) {
+  // Git maintenance can release its lock between directory enumeration and lstat.
+  if(error.code!=='ENOENT'||error.path!==path.join(root,'maintenance.lock'))throw error;
+  boundObjectStore(root);
+ }
+}
 /** Copies committed local objects without hardlinks, remote transport, hooks, or checkout. */
 export function onboardRepository(source,destination,{ref='HEAD'}={}) {
  source=plain(source);plain(path.join(source,'.git'));if(!fs.statSync(path.join(source,'.git')).isDirectory())throw Error('Source must be a normal local repository');
- let objectBytes=0,objectCount=0;function boundObjects(dir,depth=0){if(depth>8)throw Error('Git object store depth exceeded');for(const entry of fs.readdirSync(dir,{withFileTypes:true})){const file=path.join(dir,entry.name),stat=fs.lstatSync(file);if(++objectCount>100000||stat.isSymbolicLink()||(!stat.isDirectory()&&!stat.isFile()))throw Error('Unsafe Git object store');if(stat.isDirectory())boundObjects(file,depth+1);else{objectBytes+=stat.size;if(objectBytes>128*1024*1024)throw Error('Git object store exceeds bound');}}}boundObjects(path.join(source,'.git/objects'));
+ checkObjectStore(path.join(source,'.git/objects'));
  if(fs.existsSync(path.join(source,'.git/objects/info/alternates')))throw Error('Borrowed Git object stores require independent materialization');
  const parent=plain(path.dirname(path.resolve(destination))),root=path.join(parent,path.basename(destination));if(fs.existsSync(root))throw Error('Git destination exists');
  fs.mkdirSync(root,{mode:0o700});fs.mkdirSync(path.join(root,'receipts'),{mode:0o700});

@@ -13,3 +13,18 @@ test('Git rejects oversized object stores before copying and oversized projected
  fs.writeFileSync(path.join(f.source,'huge.txt'),'x'.repeat(4*1024*1024+1));f.git(['add','huge.txt']);f.git(['commit','-m','large projected blob']);
  assert.throws(()=>onboardRepository(f.source,f.dest),/projected tree exceeds bound/);assert.equal(fs.existsSync(path.join(f.dest,'repository/huge.txt')),false);
 });
+
+
+test('Git onboarding rescans if maintenance releases its lock during inspection',t=>{
+ const f=fixture(t);
+ const lock=path.join(f.source,'.git/objects/maintenance.lock');
+ fs.writeFileSync(lock,'');
+ const lstat=fs.lstatSync;
+ let released=false;
+ t.mock.method(fs,'lstatSync',(file,...args)=>{
+  if(file===lock&&!released){fs.unlinkSync(lock);released=true;}
+  return lstat(file,...args);
+ });
+ assert.equal(onboardRepository(f.source,f.dest).commit,f.git(['rev-parse','HEAD']).trim());
+ assert.equal(released,true);
+});
