@@ -9,6 +9,7 @@ import {catalog} from './catalog.mjs';
 import {selectTeam,missionTypes} from './selection.mjs';
 import {verifyEvidence} from './evidence.mjs';
 import {root} from './settings.mjs';
+const factoryVersion = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8')).version;
 const empty={type:'object',properties:{},additionalProperties:false};
 const definitions=[
  ['factory_list_capabilities','List source-backed capability inventory',empty],
@@ -49,7 +50,7 @@ export function handleMcp(message,options){
  if(!message||message.jsonrpc!=='2.0'||typeof message.method!=='string'||(Object.hasOwn(message,'id')&&!(typeof message.id==='string'||Number.isSafeInteger(message.id))))return {jsonrpc:'2.0',id:null,error:{code:-32600,message:'Invalid Request'}};
  if(!Object.hasOwn(message,'id'))return null;
  const reply=value=>({jsonrpc:'2.0',id:message.id,...value});
- if(message.method==='initialize')return reply({result:{protocolVersion:'2025-06-18',capabilities:{tools:{listChanged:false}},serverInfo:{name:'kujo-software-factory',version:'0.1.0'},instructions:'Read-only local discovery and planning. Mission execution, approval, cancellation and external writes are not exposed.'}});
+ if(message.method==='initialize')return reply({result:{protocolVersion:'2025-06-18',capabilities:{tools:{listChanged:false}},serverInfo:{name:'kujo-software-factory',version:factoryVersion},instructions:'Read-only local discovery and planning. Mission execution, approval, cancellation and external writes are not exposed.'}});
  if(message.method==='ping')return reply({result:{}});
  if(message.method==='tools/list')return reply({result:{tools:definitions}});
  if(message.method==='tools/call'){
