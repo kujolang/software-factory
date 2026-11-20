@@ -1,0 +1,66 @@
+{
+  "schema": "kujo.factory.github-issue-qualification/v1",
+  "ok": false,
+  "issue": "https://github.com/kujolang/software-factory/issues/1",
+  "issueSnapshot": ".runtime/mission-workflows/mission-HJ3cZN/github-issue.json",
+  "issueSnapshotSha256": "af7441232a7a93df493c59c0a8aa25c5ab184a379e25ce3c185ea602ff5e19c6",
+  "seed": {
+    "schema": "kujo.factory.github-issue-seed-proof/v1",
+    "ok": true,
+    "publicSeedCommit": "64c313ba2b10329018148a9c2bf34de32ae5f52a",
+    "projectedCommit": "b0a3bf8176e7132f26a475e4cb83b5daa10a1241",
+    "qualificationSha256": "1365526ea1d9e4655f976816c3a9a13a5f066054409ca3976f0bf57d7cf8e677",
+    "observedFailure": "99 !== 32",
+    "nativeReceiptVerified": true,
+    "cleanupVerified": true,
+    "cleanupSha256": "001890772eb2dccc42cf1b0c57838da724b8370fa151ee49b955905219223463",
+    "nativeVerificationSha256": "a4e9d66c03547b8e0fe5039888818877a15f3f4d272f4152349a40d394d1a76e",
+    "scope": "Actual rootless Workcell wrong-answer rejection of admitted committed intentional fixture; no software release approval",
+    "preservedPriorFailure": "seed-qualification.json records forbidden Git metadata admission failure, not arithmetic rejection"
+  },
+  "workflowDirectory": ".runtime/mission-workflows/mission-HJ3cZN",
+  "provider": "ChatGPT account default Codex",
+  "reportedCostUsd": null,
+  "attempts": [
+    {
+      "runId": "factory-2026-11-20T03-53-41-638Z",
+      "source": {
+        "commit": "be4ad22a2c8b02abfb8a5bc8a352744b8ceda666",
+        "tree": "7c389fdbcc5608a4401463a0429b876f82f64c4c",
+        "dirty": false,
+        "identityScope": "Git HEAD; dirty working-tree bytes are separately hashed below"
+      },
+      "outcome": "Independent Workcell acceptance, browser, build and Lens passed; release reviewer withheld approval pending operator evidence and later steps.",
+      "callReservations": 10,
+      "usage": {
+        "input_tokens": 169146,
+        "output_tokens": 15731
+      },
+      "failedEvidenceBundle": "sha256:756888f0ca6c699eef324c12f7b846d02e87c003ec938ebe371285955f1a5029",
+      "offlineVerificationPassed": true
+    },
+    {
+      "runId": "factory-2026-11-20T04-01-28-293Z",
+      "source": {
+        "commit": "be4ad22a2c8b02abfb8a5bc8a352744b8ceda666",
+        "tree": "7c389fdbcc5608a4401463a0429b876f82f64c4c",
+        "dirty": false,
+        "identityScope": "Git HEAD; dirty working-tree bytes are separately hashed below"
+      },
+      "outcome": "Independent reviewer blocked the existing frontend stale-response race. Two-call review-only budget prevented an implementation correction; no release.",
+      "callReservations": 1,
+      "usage": {
+        "input_tokens": 11900,
+        "output_tokens": 1051
+      },
+      "failedEvidenceBundle": "sha256:49a12f62337cf456b63227e53b8d145497595d6292209b1174ba15e4e8e67048",
+      "offlineVerificationPassed": true
+    }
+  ],
+  "unpublishedPrPacketPrepared": false,
+  "qualificationFixBranchPushed": false,
+  "prPublished": false,
+  "deploymentAuthorized": false,
+  "callsConsumed": 11,
+  "scopeDecision": "Issue scope intentionally permits only the seeded Fahrenheit offset. The identified unchanged UI race is outside the one-line arithmetic change and absent as an explicit pack check. Independent rejection stands. Scope expansion or an operator-approved explicit interpretation and a fresh independent verdict are required before preparing a qualified PR packet."
+}

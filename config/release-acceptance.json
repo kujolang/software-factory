@@ -337,9 +337,10 @@
       "evidence": [
         "docs/RELEASE-QUALIFICATION.md",
         "docs/GITHUB-READ-QUALIFICATION.md",
-        "docs/PERFORMANCE-WORKFLOWS.md"
+        "docs/PERFORMANCE-WORKFLOWS.md",
+        "docs/GITHUB-ISSUE-QUALIFICATION.json"
       ],
-      "limits": "Actual isolated Git commit/conflict/PR-packet preparation, public historical CI reads and source-bound Node repair/performance change exports passed. No external writes were authorized by local release. Public target had no issues, so positive live issue ingestion was not fabricated. Final-source representative issue-to-proposed-PR qualification remains open."
+      "limits": "Live public issue #1 was ingested. Rootless Workcell reproduced the seeded failure; the one-line repair passed initial independent review and sealed API/browser checks. Local release was withheld and fresh review found an existing stale browser response race. Both failed bundles verify offline. No approved full-repository repair commit or unpublished PR packet is claimed for this issue."
     },
     {
       "id": "AC-12",
