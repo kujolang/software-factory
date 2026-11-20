@@ -69,3 +69,17 @@ test('read-only provider schemas prohibit file proposals without changing host e
  const writable=roleContract('chain.backend-developer',{verify:false,fileEffects:true});
  assert.equal(writable.schema.properties.files.maxItems,undefined);
 });
+
+test('independent reviewers cannot pass while reporting unresolved issues',()=>{
+ for(const id of ['chain.code-reviewer','chain.release-verifier']){
+  const c=roleContract(id,{verify:false,fileEffects:false});
+  const output={summary:'Contradictory model verdict',verdict:'pass',issues:['Input validation is missing and must be fixed.'],files:[],deliverables:Object.fromEntries(c.role.manifest.outputs.map(field=>[field.name,'Concrete fixture finding']))};
+  assert.throws(()=>admitRoleProposal(c,output),/Passing independent review contains unresolved issues/);
+  assert.equal(admitRoleProposal(c,{...output,verdict:'fail'}).verdict,'fail');
+  assert.equal(admitRoleProposal(c,{...output,issues:[]}).verdict,'pass');
+ }
+ // Advisory observations may contain findings; they never grant independent release.
+ const c=roleContract('chain.research-analyst',{verify:false});
+ const advisory={summary:'Advisory fixture',verdict:'proposed',issues:['Open research question'],files:[],deliverables:Object.fromEntries(c.role.manifest.outputs.map(field=>[field.name,'Advisory fixture']))};
+ assert.equal(admitRoleProposal(c,advisory),advisory);
+});

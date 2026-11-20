@@ -20,6 +20,7 @@ export function roleContract(id,{base,verify=true,fileEffects=true}={}){
  if(required.some(name=>properties[name]?.type!=='string'))throw Error('Unsupported canonical role output type');
  const deliverables={type:'object',properties:Object.fromEntries(required.map(name=>[name,{...properties[name],minLength:1,maxLength:16000}])),required,additionalProperties:false};
  const schema={...bundle,properties:{...bundle.properties,...(!fileEffects?{files:{...bundle.properties.files,maxItems:0}}:{}),deliverables},required:[...bundle.required,'deliverables']};
+ if(['chain.code-reviewer','chain.release-verifier'].includes(id))schema.properties.issues={...bundle.properties.issues,description:'Unresolved correctness, security or release blockers. A pass verdict requires this array to be empty. Put nonblocking observations and checks not personally executed in canonical deliverables, not here.'};
  const validate=new Ajv2020({strict:false}).compile(schema);
  return {role,schema,validate,identity:sha(JSON.stringify({manifest:role.manifest,input:role.input.schema,output:role.output.schema,instructions:role.instructions}))};
 }
@@ -27,6 +28,7 @@ export function roleContract(id,{base,verify=true,fileEffects=true}={}){
 export function admitRoleProposal(contract,output,{allowedFiles=()=>false}={}){
  if(!contract.validate(output))throw Error('Role proposal missing canonical deliverables or violating fixed-output contract');
  validateRolePayload(contract.role,'output',output.deliverables);
+ if(['chain.code-reviewer','chain.release-verifier'].includes(contract.role.manifest.id)&&output.verdict==='pass'&&output.issues.length)throw Error('Passing independent review contains unresolved issues');
  if(output.files.some(file=>!allowedFiles(file.path)))throw Error('Role proposed a prohibited file effect');
  if(output.files.length>100||output.issues.length>100||JSON.stringify(output).length>1000000)throw Error('Role proposal exceeds bounds');
  return output;
