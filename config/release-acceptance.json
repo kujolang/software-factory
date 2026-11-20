@@ -293,7 +293,7 @@
     {
       "id": "AC-10",
       "requirement": "Recovery and interruption behavior tested",
-      "status": "partial",
+      "status": "verified",
       "implementation": [
         "factory/workcell-controller-death-test.mjs",
         "factory/operations.mjs",
@@ -316,9 +316,10 @@
         "docs/OPERATIONS.md",
         "docs/OFFLINE-FINAL-QUALIFICATION.json",
         "docs/PRODUCTION-RECOVERY-QUALIFICATION.json",
-        "docs/FINAL-ENGINE-QUALIFICATION.json"
+        "docs/FINAL-ENGINE-QUALIFICATION.json",
+        "docs/HERMES-RECOVERY-QUALIFICATION.json"
       ],
-      "limits": "Actual production recovery at a39b8a8 passed once-only command execution, original deadline/receipt/checkpoint preservation, independent release and offline export. Current 0418dbe OS parent-death/provider-reaping fixtures and Workcell watchdog/controller-death checks pass. A later positive live production continuation remains required after lifetime hardening; uncertain effects remain blocked."
+      "limits": "Current-source live Hermes revalidation at 316ffc5 was interrupted at a completed verify and pending release boundary and resumed through independent local release. Original deadline, verification receipt and checkpoint remained unchanged; verification executed once and the export passed network-denied standalone verification. The full new-build attempt at this source failed before its checkpoint; historical a39b8a8 separately records successful new-build command-to-architecture recovery. Worker-death regressions remain independent. These observations do not qualify uncertain external effects."
     },
     {
       "id": "AC-11",
@@ -496,7 +497,7 @@
   ],
   "continuation": "docs/IMPLEMENTATION-LEDGER.md",
   "rule": "No file, stub, mock or schema compilation alone establishes working capability.",
-  "continuationScope": "Current catalogs, engine and clean CI pass; live provider, installed MCP, authorized issue repair and post-hardening production recovery remain open.",
+  "continuationScope": "Current engine and clean CI pass; the free Hermes provider and current live checkpoint recovery passed for revalidation. Installed MCP construction and authorized issue repair remain open.",
   "reconciliation": {
     "date": "2026-11-20",
     "sourceCheckpoint": "0418dbe4bd4f073a97ef9276597388b4cc683e61",
