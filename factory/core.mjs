@@ -108,17 +108,14 @@ export function files(dir) {
     .sort();
 }
 export function digest(dir) {
-  return crypto
-    .createHash("sha256")
-    .update(
-      files(dir)
-        .map(
-          (p) =>
-            p + "\0" + fs.readFileSync(path.join(dir, p)).toString("base64"),
-        )
-        .join("\n"),
-    )
-    .digest("hex");
+  const hash = crypto.createHash("sha256");
+  let separator = "";
+  for (const name of files(dir)) {
+    hash.update(separator + name + "\0");
+    hash.update(fs.readFileSync(path.join(dir, name)).toString("base64"));
+    separator = "\n";
+  }
+  return hash.digest("hex");
 }
 export function materialize(dir, bundle, allowed) {
   if (!bundle || !Array.isArray(bundle.files) || bundle.files.length > 20)
@@ -163,6 +160,7 @@ export async function command(
   } = {},
 ) {
   if (shutdownSignal) throw Error("Controller shutdown in progress");
+  if (!Number.isSafeInteger(maxBytes) || maxBytes < 1) throw Error("Invalid command output limit");
   const start = Date.now();
   const child = spawn(bin, args, {
     cwd,
@@ -171,24 +169,28 @@ export async function command(
     detached: true,
   });
   activeChildren.add(child);
-  let out = "",
-    err = "",
-    reason = "";
+  const stdout = {chunks: [], bytes: 0};
+  const stderr = {chunks: [], bytes: 0};
+  let reason = "";
   const stop = (why) => {
+    if (reason) return;
     reason = why;
     try {
       process.kill(-child.pid, "SIGKILL");
     } catch {}
   };
+  const capture = (target, chunk) => {
+    const remaining = maxBytes - target.bytes;
+    if (remaining > 0) {
+      const retained = chunk.length <= remaining ? chunk : Buffer.from(chunk.subarray(0, remaining));
+      target.chunks.push(retained);
+      target.bytes += retained.length;
+    }
+    if (chunk.length > remaining) stop("output_limit");
+  };
   const timer = setTimeout(() => stop("timeout"), timeout);
-  child.stdout.on("data", (c) => {
-    out += c;
-    if (Buffer.byteLength(out) > maxBytes) stop("output_limit");
-  });
-  child.stderr.on("data", (c) => {
-    err += c;
-    if (Buffer.byteLength(err) > maxBytes) stop("output_limit");
-  });
+  child.stdout.on("data", (chunk) => capture(stdout, chunk));
+  child.stderr.on("data", (chunk) => capture(stderr, chunk));
   child.stdin.on("error", () => {});
   child.stdin.end(input);
   let code;
@@ -205,7 +207,13 @@ export async function command(
     clearTimeout(timer);
     activeChildren.delete(child);
   }
-  return { code, out, err, reason, durationMs: Date.now() - start };
+  return {
+    code,
+    out: Buffer.concat(stdout.chunks, stdout.bytes).toString("utf8"),
+    err: Buffer.concat(stderr.chunks, stderr.bytes).toString("utf8"),
+    reason,
+    durationMs: Date.now() - start,
+  };
 }
 export function snapshot(dir) {
   return files(dir)
