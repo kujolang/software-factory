@@ -14,3 +14,30 @@ test('native SDK cancellation/timeout consume reservations and preserve unknown 
 
 test('retained provider receipts detect removal of both budget marker and directory',t=>{const parent=fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()),'budget-downgrade-'));t.after(()=>fs.rmSync(parent,{recursive:true,force:true}));fs.mkdirSync(path.join(parent,'artifacts'));fs.writeFileSync(path.join(parent,'run.json'),JSON.stringify({id:'mission'}));fs.writeFileSync(path.join(parent,'artifacts/review-receipt.json'),JSON.stringify({budgetReservation:{id:'retained'}}));assert.throws(()=>providerBudgetContext(parent,'core-developer'),/required_marker_missing/);});
 test('operator budget flag cannot be silently bypassed by direct real provider APIs',async()=>{const old=process.env.FACTORY_BUDGET_POLICY_FILE;process.env.FACTORY_BUDGET_POLICY_FILE='/nonexistent-operator-policy';try{await assert.rejects(executeProposal({provider:'codex',prompt:'fixed',schema:{type:'object'}}),e=>e.code==='budget_context_required');const {executeSDKProposal}=await import('../factory/provider-sdk.mjs');await assert.rejects(executeSDKProposal({provider:'openai',model:'fixture-model',prompt:'fixed',schema:{type:'object'}}),e=>e.code==='budget_context_required');}finally{if(old===undefined)delete process.env.FACTORY_BUDGET_POLICY_FILE;else process.env.FACTORY_BUDGET_POLICY_FILE=old;}});
+
+test('Hermes binds each request to the reserved token cap and rejects unverified cost or model',async t=>{
+ const budget=setup(t,policy(4,96));
+ const binary=path.join(budget.parent,'hermes-python-fixture');
+ const model='tencent/hy4-flash:free';
+ const env=process.env.FACTORY_HERMES_PYTHON;
+ process.env.FACTORY_HERMES_PYTHON=binary;
+ t.after(()=>{if(env===undefined)delete process.env.FACTORY_HERMES_PYTHON;else process.env.FACTORY_HERMES_PYTHON=env;});
+ const run=async override=>{
+  const response={model,finishReason:'stop',toolsRequested:false,costZero:true,promptEval:12,completionEval:5,content:'{"answer":42}',...override};
+  fs.writeFileSync(binary,`#!${process.execPath}
+const assert=require('node:assert/strict');
+const request=JSON.parse(require('node:fs').readFileSync(0,'utf8'));
+assert.equal(request.maxOutputTokens,96);
+assert.equal(request.model,${JSON.stringify(model)});
+console.log(${JSON.stringify(JSON.stringify(response))});
+`,{mode:0o700});
+  return executeProposal({provider:'hermes',model,prompt:'Return an answer integer.',schema:{type:'object',properties:{answer:{type:'integer'}},required:['answer'],additionalProperties:false},budgetContext:budget});
+ };
+ const good=await run({});
+ assert.equal(good.receipt.providerReportedCostUsd,0);
+ assert.equal(good.receipt.budgetReservation.maxOutputTokens,96);
+ await assert.rejects(run({costZero:false}),{code:'hermes_model_or_cost_unverified'});
+ await assert.rejects(run({model:'paid-fallback'}),{code:'hermes_model_or_cost_unverified'});
+ await assert.rejects(run({toolsRequested:true}),{code:'prohibited_tool_call'});
+ assert.deepEqual(inspectProviderBudget(budget.directory,budget.missionId).reservations.map(r=>r.status),['completed','failed','failed','failed']);
+});
