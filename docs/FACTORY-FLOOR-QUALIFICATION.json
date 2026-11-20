@@ -1,0 +1,45 @@
+{
+  "schema": "kujo.factory.floor-qualification/v1",
+  "ok": true,
+  "fixture": true,
+  "modelCalls": 0,
+  "releaseApproval": false,
+  "execution": "Actual existing-image Workcell pack browser; synthetic API observations",
+  "imageRequested": "kujolang/factory-node:local",
+  "sourceFiles": {
+    "factory/web/index.html": "477c0cd2b908e8ec42e3184e93a84e70fc814b77bb0b2eb2ea9c0459d00f9a5a",
+    "factory/web/app.js": "1442ffc748f31ccb795fc104d74975a445dc19c12ea7a529cbf109b17de8a48f",
+    "factory/web/style.css": "23d6aead97c016251dbb37939168d689d5de2b9843ecfe08e716ff9535a44822",
+    "factory/web/assets/DepartureMono-Regular.woff2": "5b4fed1daa90708aa9c6ee1190abca9dc22164a1c1def0020386e46b61038cfb"
+  },
+  "apiChecks": [
+    "health",
+    "reject-unknown",
+    "restart"
+  ],
+  "browserChecks": [
+    "open",
+    "fixture-banner",
+    "unknown-cost",
+    "provider-open",
+    "fixture-provider",
+    "gates-open",
+    "failure-summary",
+    "state-open",
+    "skill-evidence",
+    "changes-open",
+    "proposal-open",
+    "markup-visible",
+    "no-injected-image",
+    "no-injected-script",
+    "no-script-effects",
+    "replay",
+    "snapshot-disclosure"
+  ],
+  "failure": null,
+  "evidence": ".runtime/factory-floor-qualification/2026-11-20T01-23-54-950Z",
+  "date": "2026-11-20",
+  "controllerCommit": "a39b8a8a410ad6cab107ae44c91cd86d98b1f46d",
+  "qualificationSha256": "507bd0de513918dc5a750d5326d887642416eb1dde90854c8436e8a9be738e30",
+  "scope": "Actual rootless browser execution against synthetic observer data; no current live-mission browser-data, model execution or release-approval claim."
+}
