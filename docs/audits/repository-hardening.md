@@ -20,7 +20,6 @@
 | H5 | P2 | Converter browser | The public client allowed late success or failure to replace the current result. | `examples/converter/public/app.js` checks request order on both paths. The new supplemental Workcell check controls response completion while loading the shipped script. The sealed pack retains its existing acceptance contract. |
 | H6 | P2 | Acceptance fixture | The initial pack qualification failed after the browser change because its text replacement no longer matched. | `scripts/test-packs.mjs` asserts each negative fixture mutation has exactly one target before invoking the real acceptance runner. Both intentionally wrong outputs are still required to fail. |
 | H7 | P3 | Qualification documentation | Adaptation, architecture and security docs described some separately qualified paths as still pending. | Updated the docs to point to the recorded qualification scopes and clarify the default MCP interface. |
-
 | H8 | P2 | Git onboarding | Linux CI observed Git removing `.git/objects/maintenance.lock` between enumeration and inspection. | Retry the complete bounded scan once for that specific disappearance. A targeted real Git fixture injects the lock removal and verifies the same commit is onboarded. Deterministic repository fixtures disable automatic maintenance. |
 
 ## Audit coverage
