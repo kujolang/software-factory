@@ -198,12 +198,13 @@
     {
       "id": "AC-07",
       "requirement": "At least two independently qualified provider paths",
-      "status": "partial",
+      "status": "verified",
       "implementation": [
         "factory/providers.mjs",
         "factory/provider-ollama.kujo",
         "factory/provider-sdk.mjs",
-        "factory/provider-budget.mjs"
+        "factory/provider-budget.mjs",
+        "factory/provider-hermes.py"
       ],
       "tests": [
         "tests/providers.test.mjs",
@@ -215,9 +216,10 @@
         "docs/PROVIDER-BUDGETS.md",
         "docs/SDK-PROVIDERS.md",
         "docs/PROVIDER-BUDGET-QUALIFICATION.json",
-        "docs/PROVIDER-QUALIFICATION-ATTEMPTS.json"
+        "docs/PROVIDER-QUALIFICATION-ATTEMPTS.json",
+        "docs/HERMES-QUALIFICATION.json"
       ],
-      "limits": "Codex revalidation passed at dae93ee; historical local Ollama revalidation passed at its original source. Current local attempts exposed a timeout, prohibited proposal, contradictory passing review and larger-model resource exhaustion. Read-only schemas and contradictory-decision rejection are now enforced and tested. No successful live two-provider qualification is claimed after the latest fixes. Cloud SDK paths remain protocol-fixture-only; unknown cost stays null."
+      "limits": "Codex and Hermes Nous Portal each have real source-scoped end-to-end revalidation evidence. Codex passed at dae93ee; the free Tencent model passed at b140936 with two reserved calls, zero reported cost, real Workcell and standalone offline verification. An earlier low-cap Hermes attempt remains failed. Hermes construction and later-source Codex revalidation were not exercised. Historical Ollama evidence and failed attempts remain source-scoped; the other cloud SDK paths have protocol fixtures only."
     },
     {
       "id": "AC-08",
