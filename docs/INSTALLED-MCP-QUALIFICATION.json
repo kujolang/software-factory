@@ -114,5 +114,81 @@
   "subsequentFix": {
     "commit": "0418dbe4bd4f073a97ef9276597388b4cc683e61",
     "description": "Native worker parent watchdog and provider-child reaping close the observed detached-process lifetime gap. Actual OS fixtures and both clean CI platforms pass; no later successful installed live MCP mission is inferred."
+  },
+  "hermesContinuation": {
+    "ok": false,
+    "installedBase": "0cebc49",
+    "sealedConverterGrantCommit": "6cf4b78",
+    "fixtureFixCommit": "5dac7bc",
+    "qualificationDirectory": ".runtime/install-qualification/checkout-W5Mwnr",
+    "installEvidence": "npm ci, setup and offline doctor passed at base. Its aggregate found a nested install subprocess fixture failure. After the source-only upgrade, offline doctor and all 27 focused checks passed. Both clean GitHub CI platforms passed 5dac7bc.",
+    "ciRun": 44668603804,
+    "observations": [
+      "Official MCP SDK prepared the sealed converter, froze the pack hash, recorded an inert approval request, submitted the real mission and rejected duplicate submission.",
+      "Both attempts spent one model call and stopped before construction when the commander hit its 1,536-token cap. The additional Tencent native no-thinking request flag did not resolve this and was reverted.",
+      "Both failed runs independently verify offline. No construction/release artifact was produced."
+    ],
+    "attempts": [
+      {
+        "directory": ".runtime/installed-mcp-qualification/qualification-YBwPOn",
+        "commit": "5dac7bcc413daf7071d496c14e247cf419125eac",
+        "runId": "factory-2026-11-20T03-35-33-216Z",
+        "packSha256": "f700cd0796f07c0e4ec1821294ccaff58ddb083ff51e109ddad8c6d1822d0e19",
+        "missionSha256": "f468a6165b574e11b1319460cb6f37b9fad98ae80bd96676a2bdf752787d1d97",
+        "terminal": {
+          "schema": "kujo.factory.control-terminal/v1",
+          "state": "controller-failed",
+          "code": 1,
+          "signal": null,
+          "loggingFailed": false,
+          "finishedAt": "2026-11-20T03:36:12.417Z",
+          "cleanupVerified": false,
+          "releaseAuthority": "Consult source-bound factory release evidence; exit status is not approval",
+          "deploymentAuthorized": false
+        },
+        "model": "tencent/hy4-flash:free",
+        "usage": [
+          {
+            "input_tokens": 1743,
+            "output_tokens": 1536,
+            "cached_input_tokens": null
+          }
+        ],
+        "outputTokenLimit": 1536,
+        "providerReportedCostUsd": 0,
+        "failedEvidenceBundle": "sha256:41e0d6c9e276010c85ddba07711f352e481a4897b5a1c78c974bb1fd38391178",
+        "networkDeniedStandaloneVerificationPassed": true
+      },
+      {
+        "directory": ".runtime/installed-mcp-qualification/qualification-MJGgt1",
+        "commit": "bc7c1b15bcdd95941a9163fd863084755de31fb1",
+        "runId": "factory-2026-11-20T03-37-14-789Z",
+        "packSha256": "f700cd0796f07c0e4ec1821294ccaff58ddb083ff51e109ddad8c6d1822d0e19",
+        "missionSha256": "f468a6165b574e11b1319460cb6f37b9fad98ae80bd96676a2bdf752787d1d97",
+        "terminal": {
+          "schema": "kujo.factory.control-terminal/v1",
+          "state": "controller-failed",
+          "code": 1,
+          "signal": null,
+          "loggingFailed": false,
+          "finishedAt": "2026-11-20T03:37:42.638Z",
+          "cleanupVerified": false,
+          "releaseAuthority": "Consult source-bound factory release evidence; exit status is not approval",
+          "deploymentAuthorized": false
+        },
+        "model": "tencent/hy4-flash:free",
+        "usage": [
+          {
+            "input_tokens": 1743,
+            "output_tokens": 1536,
+            "cached_input_tokens": null
+          }
+        ],
+        "outputTokenLimit": 1536,
+        "providerReportedCostUsd": 0,
+        "failedEvidenceBundle": "sha256:fcf6c819dc157e288d9e035e4c2832a2bc20dfc5e3fe5a4118747c3c2cd48a05",
+        "networkDeniedStandaloneVerificationPassed": true
+      }
+    ]
   }
 }

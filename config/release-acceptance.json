@@ -395,7 +395,7 @@
         "docs/INSTALLED-MCP-QUALIFICATION.json",
         "docs/CI-QUALIFICATION.json"
       ],
-      "limits": "Official SDK 1.32.2 read-only discovery and grant-scoped preparation/status/denial passed. Four actual installed submissions produced no qualified release; failed evidence is preserved. The observed detached-worker cancellation defect is fixed and actual OS regressions pass. Successful current-source installed MCP construction/artifact retrieval remains unqualified; no remote multi-user/editor-host claim."
+      "limits": "Official SDK 1.32.2 discovery, grant-scoped preparation, submission, status and duplicate denial pass. The operator can select the sealed converter by grant, with its reviewed pack hash bound before submission. Two real installed Hermes missions stopped at the commander output cap and have independently verified failed exports. Successful installed construction and artifact retrieval remain open; no remote multi-user claim."
     },
     {
       "id": "AC-14",
@@ -422,7 +422,7 @@
         "docs/OFFLINE-FINAL-QUALIFICATION.json",
         "docs/INSTALLED-MCP-QUALIFICATION.json"
       ],
-      "limits": "Fresh 3997bc0 macOS setup/doctor/aggregate, actual installed advisory, network-denied setup and upgrade/rollback passed. Current 0418dbe Linux/macOS clean CI passes. Installed MCP software-construction attempts remain failed/interrupted, not a successful clean-install construction claim. Approximately 1.4 GiB free is below unchanged 2 GiB mission and 3 GiB fresh-install floors; no clean-OS/WSL execution claim."
+      "limits": "Fresh checkout and independently scoped install evidence exist. The updated installation passed offline doctor and 27 focused checks; clean Linux/macOS CI passed at 5dac7bc. The previous default and current sealed-converter live MCP attempts produced no qualified construction release. Disk headroom was adequate for the latest attempts. WSL execution is unqualified."
     },
     {
       "id": "AC-15",
